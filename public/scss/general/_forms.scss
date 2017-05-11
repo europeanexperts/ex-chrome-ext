@@ -1,0 +1,32 @@
+@import '../utilities/color';
+@import '../utilities/fonts_var';
+
+// Form elements style
+
+input[type='tel'],
+input[type='text'],
+input[type='email'],
+input[type='number'],
+input[type='search'],
+input[type='password'],
+textarea,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: .6rem 1rem;
+  border: {
+    width: .1rem;
+    style: solid;
+    color: $base-border;
+    radius: .3rem;
+  };
+  font-weight: 400;
+}
+
+textarea {
+  resize: none;
+}
+
+label {
+  font-weight: 400;
+}

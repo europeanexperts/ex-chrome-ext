@@ -1,0 +1,68 @@
+// General variables ----
+$default-fonts  : "Helvetica", Arial, sans-serif;
+$base-font-name : 'Open Sans';
+// ----------------------
+
+// Fonts path -----------
+$font-path      : '../fonts/';
+
+$base-font-data : (
+  // order of variables
+  // 'font-folder', 'font-file-name', 'font-local-1', 'font-local-2', 'font-weight'
+  1: ('opensans/', 'open-sans-regular', 'Open Sans', 'Open Sans Bold', 400),
+  2: ('opensans/', 'open-sans-bold', 'OpenSans', 'OpenSans-Bold', 700)
+);
+// ----------------------
+
+// Fonts family variables
+$base-font-size   : 62.5%; // 10px
+$base-font-family : $base-font-name, $default-fonts !default;
+
+// Typography -----------
+@function line_height($lh, $fs) { // lh - line-height, fs - font-size
+  @return $lh / $fs; // value float or integer
+}
+
+$size-body: (
+  null   : (1.6rem, line_height(20, 16)), // 'font-size', 'line-height'
+  medium : (1.6rem, line_height(22, 16))
+);
+
+$size-h1: (
+  null   : (3.2rem, line_height(40, 32), 2rem), // 'font-size', 'line-height', 'margin-value'
+  medium : (4rem, line_height(45, 40), 2.2rem),
+  xlarge : (4.8rem, line_height(50.4, 48), 2.2rem)
+);
+
+$size-h2: (
+  null   : (2.6rem, line_height(30, 26), 2rem),
+  medium : (3.2rem, line_height(40, 32), 2.2rem),
+  xlarge : 3.6rem
+);
+
+$size-h3: (
+  null   : (2.2rem, line_height(25, 22), 2rem),
+  medium : (2.4rem, line_height(30, 24), 2.2rem),
+  xlarge : 2.8rem
+);
+
+$size-h4: (
+  null   : (1.8rem, line_height(20, 18), 2rem),
+  medium : (1.8rem, line_height(22, 18), 2.2rem)
+);
+
+$size-h5: (
+  null   : (1.6rem, line_height(20, 16), 2rem),
+  medium : (1.6rem, line_height(22, 16), 2.2rem)
+);
+
+$size-h6: (
+  null   : (1.4rem, line_height(20, 14), 2rem),
+  medium : (1.4rem, line_height(22, 14), 2.2rem)
+);
+
+$size-q: (
+  null   : (2rem, line_height(25, 20)),
+  medium : (2.4rem, line_height(35, 24))
+);
+// ----------------------

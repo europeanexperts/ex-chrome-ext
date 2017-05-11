@@ -1,0 +1,270 @@
+$normalized-font-family : sans-serif !default;
+$normalize-headings     : false !default;
+
+$h1-font-size : 2em !default;
+$h2-font-size : 1.5em !default;
+$h3-font-size : 1.25em !default;
+$h4-font-size : 1em !default;
+$h5-font-size : .875em !default;
+$h6-font-size : .75em !default;
+$h1-margin    : .67em 0 !default;
+$h2-margin    : .83em 0 !default;
+$h3-margin    : 1em 0 !default;
+$h4-margin    : 1.33em 0 !default;
+$h5-margin    : 1.67em 0 !default;
+$h6-margin    : 2.33em 0 !default;
+
+$background   : #fff !default;
+$mark-bg      : #ff0 !default;
+$color        : #000 !default;
+$field-border : #c0c0c0 !default;
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+summary,
+main {
+  display: block;
+}
+
+audio,
+canvas,
+video {
+  display: inline-block;
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+[hidden],
+template {
+  display: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+html,
+button,
+input,
+select,
+textarea {
+  font-family: $normalized-font-family;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  background: transparent;
+  
+  &:focus {
+    outline: thin dotted;
+  }
+  
+  &:hover,
+  &:active {
+    outline: 0;
+  }
+}
+
+@if $normalize-headings == true {
+  h1 {
+    margin: $h1-margin;
+    font-size: $h1-font-size;
+  }
+  
+  h2 {
+    margin: $h2-margin;
+    font-size: $h2-font-size;
+  }
+  
+  h3 {
+    margin: $h3-margin;
+    font-size: $h3-font-size;
+  }
+  
+  h4 {
+    margin: $h4-margin;
+    font-size: $h4-font-size;
+  }
+  
+  h5 {
+    margin: $h5-margin;
+    font-size: $h5-font-size;
+  }
+  
+  h6 {
+    margin: $h6-margin;
+    font-size: $h6-font-size;
+  }
+}
+
+abbr[title] {
+  border-bottom: .1rem dotted;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+dfn {
+  font-style: italic;
+}
+
+mark {
+  background: $mark-bg;
+  color: $color;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font: {
+    family: monospace, serif;
+    size: 1em;
+  };
+}
+
+pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+q {
+  quotes: '\201C' '\201D' '\2018' '\2019';
+
+  &::before,
+  &::after {
+    content: '';
+    content: none;
+  }
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -.5em;
+}
+
+sub {
+  bottom: -.25em;
+}
+
+img {
+  border: 0;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+figure {
+  margin: 0;
+}
+
+fieldset {
+  margin: 0 .2rem;
+  padding: .35em .625em .75em;
+  border: .1rem solid $field-border;
+}
+
+legend {
+  padding: 0;
+  border: 0;
+  white-space: normal;
+}
+
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-family: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+button,
+input {
+  line-height: normal;
+  
+  &::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+  }
+}
+
+button,
+select {
+  text-transform: none;
+}
+
+html input[type="button"],
+input[type="reset"],
+input[type="submit"],
+button {
+  cursor: pointer;
+  -webkit-appearance: button;
+}
+
+button[disabled],
+input[disabled] {
+  cursor: default;
+}
+
+input {
+  &[type="search"] {
+    box-sizing: content-box;
+    -webkit-appearance: textfield;
+    
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-decoration {
+      -webkit-appearance: none;
+    }
+  }
+  
+  &[type="checkbox"],
+  &[type="radio"] {
+    box-sizing: border-box;
+    padding: 0;
+  }
+}
+
+textarea {
+  overflow: auto;
+  vertical-align: top;
+}
+
+table {
+  border: {
+    collapse: collapse;
+    spacing: 0;
+  };
+}

@@ -1,0 +1,38 @@
+{
+  "name": "LinkedIn parser EuEx template",
+  "version": "1.0.0",
+  "description": "CSS Template for LinkedIn parser EuEx",
+  "repository": {
+    "type": "git",
+    "url": "git+http://git.thinkmobiles.com:9000/web/LinkedIn_parser_EuEx"
+  },
+  "author": "TM Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "http://git.thinkmobiles.com:9000/web/LinkedIn_parser_EuEx/issues"
+  },
+  "devDependencies": {
+    "autoprefixer": "^6.5.1",
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-cssnano": "^2.1.0",
+    "grunt-postcss": "^0.8.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-jshint": "^2.0.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-postcss": "^6.2.0",
+    "gulp-pug": "^3.1.0",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^2.1.1",
+    "gulp-uglify": "^2.0.0",
+    "gulp-watch": "^4.3.10",
+    "jshint": "^2.9.4",
+    "jshint-stylish": "^2.2.1"
+  }
+}

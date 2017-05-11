@@ -1,0 +1,71 @@
+@import '../utilities/variables';
+@import '../utilities/placeholder';
+
+// Container wrap
+.clearfix {
+  @extend %clearFix;
+}
+
+.container {
+  @extend %container;
+  @extend %clearFix;
+  
+  &-full {
+    @extend %container;
+    @extend %clearFix;
+  }
+  
+  @media (min-width: $small-screen) {
+    max-width: $small-container;
+  }
+  
+  @media (min-width: $medium-screen) {
+    max-width: $medium-container;
+  }
+  
+  @media (min-width: $large-screen) {
+    max-width: $large-container;
+  }
+  
+  @media (min-width: $xlarge-screen) {
+    max-width: $xlarge-container;
+  }
+}
+
+.row {
+  @extend %clearFix;
+  margin-right: ($gutter-width / -2);
+  margin-left: ($gutter-width / -2);
+}
+
+.col {
+  position: relative;
+  float: left;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 1px;
+  padding-right: ($gutter-width / 2);
+  padding-left: ($gutter-width / 2);
+}
+
+@media (max-width: $small-screen-down) {
+  .container {
+    padding-right: ($gutter-width / 2.5);
+    padding-left: ($gutter-width / 2.5);
+    
+    &-full {
+      padding-right: ($gutter-width / 2.5);
+      padding-left: ($gutter-width / 2.5);
+    }
+  }
+  
+  .row {
+    margin-right: ($gutter-width / -2.5);
+    margin-left: ($gutter-width / -2.5);
+  }
+  
+  .col {
+    padding-right: ($gutter-width / 2.5);
+    padding-left: ($gutter-width / 2.5);
+  }
+}

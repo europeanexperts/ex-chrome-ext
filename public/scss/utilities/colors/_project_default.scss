@@ -1,0 +1,46 @@
+// Default --------------
+$black : #000 !default;
+$white : #fff !default;
+// -----------------------
+
+$colors-default : (
+  'blue'       : #08c,
+  'light-gray' : #bdbdbd,
+  'gray'       : #616161,
+  'dark-gray'  : #212121
+);
+
+$colors-state : (
+  'red'    : #f44336,
+  'green'  : #4caf50,
+  'blue'   : #08c,
+  'orange' : #ff9800
+);
+
+$colors : (
+  'default' : $colors-default,
+  'state'   : $colors-state
+);
+
+// usage: color("name-of-type", "name-of-color")
+// to avoid to repeating map-get($colors, ...)
+
+@function color($color, $type) {
+  @if map-has-key($colors, $color) {
+    $curr-color: map-get($colors, $color);
+    @if map-has-key($curr-color, $type) {
+      @return map-get($curr-color, $type);
+    }
+  }
+  
+  @warn "Unknown `#{$type}` in #{$color}.";
+  @return null;
+}
+
+
+// Base ------------------
+$base-bg     : $white;
+$base-text   : color('default', 'dark-gray');
+$base-link   : color('default', 'blue');
+$base-border : color('default', 'light-gray');
+// -----------------------
