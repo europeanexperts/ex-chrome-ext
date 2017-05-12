@@ -4,11 +4,7 @@
 
 // -----------------------
 
-// Header ---------------
-
-// -----------------------
-
-// Nav-bar ----------------
+// Header ----------------
 
 // -----------------------
 
@@ -16,10 +12,21 @@
 
 // -----------------------
 
-// Buttons ---------------
+// Form ------------------
+$input-border : rgba($black, .1);
+$input-bg     : color('form', 'light-gray');
+$input-text   : color('form', 'dark-gray');
+$unchecked-bg : color('form', 'gray');
+$checked-bg   : color('state', 'green');
 
+// Buttons ---------------
+$btn-text     : $white;
+$btn-red      : color('state', 'red');
+$btn-green    : color('state', 'green');
+$btn-inactive : color('state', 'light-green');
+$btn-gradient : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.2) 100%);
 // -----------------------
 
 // Tables ----------------
-
+$table-bg: color('state', 'light-blue');
 // -----------------------

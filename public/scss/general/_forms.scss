@@ -17,10 +17,15 @@ select {
   border: {
     width: .1rem;
     style: solid;
-    color: $base-border;
-    radius: .3rem;
+    color: $input-border;
+    radius: .4rem;
   };
-  font-weight: 400;
+  background: $input-bg;
+  font: {
+    weight: 400;
+    size: 1.3rem;
+  };
+  color: $input-text;
 }
 
 textarea {
@@ -28,5 +33,61 @@ textarea {
 }
 
 label {
-  font-weight: 400;
+  font: {
+    weight: 700;
+    family: Arial;
+    size: 1.1rem;
+  };
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.checkbox {
+  display: none;
+
+  &:not(:checked) + label,
+  &:checked + label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
+  &:not(:checked) + label:before,
+  &:checked + label:before {
+    position: absolute;
+    content: '';
+    display: inline-block;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    background-color: $unchecked-bg;
+  }
+
+  &:checked + label:before {
+    background-color: $checked-bg;
+  }
+
+  &:not(:checked) + label:after,
+  &:checked + label:after {
+    position: absolute;
+    content: '>';
+    top: 0;
+    left: 4px;
+    transition: all .2s;
+  }
+
+  &:not(:checked) + label:after {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  &:checked + label:after {
+    color: $white;
+    opacity: 1;
+    transform: scale(1);
+  }
 }

@@ -1,12 +1,5 @@
 @import '../utilities/color';
 
-// Tables colors - transfer into 'utilities/colors.scss' file for project
-$table-border   : $base-border;
-$table-bg       : lighten(color('default', 'light-gray'), 20%);
-$table-bg-hover : lighten(color('default', 'light-gray'), 10%);
-$table-caption  : color('default', 'gray');
-// ----------------------
-
 // Tables style
 table {
   border: {
@@ -15,150 +8,40 @@ table {
   };
 }
 
-caption {
-  padding-top: .8em;
-  padding-bottom: .8em;
-  color: $table-caption;
-  text-align: right;
-}
-
 td,
 th {
+  border: none;
   padding: .8em;
   text-align: left;
   vertical-align: middle;
-}
-
-td {
-  border-top: .1rem solid $table-border;
-}
-
-thead th {
-  border: {
-    top: .1rem solid $table-border;
-    bottom: .2rem solid $table-border;
-  };
-  vertical-align: bottom;
-}
-
-tfoot th {
-  border: {
-    top: .2rem solid $table-border;
-    bottom: .1rem solid $table-border;
-  };
 }
 
 .table {
   display: table;
   width: 100%;
   max-width: 100%;
+  font-size: 1.1rem;
 
-  // block formatting
-  &-caption {
-    display: table-caption;
-    padding-top: .8em;
-    padding-bottom: .8em;
-    color: $table-caption;
-    text-align: right;
+  tbody tr:nth-child(2n + 1) td {
+    background: $table-bg;
   }
 
   &-row {
     display: table-row;
+    height: 5rem;
   }
 
   &-cell {
     display: table-cell;
-    padding: .8em;
-    border-top: .1rem solid $table-border;
+    padding: 1rem;
   }
 
   &-head {
-    display: table-header-group;
-
     .table-cell {
-      border: {
-        top: .1rem solid $table-border;
-        bottom: .1rem solid $table-border;
-      };
-      font-weight: 700;
+      font : {
+        size: 1.2rem;
+        weight: 700;
+      }
     }
-  }
-
-  &-body {
-    display: table-row-group;
-  }
-
-  &-foot {
-    display: table-footer-group;
-
-    .table-cell {
-      border: {
-        top: .2rem solid $table-border;
-        bottom: .1rem solid $table-border;
-      };
-      font-weight: 700;
-    }
-  }
-
-  // table formatting
-  &.striped {
-    tbody tr:nth-child(2n + 1) td {
-      background: $table-bg;
-    }
-
-    .table-body .table-row:nth-child(2n + 1) .table-cell {
-      background: $table-bg;
-    }
-  }
-
-  &.bordered {
-    border: .1rem solid $table-border;
-
-    th {
-      border: {
-        right: .1rem solid $table-border;
-        left: .1rem solid $table-border;
-      };
-    }
-
-    td {
-      border: .1rem solid $table-border;
-    }
-  
-    .table-cell {
-      border-right: .1rem solid $table-border;
-    }
-  }
-
-  &.hovered {
-    tbody tr:hover td {
-      background: $table-bg-hover;
-    }
-
-    .table-body .table-row:hover .table-cell {
-      background: $table-bg-hover;
-    }
-  }
-
-  &.condensed {
-    td,
-    th,
-    .table-cell {
-      padding: .4em;
-    }
-  }
-
-  &.centered {
-    td,
-    th,
-    .table-cell {
-      text-align: center;
-    }
-  }
-
-  &-responsive {
-    width: 100%;
-    min-height: .01%;
-    overflow: auto;
   }
 }

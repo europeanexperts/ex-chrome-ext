@@ -1,37 +1,19 @@
 @import '../utilities/color';
 @import '../utilities/fonts_var';
 
-// Buttons colors - transfer into 'utilities/colors.scss' file for project
-
-$btn-text   : $white;
-$btn-red    : color('state', 'red');
-$btn-blue   : color('state', 'blue');
-$btn-green  : color('state', 'green');
-$btn-orange : color('state', 'orange');
-// ----------------------
-
 // Buttons style
-.close { // popup close button
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
 
 .btn {  // general styles for all buttons(<a>, <button>)
   position: relative;
   display: inline-block;
   margin: 0;
-  padding: .8rem 1.6rem;
-  border: 0 none {
-    width: .1rem;
-    style: solid;
-    color: transparent;
-  };
+  padding: 1rem 3rem;
+  border: 0 none;
+  border-radius: 1.4rem;
   outline: none 0;
   background-color: transparent;
-  font-family: $base-font-family;
-  font-size: 1.6rem;
+  font-family: $default-fonts;
+  font-size: 1.1rem;
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -44,94 +26,35 @@ $btn-orange : color('state', 'orange');
   user-select: none;
 
   &.red {
-    border-color: $btn-red;
-    background-color: $btn-red;
-    color: $white;
+    background : {
+      color: $btn-red;
+      image: $btn-gradient;
+    };
+    color: $btn-text;
 
     &:hover {
-      border-color: lighten($btn-red, 10%);
       background-color: lighten($btn-red, 10%);
     }
   }
 
-  &.blue {
-    border-color: $btn-blue;
-    background-color: $btn-blue;
-    color: $white;
-
-    &:hover {
-      border-color: lighten($btn-blue, 10%);
-      background-color: lighten($btn-blue, 10%);
-    }
-  }
-
   &.green {
-    border-color: $btn-green;
-    background-color: $btn-green;
-    color: $white;
+    background : {
+      color: $btn-green;
+      image: $btn-gradient;
+    };
+    color: $btn-text;
 
     &:hover {
-      border-color: lighten($btn-green, 10%);
       background-color: lighten($btn-green, 10%);
     }
   }
 
-  &.orange {
-    border-color: $btn-orange;
-    background-color: $btn-orange;
-    color: $white;
-
-    &:hover {
-      border-color: lighten($btn-orange, 10%);
-      background-color: lighten($btn-orange, 10%);
-    }
+  &.big {
+    padding: 1.7rem 5.3rem;
+    border-radius: 2rem;
   }
 
-  &.bordered {
-    background-color: transparent;
-
-    &.red {
-      color: $btn-red;
-
-      &:hover {
-        border-color: $btn-red;
-        background-color: $btn-red;
-        color: $white;
-      }
-    }
-
-    &.blue {
-      color: $btn-blue;
-
-      &:hover {
-        border-color: $btn-blue;
-        background-color: $btn-blue;
-        color: $white;
-      }
-    }
-
-    &.green {
-      color: $btn-green;
-
-      &:hover {
-        border-color: $btn-green;
-        background-color: $btn-green;
-        color: $white;
-      }
-    }
-
-    &.orange {
-      color: $btn-orange;
-
-      &:hover {
-        border-color: $btn-orange;
-        background-color: $btn-orange;
-        color: $white;
-      }
-    }
-  }
-
-  &.rounded {
-    border-radius: .5rem;
+  &.inactive {
+    background-color: $btn-inactive;
   }
 }
