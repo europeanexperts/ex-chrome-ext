@@ -168,7 +168,9 @@ input[type="checkbox"], input[type="radio"] {
   box-sizing: border-box;
   padding: 0; }
 
-input:focus, input:active,
+textarea:focus, textarea:active,
+input:focus,
+input:active,
 button:focus,
 button:active {
   outline: 0; }
@@ -416,11 +418,13 @@ html {
   background: #434343; }
   .wrapper .extension-body {
     width: 76.8rem;
+    height: 66rem;
     margin: 0 auto;
     border-radius: .6rem;
     background: #fff; }
     .wrapper .extension-body.log-in {
-      width: 38.4rem; }
+      width: 38.4rem;
+      height: auto; }
 
 input[type='tel'],
 input[type='text'],
@@ -443,6 +447,9 @@ select {
   font-weight: 400; }
 
 textarea {
+  height: 6.5em;
+  color: #2c6cda;
+  text-decoration: underline;
   resize: none; }
 
 label {
@@ -475,16 +482,16 @@ label {
     background-color: #d2d2d2; }
   .checkbox:checked + label:before {
     background-color: #38a898; }
-  .checkbox:not(:checked) + label span,
-  .checkbox:checked + label span {
+  .checkbox:not(:checked) + label .check,
+  .checkbox:checked + label .check {
     position: absolute;
     top: 0;
     left: .5rem;
     transition: all .2s; }
-  .checkbox:not(:checked) + label span {
+  .checkbox:not(:checked) + label .check {
     opacity: 0;
     transform: scale(0); }
-  .checkbox:checked + label span {
+  .checkbox:checked + label .check {
     color: #fff;
     opacity: 1;
     transform: scale(1); }
@@ -497,6 +504,9 @@ label {
   margin-bottom: 2rem; }
   .input-field input {
     height: 4.5rem; }
+  .input-field .checkbox-label {
+    padding-left: 2.8rem;
+    line-height: 1.8rem; }
 
 .search-field {
   position: relative;
@@ -540,18 +550,29 @@ label {
     background-color: #e97660;
     background-image: linear-gradient(to top, rgba(0, 0, 0, 0.2) 0%, rgba(255, 255, 255, 0.2) 100%);
     color: #fff; }
+    .btn.red:hover {
+      background-color: #e34f33; }
   .btn.green {
     background-color: #38a898;
     background-image: linear-gradient(to top, rgba(0, 0, 0, 0.2) 0%, rgba(255, 255, 255, 0.2) 100%);
     color: #fff; }
+    .btn.green:hover {
+      background-color: #2b8275; }
   .btn.big {
-    padding: 1.5rem 5.3rem;
+    padding: 1.5rem 3.6rem;
     border-radius: 2rem; }
   .btn.inactive {
-    background-color: #b7dcd5; }
+    background-color: #b7dcd5;
+    pointer-events: none; }
+
+.log-in .btn.big {
+  padding: 1.5rem 5.3rem; }
 
 .btn-group {
   overflow: hidden; }
+  .btn-group svg {
+    margin-right: .3rem;
+    vertical-align: baseline; }
   .btn-group .left-side {
     float: left;
     font-size: 0; }
@@ -704,6 +725,26 @@ th {
   .icon-up {
     width: 1rem;
     height: 1rem; }
+  .icon-pause {
+    width: .9rem;
+    height: .9rem; }
+
+::-webkit-scrollbar {
+  position: absolute;
+  right: 2rem;
+  width: .6rem;
+  border-radius: .3rem; }
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.15); }
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.15); }
+
+::-webkit-scrollbar-track {
+  border-radius: .2rem;
+  background-color: rgba(0, 0, 0, 0.07); }
 
 .main-header {
   display: flex;
@@ -747,8 +788,10 @@ th {
   margin: 0 1.5rem; }
 
 .main-content {
-  height: 55rem;
-  padding: 2rem 3.6rem 6rem 1.5rem; }
+  height: 53.5rem;
+  margin: 0 1.5rem 1.5rem 0;
+  padding: 2rem 2.1rem 6rem 1.5rem;
+  overflow-y: auto; }
   .main-content .forgot-password {
     display: block;
     margin-bottom: 3rem;
@@ -770,8 +813,19 @@ th {
     display: flex;
     justify-content: space-between;
     padding-bottom: 2rem; }
+  .main-content.settings {
+    padding-bottom: 2rem; }
+    .main-content.settings .input-field {
+      width: 50%; }
+      .main-content.settings .input-field.textarea-wrap {
+        width: 100%; }
+    .main-content.settings .btn {
+      display: block;
+      margin-top: 3rem; }
 
 .log-in .main-content {
+  height: auto;
+  margin: 0;
   padding: 3rem 1.5rem 6rem; }
 
 .info-block .info-field {

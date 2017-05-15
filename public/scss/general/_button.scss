@@ -33,7 +33,7 @@
     color: $btn-text;
 
     &:hover {
-      //background-color: lighten($btn-red, 10%);
+      background-color: darken($btn-red, 10%);
     }
   }
 
@@ -45,23 +45,36 @@
     color: $btn-text;
 
     &:hover {
-      //background-color: lighten($btn-green, 10%);
+      background-color: darken($btn-green, 10%);
     }
   }
 
   &.big {
-    padding: 1.5rem 5.3rem;
+    padding: 1.5rem 3.6rem;
     border-radius: 2rem;
   }
 
   &.inactive {
     background-color: $btn-inactive;
+    pointer-events: none;
   }
+}
 
+.log-in {
+  .btn {
+    &.big {
+      padding: 1.5rem 5.3rem;
+    }
+  }
 }
 
 .btn-group {
   overflow: hidden;
+
+  svg {
+    margin-right: .3rem;
+    vertical-align: baseline;
+  }
 
   .left-side {
     float: left;

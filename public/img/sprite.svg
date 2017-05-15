@@ -30,5 +30,8 @@
         <symbol id="icon-up" viewBox="0 0 32 32">
             <path fill="#33a292" d="M11.2 32h9.6v-19.2h6.4l-11.2-12.8-11.2 12.8h6.4z"></path>
         </symbol>
+        <symbol id="icon-pause" viewBox="0 0 29 32">
+            <path fill="#fff" d="M0 32v-32h8.727v32zM20.364 32v-32h8.727v32z"></path>
+        </symbol>
     </defs>
 </svg>
