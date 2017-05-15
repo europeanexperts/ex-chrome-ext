@@ -1,1 +1,49 @@
-// Header block style
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 3.6rem 0 1.5rem;
+  padding: 1.3rem 0;
+  border-bottom: 1px solid $base-border;
+
+  .heading-block {
+    display: flex;
+  }
+
+  .heading {
+    margin: 0;
+    font-family: $default-fonts;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 2.2rem;
+    text-transform: uppercase;
+  }
+
+  .btn-prev {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-right: 2rem;
+    padding-right: 1rem;
+    border-right: 1px solid $base-border;
+    cursor: pointer;
+  }
+
+  .log-out-btn {
+    cursor: pointer;
+
+    span {
+      margin-right: 1rem;
+      color: $btn-green;
+      font-family: $default-fonts;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 2.2rem;
+    }
+  }
+}
+
+.log-in {
+  .main-header {
+    margin: 0 1.5rem;
+  }
+}

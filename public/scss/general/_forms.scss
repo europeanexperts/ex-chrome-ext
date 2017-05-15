@@ -21,11 +21,11 @@ select {
     radius: .4rem;
   };
   background: $input-bg;
-  font: {
-    weight: 400;
-    size: 1.3rem;
-  };
   color: $input-text;
+  font: {
+    size: 1.3rem;
+    weight: 400;
+  };
 }
 
 textarea {
@@ -33,12 +33,14 @@ textarea {
 }
 
 label {
+  display: block;
+  margin-bottom: .8rem;
   font: {
-    weight: 700;
-    family: Arial;
+    family: $default-fonts;
     size: 1.1rem;
+    weight: 700;
   };
-  line-height: 16px;
+  line-height: 1.6rem;
   text-transform: uppercase;
 }
 
@@ -48,7 +50,6 @@ label {
   &:not(:checked) + label,
   &:checked + label {
     position: relative;
-    padding-left: 30px;
     cursor: pointer;
     vertical-align: middle;
   }
@@ -61,9 +62,9 @@ label {
     top: 0;
     left: 0;
     box-sizing: border-box;
-    width: 18px;
-    height: 18px;
-    border-radius: 2px;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: .2rem;
     background-color: $unchecked-bg;
   }
 
@@ -71,23 +72,37 @@ label {
     background-color: $checked-bg;
   }
 
-  &:not(:checked) + label:after,
-  &:checked + label:after {
+  &:not(:checked) + label span,
+  &:checked + label span {
     position: absolute;
-    content: '>';
     top: 0;
-    left: 4px;
+    left: .5rem;
     transition: all .2s;
   }
 
-  &:not(:checked) + label:after {
+  &:not(:checked) + label span {
     opacity: 0;
     transform: scale(0);
   }
 
-  &:checked + label:after {
+  &:checked + label span {
     color: $white;
     opacity: 1;
     transform: scale(1);
+  }
+
+  &-wrap {
+    label {
+      height: 1.8rem;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.input-field {
+  margin-bottom: 2rem;
+
+  input {
+    height: 4.5rem;
   }
 }

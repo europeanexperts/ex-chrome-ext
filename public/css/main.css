@@ -168,6 +168,11 @@ input[type="checkbox"], input[type="radio"] {
   box-sizing: border-box;
   padding: 0; }
 
+input:focus, input:active,
+button:focus,
+button:active {
+  outline: 0; }
+
 textarea {
   overflow: auto;
   vertical-align: top; }
@@ -180,6 +185,11 @@ html,
 body {
   margin: 0;
   padding: 0; }
+
+.table tbody td {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
 
 * {
   box-sizing: border-box; }
@@ -389,26 +399,22 @@ blockquote {
 
 html {
   position: relative;
-  min-height: 100%; }
+  min-height: 100%;
+  background: #434343; }
   html body {
     height: 100%;
-    min-height: .1rem;
-    margin-bottom: 6rem; }
-  @media (min-width: 544px) {
-    html body {
-      margin-bottom: 6rem; } }
-  @media (min-width: 768px) {
-    html body {
-      margin-bottom: 6rem; } }
-  @media (min-width: 1024px) {
-    html body {
-      margin-bottom: 6rem; } }
-  @media (min-width: 1200px) {
-    html body {
-      margin-bottom: 6rem; } }
+    min-height: .1rem; }
 
 .wrapper {
-  width: 100%; }
+  width: 100%;
+  background: #434343; }
+  .wrapper .extension-body {
+    width: 76.8rem;
+    margin: 0 auto;
+    border-radius: .6rem;
+    background: #fff; }
+    .wrapper .extension-body.log-in {
+      width: 38.4rem; }
 
 input[type='tel'],
 input[type='text'],
@@ -426,18 +432,20 @@ select {
   border-color: rgba(0, 0, 0, 0.1);
   border-radius: .4rem;
   background: #f6f6f6;
-  font-weight: 400;
+  color: #5d5d5d;
   font-size: 1.3rem;
-  color: #5d5d5d; }
+  font-weight: 400; }
 
 textarea {
   resize: none; }
 
 label {
-  font-weight: 700;
-  font-family: Arial;
+  display: block;
+  margin-bottom: .8rem;
+  font-family: Arial, "Helvetica", sans-serif;
   font-size: 1.1rem;
-  line-height: 16px;
+  font-weight: 700;
+  line-height: 1.6rem;
   text-transform: uppercase; }
 
 .checkbox {
@@ -445,7 +453,6 @@ label {
   .checkbox:not(:checked) + label,
   .checkbox:checked + label {
     position: relative;
-    padding-left: 30px;
     cursor: pointer;
     vertical-align: middle; }
   .checkbox:not(:checked) + label:before,
@@ -456,26 +463,33 @@ label {
     top: 0;
     left: 0;
     box-sizing: border-box;
-    width: 18px;
-    height: 18px;
-    border-radius: 2px;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: .2rem;
     background-color: #d2d2d2; }
   .checkbox:checked + label:before {
     background-color: #38a898; }
-  .checkbox:not(:checked) + label:after,
-  .checkbox:checked + label:after {
+  .checkbox:not(:checked) + label span,
+  .checkbox:checked + label span {
     position: absolute;
-    content: '>';
     top: 0;
-    left: 4px;
+    left: .5rem;
     transition: all .2s; }
-  .checkbox:not(:checked) + label:after {
+  .checkbox:not(:checked) + label span {
     opacity: 0;
     transform: scale(0); }
-  .checkbox:checked + label:after {
+  .checkbox:checked + label span {
     color: #fff;
     opacity: 1;
     transform: scale(1); }
+  .checkbox-wrap label {
+    height: 1.8rem;
+    margin-bottom: 0; }
+
+.input-field {
+  margin-bottom: 2rem; }
+  .input-field input {
+    height: 4.5rem; }
 
 .btn {
   position: relative;
@@ -511,10 +525,12 @@ label {
     .btn.green:hover {
       background-color: #4fc4b3; }
   .btn.big {
-    padding: 1.7rem 5.3rem;
+    padding: 1.5rem 5.3rem;
     border-radius: 2rem; }
   .btn.inactive {
     background-color: #b7dcd5; }
+  .btn.delete {
+    float: right; }
 
 table {
   border-collapse: collapse;
@@ -522,8 +538,7 @@ table {
 
 td,
 th {
-  border: none;
-  padding: .8em;
+  border: 0;
   text-align: left;
   vertical-align: middle; }
 
@@ -531,37 +546,162 @@ th {
   display: table;
   width: 100%;
   max-width: 100%;
-  font-size: 1.1rem; }
-  .table tbody tr:nth-child(2n + 1) td {
-    background: #f4f7f9; }
-  .table-row {
-    display: table-row;
-    height: 5rem; }
-  .table-cell {
-    display: table-cell;
-    padding: 1rem; }
-  .table-head .table-cell {
+  font-size: 1.1rem;
+  table-layout: fixed; }
+  .table thead th {
+    height: auto;
+    padding: 1rem;
     font-size: 1.2rem;
     font-weight: 700; }
+  .table tbody tr:nth-child(2n + 1) td {
+    background: #f4f7f9; }
+  .table tbody tr {
+    height: 5rem; }
+  .table tbody td {
+    padding: 1rem; }
+    .table tbody td:first-child {
+      border-radius: .2rem 0 0 .2rem; }
+    .table tbody td:last-child {
+      border-radius: 0 .2rem .2rem 0; }
+  .table tbody .cell-name {
+    font-family: Arial, "Helvetica", sans-serif;
+    font-weight: 900;
+    text-transform: uppercase; }
+  .table .avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: .4rem;
+    background-color: #c9caa8;
+    color: #fff;
+    font-family: Arial, "Helvetica", sans-serif;
+    font-weight: 900;
+    line-height: 3rem;
+    text-align: center;
+    text-transform: uppercase; }
+  .table .cell-checkbox {
+    width: 3rem; }
+  .table .cell-avatar {
+    width: 5rem; }
+  .table .cell-name {
+    width: 100%; }
+  .table .cell-region {
+    width: 19rem; }
+  .table .cell-profiles {
+    width: 7rem; }
+  .table .cell-settings, .table .cell-delete {
+    width: 4rem; }
+    .table .cell-settings svg, .table .cell-delete svg {
+      cursor: pointer; }
+
+.icon {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-content: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  font-size: 3rem;
+  line-height: 100%;
+  text-align: center;
+  overflow: hidden;
+  vertical-align: middle; }
+  .icon-svg {
+    display: inline-flex;
+    width: 100%;
+    height: 100%; }
+    .icon-svg-reference {
+      width: 100%;
+      height: 100%;
+      fill: currentColor; }
+  .icon-arrow-left {
+    width: 1.8rem;
+    height: 1.8rem; }
+  .icon-check {
+    width: .8rem;
+    height: .8rem; }
+  .icon-delete {
+    width: 1.4rem;
+    height: 1.4rem; }
+  .icon-export {
+    width: 1.4rem;
+    height: 1.3rem; }
+  .icon-import {
+    width: 1.4rem;
+    height: 1.3rem; }
+  .icon-log-out {
+    width: 1.9rem;
+    height: 1.9rem; }
+  .icon-search {
+    width: 1rem;
+    height: 1rem; }
+  .icon-settings {
+    width: 1.8rem;
+    height: 1.8rem; }
+  .icon-start {
+    width: 1rem;
+    height: 1.1rem; }
+  .icon-up {
+    width: .7rem;
+    height: 1rem; }
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 3.6rem 0 1.5rem;
+  padding: 1.3rem 0;
+  border-bottom: 1px solid #e4e4e4; }
+  .main-header .heading-block {
+    display: flex; }
+  .main-header .heading {
+    margin: 0;
+    font-family: Arial, "Helvetica", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 2.2rem;
+    text-transform: uppercase; }
+  .main-header .btn-prev {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-right: 2rem;
+    padding-right: 1rem;
+    border-right: 1px solid #e4e4e4;
+    cursor: pointer; }
+  .main-header .log-out-btn {
+    cursor: pointer; }
+    .main-header .log-out-btn span {
+      margin-right: 1rem;
+      color: #38a898;
+      font-family: Arial, "Helvetica", sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 2.2rem; }
+
+.log-in .main-header {
+  margin: 0 1.5rem; }
+
+.main-content {
+  height: 55rem;
+  padding: 2rem 3.6rem 6rem 1.5rem; }
+  .main-content .forgot-password {
+    display: block;
+    margin-bottom: 3rem;
+    color: #38a898;
+    font-family: Arial, "Helvetica", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase; }
+  .main-content .top-panel {
+    padding-bottom: 2rem; }
+
+.log-in .main-content {
+  padding: 3rem 1.5rem 6rem; }
 
 .main-footer {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  min-height: 6rem; }
-  @media (min-width: 544px) {
-    .main-footer {
-      min-height: 6rem; } }
-  @media (min-width: 768px) {
-    .main-footer {
-      min-height: 6rem; } }
-  @media (min-width: 1024px) {
-    .main-footer {
-      min-height: 6rem; } }
-  @media (min-width: 1200px) {
-    .main-footer {
-      min-height: 6rem; } }
+  padding: 1.4rem 1.5rem;
+  border-top: 0.1rem solid #e4e4e4;
+  overflow: hidden; }
 
 .hide {
   display: none !important; }

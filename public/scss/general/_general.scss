@@ -5,39 +5,52 @@
 html {
   position: relative;
   min-height: 100%;
+  background: #434343; // TODO test
 
   body {
     height: 100%;
     min-height: .1rem;
-    margin-bottom: var('footer-height', 'xsmall');
+    //margin-bottom: var('footer-height', 'xsmall');
   }
-
-  @media (min-width: $small-screen) {
-    body {
-      margin-bottom: var('footer-height', 'small');
-    }
-  }
-
-  @media (min-width: $medium-screen) {
-    body {
-      margin-bottom: var('footer-height', 'medium');
-    }
-  }
-
-  @media (min-width: $large-screen) {
-    body {
-      margin-bottom: var('footer-height', 'large');
-    }
-  }
-  
-  @media (min-width: $xlarge-screen) {
-    body {
-      margin-bottom: var('footer-height', 'xlarge');
-    }
-  }
+  //
+  //@media (min-width: $small-screen) {
+  //  body {
+  //    margin-bottom: var('footer-height', 'small');
+  //  }
+  //}
+  //
+  //@media (min-width: $medium-screen) {
+  //  body {
+  //    margin-bottom: var('footer-height', 'medium');
+  //  }
+  //}
+  //
+  //@media (min-width: $large-screen) {
+  //  body {
+  //    margin-bottom: var('footer-height', 'large');
+  //  }
+  //}
+  //
+  //@media (min-width: $xlarge-screen) {
+  //  body {
+  //    margin-bottom: var('footer-height', 'xlarge');
+  //  }
+  //}
 }
 
 // General classes for project
 .wrapper {
   width: 100%;
+  background: #434343; // TODO test
+
+  .extension-body {
+    width: 76.8rem;
+    margin: 0 auto;
+    border-radius: .6rem;
+    background: $base-bg;
+
+    &.log-in {
+      width: 38.4rem;
+    }
+  }
 }

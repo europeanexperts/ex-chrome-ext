@@ -1,1 +1,24 @@
-// Style for project content
+.main-content {
+  height: 55rem;
+  padding: 2rem 3.6rem 6rem 1.5rem;
+
+  .forgot-password {
+    display: block;
+    margin-bottom: 3rem;
+    color: $btn-green;
+    font-family: $default-fonts;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .top-panel {
+    padding-bottom: 2rem;
+  }
+}
+
+.log-in {
+  .main-content {
+    padding: 3rem 1.5rem 6rem;
+  }
+}

@@ -10,8 +10,7 @@ table {
 
 td,
 th {
-  border: none;
-  padding: .8em;
+  border: 0;
   text-align: left;
   vertical-align: middle;
 }
@@ -21,26 +20,91 @@ th {
   width: 100%;
   max-width: 100%;
   font-size: 1.1rem;
+  table-layout: fixed;
 
-  tbody tr:nth-child(2n + 1) td {
-    background: $table-bg;
-  }
-
-  &-row {
-    display: table-row;
-    height: 5rem;
-  }
-
-  &-cell {
-    display: table-cell;
-    padding: 1rem;
-  }
-
-  &-head {
-    .table-cell {
-      font : {
+  thead {
+    th {
+      height: auto;
+      padding: 1rem;
+      font: {
         size: 1.2rem;
         weight: 700;
+      }
+    }
+  }
+
+  tbody {
+    tr:nth-child(2n + 1) {
+      td {
+        background: $table-bg;
+      }
+    }
+
+    tr {
+      height: 5rem;
+    }
+
+    td {
+      @extend %textOverflow;
+      padding: 1rem;
+
+      &:first-child {
+        border-radius: .2rem 0 0 .2rem;
+      }
+
+      &:last-child {
+        border-radius: 0 .2rem .2rem 0;
+      }
+    }
+
+    .cell-name {
+      font-family: $default-fonts;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+  }
+
+  .avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: .4rem;
+    background-color: #c9caa8;
+    color: $white;
+    font-family: $default-fonts;
+    font-weight: 900;
+    line-height: 3rem;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .cell {
+
+    &-checkbox {
+      width: 3rem;
+    }
+
+    &-avatar {
+      width: 5rem;
+    }
+
+    &-name {
+      width: 100%;
+    }
+
+    &-region {
+      width: 19rem;
+    }
+
+    &-profiles {
+      width: 7rem;
+    }
+
+    &-settings,
+    &-delete {
+      width: 4rem;
+
+      svg {
+        cursor: pointer;
       }
     }
   }
