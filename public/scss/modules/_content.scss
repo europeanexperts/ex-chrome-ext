@@ -15,10 +15,76 @@
   .top-panel {
     padding-bottom: 2rem;
   }
+
+  .info-panel {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 2rem;
+  }
 }
 
 .log-in {
   .main-content {
     padding: 3rem 1.5rem 6rem;
+  }
+}
+
+.info-block {
+  .info-field {
+    display: flex;
+    font-size: 1.2rem;
+    line-height: 2;
+
+    .term {
+      width: 6rem;
+      color: $light-text;
+    }
+
+    .definition {
+      font-weight: 700;
+    }
+  }
+}
+
+.counter {
+  display: flex;
+
+  .count-item {
+    position: relative;
+    padding: 0 2rem;
+    text-align: center;
+
+    span {
+      display: block;
+    }
+
+    &::before {
+      position: absolute;
+      content: '';
+      top: 50%;
+      left: 0;
+      width: .1rem;
+      height: 2.6rem;
+      background: $base-border;
+      transform: translate(0, -50%);
+    }
+
+    &:first-child {
+      &::before {
+        display: none;
+      }
+    }
+
+    .number {
+      margin-bottom: .7rem;
+      font-family: $default-fonts;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .caption {
+      color: $light-text;
+      font-size: 1.2rem;
+    }
   }
 }

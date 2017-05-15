@@ -33,7 +33,7 @@
     color: $btn-text;
 
     &:hover {
-      background-color: lighten($btn-red, 10%);
+      //background-color: lighten($btn-red, 10%);
     }
   }
 
@@ -45,7 +45,7 @@
     color: $btn-text;
 
     &:hover {
-      background-color: lighten($btn-green, 10%);
+      //background-color: lighten($btn-green, 10%);
     }
   }
 
@@ -57,8 +57,27 @@
   &.inactive {
     background-color: $btn-inactive;
   }
-  
-  &.delete {
+
+}
+
+.btn-group {
+  overflow: hidden;
+
+  .left-side {
+    float: left;
+    font-size: 0;
+
+    .btn {
+      margin-right: 1rem;
+    }
+  }
+
+  .right-side {
     float: right;
+    font-size: 0;
+
+    .btn {
+      margin-left: 1rem;
+    }
   }
 }

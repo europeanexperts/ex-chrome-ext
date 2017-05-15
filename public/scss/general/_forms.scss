@@ -93,6 +93,7 @@ label {
 
   &-wrap {
     label {
+      width: 1.8rem;
       height: 1.8rem;
       margin-bottom: 0;
     }
@@ -104,5 +105,27 @@ label {
 
   input {
     height: 4.5rem;
+  }
+}
+
+.search-field {
+  position: relative;
+  display: inline-block;
+
+  input {
+    width: 16rem;
+    padding: .5rem 3rem .5rem 1rem;
+    border: 1px solid $base-border;
+    border-radius: 1.2rem;
+    background-color: $base-bg;
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    padding: 0;
+    transform: translate(0, -50%);
   }
 }

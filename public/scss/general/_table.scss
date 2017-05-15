@@ -20,7 +20,7 @@ th {
   width: 100%;
   max-width: 100%;
   font-size: 1.1rem;
-  table-layout: fixed;
+  //table-layout: fixed;
 
   thead {
     th {
@@ -29,6 +29,16 @@ th {
       font: {
         size: 1.2rem;
         weight: 700;
+      }
+    }
+
+    .cell-date {
+      a {
+        color: $btn-green;
+      }
+
+      svg {
+        vertical-align: baseline;
       }
     }
   }
@@ -80,7 +90,8 @@ th {
   .cell {
 
     &-checkbox {
-      width: 3rem;
+      width: 2.8rem;
+      padding-right: 0;
     }
 
     &-avatar {
@@ -88,7 +99,7 @@ th {
     }
 
     &-name {
-      width: 100%;
+      padding-left: 0;
     }
 
     &-region {
@@ -106,6 +117,38 @@ th {
       svg {
         cursor: pointer;
       }
+    }
+
+    &-job {
+      width: 12rem;
+    }
+
+    &-date {
+      width: 9rem;
+    }
+
+    &-status {
+      width: 9rem;
+    }
+
+    &-action {
+      width: 9rem;
+
+      a {
+        color: $btn-green;
+        font-family: $default-fonts;
+        font-weight: 700;
+        text-transform: uppercase;
+
+        span {
+          margin-left: .3rem;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &-search {
+      padding-left: 0;
     }
   }
 }
