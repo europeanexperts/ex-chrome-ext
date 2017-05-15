@@ -4,12 +4,10 @@
 $light-text   : color('default', 'gray');
 // -----------------------
 
-// Header ----------------
-
-// -----------------------
-
-// Footer ----------------
-
+// Scroll ----------------
+$scrollbar-thumb: rgba($black, .15);
+$scrollbar-thumb-hover: rgba($black, .25);
+$scrollbar-track: rgba($black, .07);
 // -----------------------
 
 // Form ------------------
@@ -29,4 +27,5 @@ $btn-gradient : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.2) 
 
 // Tables ----------------
 $table-bg: color('state', 'light-blue');
+$avatar-bg: color('state', 'brown');
 // -----------------------

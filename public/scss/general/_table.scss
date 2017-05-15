@@ -68,7 +68,7 @@ th {
     }
 
     .cell-name {
-      font-family: $default-fonts;
+      font-family: $second-font-name;
       font-weight: 900;
       text-transform: uppercase;
     }
@@ -78,9 +78,9 @@ th {
     width: 3rem;
     height: 3rem;
     border-radius: .4rem;
-    background-color: #c9caa8;
+    background-color: $avatar-bg;
     color: $white;
-    font-family: $default-fonts;
+    font-family: $second-font-name;
     font-weight: 900;
     line-height: 3rem;
     text-align: center;
@@ -136,7 +136,7 @@ th {
 
       a {
         color: $btn-green;
-        font-family: $default-fonts;
+        font-family: $second-font-name;
         font-weight: 700;
         text-transform: uppercase;
 
