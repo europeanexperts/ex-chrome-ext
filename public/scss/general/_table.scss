@@ -151,4 +151,16 @@ th {
       padding-left: 0;
     }
   }
+
+  &.import {
+
+    .cell-job,
+    .cell-region {
+      width: 20rem;
+    }
+
+    .cell-profiles {
+      width: 15rem;
+    }
+  }
 }
