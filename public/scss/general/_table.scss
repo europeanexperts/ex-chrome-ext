@@ -67,6 +67,7 @@ th {
       }
     }
 
+    .cell-job-name,
     .cell-name {
       font-family: $second-font-name;
       font-weight: 900;
@@ -99,11 +100,19 @@ th {
     }
 
     &-name {
+      width: 20.3rem;
+      max-width: 20.3rem;
       padding-left: 0;
+    }
+
+    &-job-name {
+      width: 29.9rem;
+      max-width: 29.9rem;
     }
 
     &-region {
       width: 19rem;
+      max-width: 19rem;
     }
 
     &-profiles {
@@ -121,6 +130,7 @@ th {
 
     &-job {
       width: 12rem;
+      max-width: 12rem;
     }
 
     &-date {
@@ -157,10 +167,22 @@ th {
     .cell-job,
     .cell-region {
       width: 20rem;
+      max-width: 20rem;
     }
 
     .cell-profiles {
       width: 15rem;
+      max-width: 15rem;
+    }
+
+    .cell-name {
+      width: 26.1rem;
+      max-width: 26.1rem;
+    }
+
+    .cell-job-name {
+      width: 28.3rem;
+      max-width: 28.3rem;
     }
   }
 }

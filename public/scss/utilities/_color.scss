@@ -5,27 +5,29 @@ $light-text   : color('default', 'gray');
 // -----------------------
 
 // Scroll ----------------
-$scrollbar-thumb: rgba($black, .15);
+$scrollbar-thumb      : rgba($black, .15);
 $scrollbar-thumb-hover: rgba($black, .25);
-$scrollbar-track: rgba($black, .07);
+$scrollbar-track      : rgba($black, .07);
 // -----------------------
 
 // Form ------------------
-$input-border : rgba($black, .1);
-$input-bg     : color('form', 'light-gray');
-$input-text   : color('form', 'dark-gray');
-$unchecked-bg : color('form', 'gray');
-$checked-bg   : color('state', 'green');
+$input-border    : rgba($black, .1);
+$input-bg        : color('form', 'light-gray');
+$input-text      : color('form', 'dark-gray');
+$unchecked-bg    : color('form', 'gray');
+$checked-bg      : color('state', 'green');
 
 // Buttons ---------------
-$btn-text     : $white;
-$btn-red      : color('state', 'red');
-$btn-green    : color('state', 'green');
-$btn-inactive : color('state', 'light-green');
-$btn-gradient : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.2) 100%);
+$btn-text        : $white;
+$btn-red         : color('state', 'red');
+$btn-red-hover   : color('state', 'dark-red');
+$btn-green       : color('state', 'green');
+$btn-green-hover : color('state', 'dark-green');
+$btn-inactive    : color('state', 'light-green');
+$btn-gradient    : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.2) 100%);
 // -----------------------
 
 // Tables ----------------
-$table-bg: color('state', 'light-blue');
-$avatar-bg: color('state', 'brown');
+$table-bg  : color('state', 'light-blue');
+$avatar-bg : color('state', 'brown');
 // -----------------------

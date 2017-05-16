@@ -33,7 +33,7 @@
     color: $btn-text;
 
     &:hover {
-      background-color: darken($btn-red, 10%);
+      background-color: $btn-red-hover;
     }
   }
 
@@ -45,7 +45,7 @@
     color: $btn-text;
 
     &:hover {
-      background-color: darken($btn-green, 10%);
+      background-color: $btn-green-hover;
     }
   }
 
