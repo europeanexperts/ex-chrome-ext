@@ -112,6 +112,7 @@
                 data.id = now.valueOf();
                 jobs.push(data);
             } else {
+                data.id = parseInt(data.id, 10);
                 job = jobs.find(function (item) {
                     return item.id === data.id;
                 });

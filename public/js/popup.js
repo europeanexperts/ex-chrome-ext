@@ -221,7 +221,10 @@
         },
 
         onUpdateItem: function (e, data) {
-            console.log('>>> on update item', data);
+            var $tr = this.$list.find('.item[data-id=' + data.id + ']');
+
+            $tr.find('.jobLanguage').html(data.language);
+            $tr.find('.jobRegion').html(data.region);
         },
 
         onSettingsClick: function (e) {
@@ -234,6 +237,10 @@
             EXT_API.fetchJob(data, function (err, jobData) {
                 if (err) {
                     return APP.error(err);
+                }
+
+                if (!jobData || !jobData.id) {
+                    return APP.notification({message: 'The job was not found'});
                 }
 
                 jobData.id = id;
@@ -328,8 +335,8 @@
                     '<td class="cell-avatar">',
                     '  <div class="avatar">' + item.avatar || '' + '</div>',
                     '</td>',
-                    '<td class="cell-job-name">' + item.language + '</td>',
-                    '<td class="cell-region">' + item.region + '</td>',
+                    '<td class="jobLanguage cell-job-name">' + item.language + '</td>',
+                    '<td class="jobRegion cell-region">' + item.region + '</td>',
                     '<td class="cell-cell-profiles">' + item.profiles || 0 + '</td>',
                     '<td class="cell-settings">',
                     '  <svg class="editJobBtn icon icon-settings">',
