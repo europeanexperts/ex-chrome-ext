@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+    <title>Chrome Extension</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <!--[if lt IE 9]-->
+    <script src="/js/libs/html5shiv/dist/html5shiv.min.js"></script>
+    <script src="/js/libs/respond/dest/respond.min.js"></script>
+    <!--[endif]-->
+
+    <style>
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+
+        <!--<div class="extension-body log-in">-->
+        <div class="extensionBody extension-body">
+            <header class="main-header">
+                <div class="heading-block">
+                    <div class="prevBtn btn-prev">
+                        <svg class="icon icon-arrow-left">
+                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-arrow-left"></use>
+                        </svg>
+                    </div>
+                    <h1 class="heading"><!--title here--></h1>
+                </div>
+                <div class="logoutBtn log-out-btn hide">
+                    <span>Log out</span>
+                    <svg class="icon icon-log-out">
+                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-log-out"></use>
+                    </svg>
+                </div>
+            </header>
+            <main class="main-content">
+
+                <!-- Login page -->
+                <div class="page" data-name="login" data-title="Log In">
+                    <form>
+                        <div class="input-field">
+                            <label for="email">Email</label>
+                            <input type="text" id="email" name="email">
+                        </div>
+                        <div class="input-field">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password">
+                        </div>
+                        <a href="#" class="link forgot-password">Forgot Password?</a>
+                        <!--<input class="btn green big" type="submit" value="Log In">-->
+                        <button class="btn green big">Log In</button>
+                    </form>
+                </div>
+
+                <!-- Forgot password page -->
+                <div class="page" data-name="forgotPassword" data-title="Restore Password">
+                    <form action="">
+                        <div class="input-field">
+                            <label for="restoreEmail">Email</label>
+                            <input type="email" id="restoreEmail" name="email">
+                        </div>
+                        <input class="btn green big" type="submit" value="Restore">
+                    </form>
+                </div>
+
+                <!-- Jobs List page -->
+                <div class="page" data-name="jobs" data-title="Job List">
+                    <div class="top-panel">
+                        <div class="btn-group">
+                            <div class="left-side">
+                                <button class="createJobBtn btn green">Create job</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="cell-checkbox"></th>
+                            <th class="cell-avatar"></th>
+                            <th class="cell-job-name">Job Name</th>
+                            <th class="cell-region">Region</th>
+                            <th class="cell-profiles">Profiles</th>
+                            <th class="cell-settings"></th>
+                            <th class="cell-delete"></th>
+                        </tr>
+                        </thead>
+                        <tbody class="jobList">
+                        <tr class="item" data-id="1">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-1">
+                                    <label for="checkbox-1">
+                                    <span class="check">
+                                        <svg class="icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="editJobBtn icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <!--<<tr class="item" data-id="2">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-2">
+                                    <label for="checkbox-2">
+                                    <span class="check">
+                                        <svg class="icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="editJobBtn icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr class="item" data-id="3">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-3">
+                                    <label for="checkbox-3">
+                                    <span class="check">
+                                        <svg class="icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="editJobBtn icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr class="item" data-id="4">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-4">
+                                    <label for="checkbox-4">
+                                    <span class="check">
+                                        <svg class="icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="editJobBtn icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr class="item" data-id="5">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-5">
+                                    <label for="checkbox-5">
+                                    <span class="check">
+                                        <svg class="editJobBtn icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr class="item" data-id="6">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-6">
+                                    <label for="checkbox-6">
+                                    <span class="check">
+                                        <svg class="icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="editJobBtn icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr class="item" data-id="7">
+                            <td class="cell-checkbox">
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" class="checkbox" id="checkbox-7">
+                                    <label for="checkbox-7">
+                                    <span class="check">
+                                        <svg class="icon icon-check">
+                                            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                        </svg>
+                                    </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="cell-avatar">
+                                <div class="avatar">ja</div>
+                            </td>
+                            <td class="cell-job-name">Java developer</td>
+                            <td class="cell-region">Ukraine, Uzghorod</td>
+                            <td class="cell-profiles">100</td>
+                            <td class="cell-settings">
+                                <svg class="editJobBtn icon icon-settings">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                                </svg>
+                            </td>
+                            <td class="cell-delete">
+                                <svg class="icon icon-delete">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </td>
+                        </tr>-->
+                        </tbody>
+
+                    </table>
+
+                    <footer class="main-footer">
+                        <div class="btn-group">
+                            <div class="right-side">
+                                <button class="deleteSelectedBtn btn red hide">Delete</button>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+
+                <!-- Job Item page -->
+                <div class="page" data-name="job" data-title="Create Job">
+                    <form action="">
+                        <div class="input-field">
+                            <label for="search-query">Search query</label>
+                            <input type="text" id="search-query" name="search">
+                        </div>
+                        <div class="input-field">
+                            <label for="region">Region</label>
+                            <input type="text" id="region" name="region">
+                        </div>
+                        <div class="input-field">
+                            <label for="language">Profile language</label>
+                            <input type="text" id="language" name="language">
+                        </div>
+                        <div class="input-field textarea-wrap">
+                            <label for="url">URL</label>
+                            <textarea id="url" name="url"></textarea>
+                        </div>
+                        <div class="input-field">
+                            <input type="checkbox" class="checkbox" id="checkbox-1" name="import_existing">
+                            <label for="checkbox-1" class="checkbox-label">
+                        <span class="check">
+                            <svg class="icon icon-check">
+                                <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                            </svg>
+                        </span>
+                                <span>Do not import existing developers</span>
+                            </label>
+                        </div>
+                        <input class="saveBtn btn green big" type="submit" value="Create job">
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/libs/jquery/dist/jquery.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/popup.js"></script>
+</body>
+</html>
