@@ -35,6 +35,14 @@ th {
     .cell-date {
       a {
         color: $btn-green;
+
+        &:hover {
+          color: $btn-green-hover;
+
+          .icon-up {
+            color: $btn-green-hover;
+          }
+        }
       }
 
       svg {
@@ -153,6 +161,16 @@ th {
         span {
           margin-left: .3rem;
           text-decoration: underline;
+        }
+
+
+        &:hover {
+          color: $btn-green-hover;
+
+          .icon-export,
+          .icon-import {
+            color: $btn-green-hover;
+          }
         }
       }
     }

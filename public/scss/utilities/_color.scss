@@ -31,3 +31,16 @@ $btn-gradient    : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.
 $table-bg  : color('state', 'light-blue');
 $avatar-bg : color('state', 'brown');
 // -----------------------
+
+// Icons -----------------
+$icon-arrow-left : color('state', 'green');
+$icon-check      : $white;
+$icon-delete     : color('state', 'red');
+$icon-export     : color('state', 'green');
+$icon-import     : color('state', 'green');
+$icon-log-out    : color('state', 'green');
+$icon-search     : $black;
+$icon-settings   : color('state', 'gray');
+$icon-start      : $white;
+$icon-pause      : $white;
+$icon-up         : color('state', 'green');
