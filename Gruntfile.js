@@ -31,10 +31,11 @@ module.exports = function(grunt) {
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
                     {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
                     {expand: true, cwd: 'public/', src: [
-                        'js/popup.js',
+                        'js/parser.js',
                         'js/contentScript.js',
+                        'js/templates.js',
                         'js/api.js',
-                        'js/parser.js'
+                        'js/popup.js'
                     ], dest: 'build/'}
                 ]
             }

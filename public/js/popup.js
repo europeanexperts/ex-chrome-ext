@@ -705,55 +705,16 @@
         },
 
         generateListTemplate: function (items) {
-            return items.map(function (item, index) {
-                var cid = new Date().valueOf() + '_' + index;
+            var template = APP_TEMPLATES.getTemplate('job-profiles-list');
+            var templateOptions = {
+                items: items.map(function (item, index) {
+                    item.cid = new Date().valueOf() + '_' + index;
 
-                return [
-                    '<tr class="item" data-id="' + item.link + '" data-cid="' + cid + '">',
+                    return item;
+                })
+            };
 
-                    // checkbox:
-                    '  <td class="cell-checkbox">',
-                    '    <div class="checkbox-wrap">',
-                    '      <input type="checkbox" class="checkbox" id="checkbox-' + cid + '">',
-                    '      <label for="checkbox-' + cid + '">',
-                    '        <span class="check">',
-                    '          <svg class="icon icon-check">',
-                    '            <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>',
-                    '          </svg>',
-                    '        </span>',
-                    '      </label>',
-                    '    </div>',
-                    '  </td>',
-
-                    // job avatar:
-                    '  <td class="cell-avatar">',
-                    '    <div class="avatar">' + item.shortName + '</div>',
-                    '  </td>',
-
-                    // profile info:
-                    '  <td class="cell-name" title="' + item.name + '">' + item.name + '</td>',
-                    '  <td class="cell-job" title="' + item.job + '">' + item.job + '</td>',
-                    '  <td class="cell-date">' + item.createdAt + '</td>',
-                    '  <td class="cell-status">' + item.status + '</td>',
-
-                    '  <td class="cell-action">',
-                    '    <a href="#">',
-                    '      <svg class="icon icon-export">',
-                    '      <use class="icon-svg" xlink:href="../img/sprite.svg#icon-export"></use>',
-                    '        </svg>',
-                    '      <span>Export</span>',
-                    '    </a>',
-                    '  </td>',
-
-                    '  <td class="cell-delete">',
-                    '    <svg class="icon icon-delete">',
-                    '      <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>',
-                    '    </svg>',
-                    '  </td>',
-
-                    '</tr>'
-                ].join('\n');
-            }).join('');
+            return template(templateOptions);
         },
 
         renderItems: function (options) {
