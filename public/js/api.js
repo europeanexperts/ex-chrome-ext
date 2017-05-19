@@ -6,7 +6,9 @@
     var RESTORE_URL = BASE_URL + '/api/password_resets';
 
     window.EXT_API = {
-        AUTH_TOKEN    : null,
+        AUTH_TOKEN: null,
+
+        // auth:
         login         : function (data, callback) {
             $.ajax({
                 url        : AUTH_URL,
@@ -54,7 +56,9 @@
                 }
             });
         },
-        fetchJobList      : function (data, callback) {
+
+        // jobs
+        fetchJobList: function (data, callback) {
             // put ajax method here
 
             setTimeout(function () {
@@ -69,9 +73,8 @@
                 callback(null, _data);
             }, 200);
         },
-        fetchJob      : function (data, callback) {
+        fetchJob    : function (data, callback) {
             // put ajax method here
-            console.log('>>> API fetchJob', data);
 
             var id = parseInt(data.id, 10);
             var jobs = EXT_API.parseJobs(localStorage.getItem('jobs'));
@@ -81,10 +84,9 @@
 
             setTimeout(function () {
                 callback(null, job);
-            }, 200);
+            }, 500);
         },
-
-        parseJobs: function (jobsStr) {
+        parseJobs   : function (jobsStr) {
             var arr;
 
             try {
@@ -96,7 +98,7 @@
 
             return arr;
         },
-        saveJob: function (_data, callback) {
+        saveJob     : function (_data, callback) {
             // put ajax method here
 
             var data = $.extend({}, _data); // to create a new object
@@ -124,7 +126,7 @@
 
             callback(null, data);
         },
-        deleteJobs: function (ids, callback) {
+        deleteJobs  : function (ids, callback) {
             // put ajax method here
 
             var jobs = EXT_API.parseJobs(localStorage.getItem('jobs'));
@@ -142,6 +144,37 @@
             localStorage.setItem('jobs', JSON.stringify(_jobs));
 
             callback();
+        },
+
+        // profiles:
+        fetchJobProfiles: function (options, callback) {
+            var jobId = options.job_id;
+            var key = 'job_profiles_' + jobId;
+            var jsonValue;
+            var profiles;
+
+            try  {
+                jsonValue = JSON.parse(localStorage.getItem(key));
+                profiles = jsonValue.profiles || [];
+
+                callback(null, profiles);
+            } catch (err) {
+                callback(null, err);
+            }
+        },
+        saveJobProfiles : function (options, callback) {
+            var jobId = options.job_id;
+            var key = 'job_profiles_' + jobId;
+            var value = {
+                job_id  : options.jobId,
+                profiles: options.profiles
+            };
+
+            localStorage.setItem(key, JSON.stringify(value));
+
+            setTimeout(function () {
+                callback(null, value);
+            }, 500);
         }
     }
 })();
