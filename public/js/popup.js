@@ -513,12 +513,16 @@
         init: function (options) {
             ExtensionPage.prototype.init.call(this, options);
 
-            //this.parser = new LinkedInParser();
-            //console.log('>>> parser', this.parser);
+            this.items = [];
 
             this.$header = this.$el.find('.jobProfileHeader');
             this.$table = this.$el.find('.table');
             this.$list = this.$el.find('.jobProfileList');
+            this.$searchField = this.$el.find('.searchField');
+
+            this.$el.find('.searchBtn').on('click', $.proxy(this.search, this));
+            this.$searchField.on('change', $.proxy(this.search, this));
+            this.$searchField.on('keyup', $.proxy(this.onSearch, this));
         },
 
         show: function (options) {
@@ -545,6 +549,7 @@
 
                 // check saved profiles:
                 if (profiles && profiles.length) {
+                    self.items = profiles;
                     self.renderItems({items: profiles});
                     self.loader({status: 1}); // Done, hide the progressbar
                     self.$table.removeClass('hide');
@@ -573,11 +578,35 @@
                                 self.renderItems({items: normalized});
                                 self.loader({status: 1}); // Done, hide the progressbar
                                 self.$table.removeClass('hide');
+                                self.items = normalized;
                             });
                         }
                     });
                 });
             });
+        },
+
+        search:function () {
+            var term = this.$searchField.val();
+            var regExp;
+            var filtered;
+
+            if (!term) {
+                filtered = this.items;
+            } else {
+                regExp = new RegExp(term, 'ig');
+                filtered = _.filter(this.items, function(item) {
+                    return regExp.test(item.name);
+                });
+            }
+
+            this.renderItems({items: filtered});
+        },
+
+        onSearch: function (e) {
+            if (e.which === 13) {
+                this.search();
+            }
         },
 
         storeProfileList: function (profiles) {
@@ -719,7 +748,13 @@
 
         renderItems: function (options) {
             var profiles = options.items;
-            var html = this.generateListTemplate(profiles);
+            var html;
+
+            if (!profiles || !profiles.length) {
+                html = '<tr><td colspan="7">There are no data</td></td></tr>';
+            } else {
+                html = this.generateListTemplate(profiles);
+            }
 
             this.$list.html(html);
         },
