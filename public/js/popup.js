@@ -545,7 +545,7 @@
 
                 // check saved profiles:
                 if (profiles && profiles.length) {
-                    self.appendItems({items: profiles});
+                    self.renderItems({items: profiles});
                     self.loader({status: 1}); // Done, hide the progressbar
                     self.$table.removeClass('hide');
 
@@ -570,7 +570,7 @@
                                 var normalized = self.normalizeProfiles(response.data.profiles);
 
                                 self.storeProfileList(normalized);
-                                self.appendItems({items: normalized});
+                                self.renderItems({items: normalized});
                                 self.loader({status: 1}); // Done, hide the progressbar
                                 self.$table.removeClass('hide');
                             });
@@ -756,11 +756,11 @@
             }).join('');
         },
 
-        appendItems: function (options) {
+        renderItems: function (options) {
             var profiles = options.items;
             var html = this.generateListTemplate(profiles);
 
-            this.$list.append(html);
+            this.$list.html(html);
         },
 
         renderJob: function (job) {
