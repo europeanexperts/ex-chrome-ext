@@ -1,5 +1,12 @@
 module.exports = function(grunt) {
     grunt.initConfig({
+        watch: {
+            scripts: {
+                //files: ['public/js/*.js'],
+                files: ['public/**/*'],
+                tasks: ['clear', 'copy:dev']
+            }
+        },
         copy: {
             main: {
                 files: [
@@ -23,7 +30,12 @@ module.exports = function(grunt) {
                 files: [
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
                     {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
-                    {expand: true, cwd: 'public/', src: ['js/popup.js', 'js/api.js'], dest: 'build/'}
+                    {expand: true, cwd: 'public/', src: [
+                        'js/popup.js',
+                        'js/contentScript.js',
+                        'js/api.js',
+                        'js/parser.js'
+                    ], dest: 'build/'}
                 ]
             }
         }
@@ -32,9 +44,10 @@ module.exports = function(grunt) {
     // load grunt tasks:
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-clear');
 
     // register grunt tasks:
-    grunt.registerTask('build', ['copy']);
+    grunt.registerTask('build', ['copy:main']);
     grunt.registerTask('build-dev', ['copy:dev']);
     grunt.registerTask('default', ['build']);
 };
