@@ -519,10 +519,16 @@
             this.$table = this.$el.find('.table');
             this.$list = this.$el.find('.jobProfileList');
             this.$searchField = this.$el.find('.searchField');
+            this.$startBtn = this.$el.find('.startBtn');
+            this.$pauseBtn = this.$el.find('.pauseBtn');
+            this.$restartBtn = this.$el.find('.restartBtn');
 
             this.$el.find('.searchBtn').on('click', $.proxy(this.search, this));
             this.$searchField.on('change', $.proxy(this.search, this));
             this.$searchField.on('keyup', $.proxy(this.onSearch, this));
+            this.$startBtn.on('click', $.proxy(this.onStartClick, this));
+            this.$pauseBtn.on('click', $.proxy(this.onPauseClick, this));
+            this.$restartBtn.on('click', $.proxy(this.onRestartClick, this));
         },
 
         show: function (options) {
@@ -586,7 +592,7 @@
             });
         },
 
-        search:function () {
+        search: function () {
             var term = this.$searchField.val();
             var regExp;
             var filtered;
@@ -595,7 +601,7 @@
                 filtered = this.items;
             } else {
                 regExp = new RegExp(term, 'ig');
-                filtered = _.filter(this.items, function(item) {
+                filtered = _.filter(this.items, function (item) {
                     return regExp.test(item.name);
                 });
             }
@@ -607,6 +613,204 @@
             if (e.which === 13) {
                 this.search();
             }
+        },
+
+        __parseProfile: function(options, callback) {
+            console.log('>>> parseProfile', options);
+
+            var url = 'https://www.linkedin.com/in/' + 'tetiana-bysaha-637a427b';
+            var _options = {
+                //tabId: this.profileTabId || null,
+                // url  : 'https://www.linkedin.com/in/' + options.link
+                url  : url
+            };
+
+            var self = this;
+
+            chrome.tabs.create({url: url, active: false}, function(tab) {
+                chrome.tabs.onUpdated.addListener(function (tabId, info, updTab) {
+                    if (updTab.url === url && tabId === tab.id && (info.status === "complete")) {
+                        console.log('... complete');
+                        //onCompleteTab(tabId, info);
+
+                        chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
+                            console.log("response: " + JSON.stringify(response));
+
+                            //chrome.tabs.remove(tabId, function() {
+                                callback(null, options); // TODO: !!!
+                            //});
+                        });
+                    }
+                });
+            });
+
+            /*APP_HELPERS.prepareParseProfile(_options, function(err, res) {
+                if (err) {
+                    return callback(err);
+                }
+
+                console.log('>>> res', res);
+                //self.profileTabId = res.tabId;
+
+                setTimeout(function () {
+                    callback(null, options); // TODO: !!!
+                }, 200);
+            });*/
+        },
+
+        parseProfile: function(options, callback) {
+            console.log('>>> parseProfile', options);
+
+            // var url = 'https://www.linkedin.com' + options.link;
+            var url = 'https://www.linkedin.com' + '/in/tetiana-bysaha-637a427b';
+            console.log('>>> url', url);
+
+            var self = this;
+
+            chrome.tabs.query({active: true}, function(tabs) {
+                var tabId = tabs[0].id;
+                var evt = 'complete:' + tabId;
+
+                APP.events.on(evt, function(e, tab, info) {
+                    if (tab.url !== url) {
+                        return;
+                    }
+
+                    APP.events.off(evt);
+                    console.log('>>> send message to ', tab.id);
+
+                    chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
+                        console.log("response: " + JSON.stringify(response));
+
+                        callback(null, response || {}); // TODO: !!!
+                    });
+                });
+
+                chrome.tabs.update(tabId, {url: url}, function() {
+                    chrome.tabs.reload(tabId, function() {
+
+                        /*chrome.tabs.onUpdated.addListener(function(_tabId, info, tupdTab) {
+                            if (tupdTab.url === url && tabId === _tabId && info.status === "complete") {
+                                //setTimeout(function() {
+
+                                console.log('>>> send message to ', tabId);
+                                chrome.tabs.sendMessage(tabId, {method: "profile"}, function (response) {
+                                    console.log("response: " + JSON.stringify(response));
+
+                                    //chrome.tabs.remove(tabId, function() {
+                                    callback(null, options); // TODO: !!!
+                                    //});
+                                });
+                            }
+                        });*/
+                        //}, 1000);
+                    });
+                });
+
+            });
+
+            /*chrome.tabs.create({url: url, active: false}, function(tab) {
+                chrome.tabs.onUpdated.addListener(function (tabId, info, updTab) {
+                    if (updTab.url === url && tabId === tab.id && (info.status === "complete")) {
+                        console.log('... complete');
+                        //onCompleteTab(tabId, info);
+
+                        chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
+                            console.log("response: " + JSON.stringify(response));
+
+                            //chrome.tabs.remove(tabId, function() {
+                                callback(null, options); // TODO: !!!
+                            //});
+                        });
+                    }
+                });
+            });*/
+
+            /*APP_HELPERS.prepareParseProfile(_options, function(err, res) {
+                if (err) {
+                    return callback(err);
+                }
+
+                console.log('>>> res', res);
+                //self.profileTabId = res.tabId;
+
+                setTimeout(function () {
+                    callback(null, options); // TODO: !!!
+                }, 200);
+            });*/
+        },
+
+        parseProfiles: function() {
+            this.parseIndex = this.parseIndex || 0;
+            var count = this.items.length;
+            var self = this;
+
+            console.log('>>> starting parser... from=%d, total=%d', self.parseIndex, count);
+
+            async.whilst(function test() {
+                return (self.parseIndex < count) && (self.status === 'started');
+            }, function iterate(cb) {
+                var profile = self.items[self.parseIndex];
+
+                console.log('>>> try to parse', self.parseIndex);
+                self.parseProfile(profile, function(err, res) {
+                    if (err) {
+                        return cb(err);
+                    }
+
+                    console.log('>>> res', res);
+                    self.parseIndex++;
+
+                    cb(null, res);
+                });
+
+            }, function(err) {
+                if (err) {
+                    APP.error(err);
+                }
+
+                console.log('>>> this.parseIndex', self.parseIndex);
+                if (self.parseIndex < count) {
+                    console.log('>>> PAUSED');
+
+                    /*self.$startBtn.addClass('hide');
+                    self.$restartBtn.addClass('hide');
+                    self.$pauseBtn.removeClass('hide');*/
+                } else {
+                    console.log('>>> DONE');
+
+                    /*self.$startBtn.removeClass('hide');
+                    self.$pauseBtn.addClass('hide');*/
+                }
+                self.$restartBtn.removeClass('hide');
+            });
+        },
+
+        onStartClick: function() {
+            this.$startBtn.addClass('hide');
+            this.$restartBtn.addClass('hide');
+            this.$pauseBtn.removeClass('hide');
+
+            console.log('>>> start');
+
+            this.status = 'started';
+            this.parseProfiles();
+        },
+
+        onPauseClick: function() {
+            this.$startBtn.removeClass('hide');
+            this.$pauseBtn.addClass('hide');
+            //this.$restartBtn.removeClass('hide'); // hide class will be removed on parse callback
+
+            console.log('>>> pause');
+
+            this.status = 'paused';
+        },
+
+        onRestartClick: function() {
+            this.status = 'restarted';
+            this.parseIndex = 0;
+            this.onStartClick();
         },
 
         storeProfileList: function (profiles) {
@@ -665,34 +869,34 @@
                     });
 
                     /*var _jobs = [
-                        {
-                            "link": "/in/synov/",
-                            "name": "Nikita Synov",
-                            "job" : "Taking Care of Your Business with Innovative Marketing Strategies"
-                        },
-                        {
-                            "link": "#",
-                            "name": "LinkedIn Member",
-                            "job" : "Program Development Professional"
-                        },
-                        {
-                            "link": "/in/victoroleksuh/",
-                            "name": "Victor Oleksuh",
-                            "job" : "Looking for Junior PHP/WordPress developer position"
-                        },
-                        {
-                            "link": "#",
-                            "name": "LinkedIn Member",
-                            "job" : "System administrator - Ergopack LLC"
-                        },
-                        {
-                            "link": "/in/%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%B0%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%BD%D0%BA%D0%BE-46418876/",
-                            "name": "Светлана Protsenko",
-                            "job" : "Senior Marketing Manager  Pilog Internftionfl Group, CIS\n"
-                        }
-                    ];
+                     {
+                     "link": "/in/synov/",
+                     "name": "Nikita Synov",
+                     "job" : "Taking Care of Your Business with Innovative Marketing Strategies"
+                     },
+                     {
+                     "link": "#",
+                     "name": "LinkedIn Member",
+                     "job" : "Program Development Professional"
+                     },
+                     {
+                     "link": "/in/victoroleksuh/",
+                     "name": "Victor Oleksuh",
+                     "job" : "Looking for Junior PHP/WordPress developer position"
+                     },
+                     {
+                     "link": "#",
+                     "name": "LinkedIn Member",
+                     "job" : "System administrator - Ergopack LLC"
+                     },
+                     {
+                     "link": "/in/%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%B0%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%BD%D0%BA%D0%BE-46418876/",
+                     "name": "Светлана Protsenko",
+                     "job" : "Senior Marketing Manager  Pilog Internftionfl Group, CIS\n"
+                     }
+                     ];
 
-                    cb(null, _jobs);*/
+                     cb(null, _jobs);*/
                 }
 
             }, function (err, results) {
@@ -915,5 +1119,22 @@
      action: "getSource",
      source: 'DOMtoString(document)'
      });*/
+
+
+    chrome.tabs.query({active: true}, function(tabs) {
+        var tabId = tabs[0].id;
+
+        chrome.tabs.onUpdated.addListener(function(_tabId, info, updTab) {
+            var evt;
+
+            if (tabId === _tabId && info.status === "complete") {
+
+                //evt = 'complete:' + tabId + ':url';
+                evt = 'complete:' + tabId;
+                APP.events.trigger(evt, [updTab, info]);
+            }
+        });
+
+    });
 
 })();

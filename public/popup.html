@@ -45,7 +45,18 @@
 <body>
 <div id="templates">
     <script type="text/template" id="job-profiles-list-template">
-        <% items.forEach(function(item) { %>
+        <% items.forEach(function(item) {
+            var _status = 'Pending';
+
+            if (item.status === 1) {
+                _status = 'Successful';
+            } else if (item.status === -1) {
+                _status = 'Unsuccessful';
+            } else {
+                _status = 'Pending';
+            }
+        %>
+
         <tr class="item" data-id="<%= item.link%>" data-cid="<%= item.cid%>">'
 
             <!-- checkbox -->
@@ -71,7 +82,7 @@
             <td class="cell-name" title="' + item.name + '"><%= item.name%></td>
             <td class="cell-job" title="' + item.job + '"><%= item.job%></td>
             <td class="cell-date"><%= item.createdAt %></td>
-            <td class="cell-status"><%= item.status%></td>
+            <td class="cell-status"><%= _status %></td>
             <td class="cell-action">
                 <a href="#">
                     <svg class="icon icon-export">
@@ -456,19 +467,19 @@
                     </div>
                     <div class="btn-group">
                         <div class="left-side">
-                            <button class="btn green">
+                            <button class="startBtn btn green">
                                 <svg class="icon icon-start">
                                     <use class="icon-svg" xlink:href="../img/sprite.svg#icon-start"></use>
                                 </svg>
-                                <span>Continue</span>
+                                <span>Start</span>
                             </button>
-                            <button class="btn green hide">
+                            <button class="pauseBtn btn green hide">
                                 <svg class="icon icon-pause">
                                     <use class="icon-svg" xlink:href="../img/sprite.svg#icon-pause"></use>
                                 </svg>
                                 <span>Pause</span>
                             </button>
-                            <button class="btn red">Restart</button>
+                            <button class="restartBtn btn red">Restart</button>
                         </div>
                         <div class="right-side">
                             <button class="btn green">Export to database</button>
@@ -736,6 +747,7 @@
 <script src="js/libs/lodash/lodash.js"></script>
 <script src="js/templates.js"></script>
 <script src="js/api.js"></script>
+<script src="js/helpers.js"></script>
 <script src="js/popup.js"></script>
 </body>
 </html>
