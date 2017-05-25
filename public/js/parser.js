@@ -188,10 +188,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             .toArray();
 
         return {
-            name     : $el.find('.pv-top-card-section__name').html(),
-            title    : _title,
-            country  : $el.find('.pv-top-card-section__location').html(),
-            summary  : '', // TODO
+            name     : $el.find('.pv-top-card-section__name').html() || '',
+            title    : _title || '',
+            country  : $el.find('.pv-top-card-section__location').html() || '',
+            summary  : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
             picture  : $el.find('.pv-top-card-section__photo img').attr('src'),
             languages: _languages,
             projects: _projects,
