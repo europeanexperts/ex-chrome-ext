@@ -458,7 +458,7 @@
                     return APP.error(err);
                 }
 
-                APP.notification({message: 'Change are successful saved', type: 'success', timeout: 2000}, function () {
+                APP.notification({message: 'Job was successful saved', type: 'success', timeout: 2000}, function () {
                     if (data.id) {
                         APP.showPage(APP.pages.jobs.name);
                         APP.events.trigger('jobs:update', res);
