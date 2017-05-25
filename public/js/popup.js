@@ -520,6 +520,9 @@
             this.jobId = options.id;
             this.$el.addClass('hide'); // hide until loading data
 
+            /*this.parseIndex = this.items.length;
+            this.status = '';*/
+
             this.fetchAll({id: options.id}, function (err, results) {
                 var job;
                 var profiles;
@@ -565,6 +568,12 @@
                     self.renderCounters();
                 });
             });
+        },
+
+        hide: function() {
+            ExtensionPage.prototype.hide.call(this);
+            /*this.parseIndex = this.items.length;
+            this.status = 'stoped';*/
         },
 
         startListParser: function (options, callback) {
