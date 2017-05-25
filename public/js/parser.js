@@ -37,30 +37,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
-            /*$('body').animate({scrollTop: $('.search-results-container').height()}, 1000, function() {
-             var timeout = 20; // 10 sec
-             var currentTime = new Date();
-             var maxTime = currentTime.setSeconds(currentTime.getSeconds() + timeout);
-
-             var intervalId = setInterval(function() {
-             var isLoadedLi = $(SELECTORS.SEARCH_RESULT_PROFILES + '.search-result__occlusion-hint').length === 0;
-             var now = new Date();
-
-             console.log('>>> check interval');
-
-             if (isLoadedLi) {
-             console.log('>>> clear interval html', intervalId);
-             clearInterval(intervalId);
-             callback();
-             } else if (now > maxTime) {
-             console.log('>>> clear interval timeout', intervalId);
-             clearInterval(intervalId);
-             callback({'message': 'Timeout error'});
-             }
-
-             }, 100);
-             });*/
-
             var positions = $('.results-list li')
                 .map(function () {
                     return $(this).position().top;
@@ -106,37 +82,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         result.profiles = _profiles;
 
         return result;
-    };
-
-    SOCIAL_PARSER.__onLoadProfile = function (callback) {
-
-        $(document).ready(function () {
-            var timeout = 10; // 10 sec
-            var currentTime = new Date();
-            var maxTime = currentTime.setSeconds(currentTime.getSeconds() + timeout);
-
-            $('html, body').animate({scrollTop: $('#profile-wrapper').height()});
-
-            var intervalId = setInterval(function () {
-                var $langEl = $('#ember2098');
-                var $skillsEl = $('#ember2096');
-                var now = new Date();
-
-                console.log('>>> check interval');
-
-                if ($langEl.html() && $langEl.html() !== '<!---->'
-                    && $skillsEl.html() && $skillsEl.html() !== '<!---->' && !$skillsEl.hasClass('pv-deferred-area--pending')) {
-                    console.log('>>> clear interval html', intervalId);
-                    clearInterval(intervalId);
-                    callback();
-                } else if (now > maxTime) {
-                    console.log('>>> clear interval timeout', intervalId);
-                    clearInterval(intervalId);
-                    callback({'message': 'Timeout error'});
-                }
-
-            }, 100);
-        });
     };
 
     SOCIAL_PARSER.onLoadProfile = function (callback) {
