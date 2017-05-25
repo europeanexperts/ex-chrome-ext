@@ -497,6 +497,7 @@
             this.$startBtn = this.$el.find('.startBtn');
             this.$pauseBtn = this.$el.find('.pauseBtn');
             this.$restartBtn = this.$el.find('.restartBtn');
+            this.$exportSelectedBtn = this.$el.find('.exportSelectedBtn');
             this.$deleteSelectedBtn = this.$el.find('.deleteSelectedBtn');
 
             this.$el.find('.searchBtn').on('click', $.proxy(this.search, this));
@@ -508,6 +509,7 @@
 
             this.$el.on('click', '.exportBtn', $.proxy(this.onExportClick, this));
             this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
+            this.$exportSelectedBtn.on('click', $.proxy(this.onExportSelectedClick, this));
             this.$deleteSelectedBtn.on('click', $.proxy(this.onDeleteSelectedClick, this));
         },
 
@@ -949,28 +951,48 @@
             this.onStartClick();
         },
 
-        onExportClick: function (e) {
-            var $tr = $(e.target).closest('.item');
-            var link = $tr.attr('data-id');
+        importProfiles: function(links) {
+            var jobJSON = this.job;
 
-            var profileJSON = EXT_API.getProfileLocal({link: link});
-            var data;
+            async.eachLimit(links, 10, function(link, cb) {
+                var profileJSON = EXT_API.getProfileLocal({link: link});
+                var data;
 
-            delete profileJSON.jobs;
-            profileJSON.linkedin_url = link;
-            profileJSON.import_existing = this.job.import_existing || false;
-            data = {
-                profile: profileJSON
-            };
+                delete profileJSON.jobs; // TODO: remove
+                profileJSON.linkedin_url = link;
+                profileJSON.import_existing = jobJSON.import_existing || false;
+                data = {
+                    profile: profileJSON
+                };
 
-            EXT_API.importProfile(data, function(err, res) {
+                EXT_API.importProfile(data, function(err, res) {
+                    if (err) {
+                        return cb(err);
+                    }
+
+                    cb(null, res);
+                });
+
+            }, function(err, res) {
                 if (err) {
                     return APP.error(err);
                 }
 
                 APP.notification({message: 'Successful saved', type: 'success'});
-                //APP.notification({message: JSON.stringify(profileJSON), type: 'success', timeout: 5000});
             });
+        },
+
+        onExportClick: function (e) {
+            var $tr = $(e.target).closest('.item');
+            var link = $tr.attr('data-id');
+
+            this.importProfiles([link]);
+        },
+
+        onExportSelectedClick: function() {
+            var links = this.getSelectedProfiles();
+
+            this.importProfiles(links);
         },
 
         onDeleteClick: function (e) {
