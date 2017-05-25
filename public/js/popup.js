@@ -972,13 +972,26 @@
             });
         },
 
-        storeProfileList: function (profiles) {
+        storeProfileListLocal: function(profiles) {
             var _options = {
                 job_id  : this.jobId,
                 profiles: profiles
             };
 
             EXT_API.saveJobProfiles(_options, function (err, res) {
+                if (err) {
+                    return APP.error(err);
+                }
+            });
+        },
+
+        storeProfileList: function (profiles) {
+            var _options = {
+                id: this.jobId,
+                profiles: profiles
+            };
+
+            EXT_API.saveJob(_options, function(err, res) {
                 if (err) {
                     return APP.error(err);
                 }
@@ -992,7 +1005,7 @@
             });
         },
 
-        __fetchAll: function (options, callback) {
+        fetchAll: function (options, callback) {
             var jobId = options.id;
             var _options = {
                 id: jobId
@@ -1018,7 +1031,7 @@
             });
         },
 
-        fetchAll: function (options, callback) {
+        fetchAllLocal: function (options, callback) {
             var jobId = options.id;
 
             async.parallel({
