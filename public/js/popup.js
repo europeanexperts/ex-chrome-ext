@@ -256,7 +256,7 @@
         onUpdateItem: function (e, data) {
             var $tr = this.$list.find('.item[data-id=' + data.id + ']');
 
-            $tr.find('.jobLanguage').html(data.search);
+            $tr.find('.jobLanguage').html(data.job_name);
             $tr.find('.jobRegion').html(data.region);
         },
 
