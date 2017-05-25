@@ -429,7 +429,7 @@
                 language      : this.$inputLanguage.val(),
                 short_name    : this.$inputShortName.val(),
                 url           : this.$inputUrl.val(),
-                importExisting: this.$inputImportExisting.val()
+                import_existing: this.$inputImportExisting.prop('checked')
             };
         },
 
@@ -478,7 +478,7 @@
             this.$inputLanguage.val(data.language);
             this.$inputShortName.val(data.short_name);
             this.$inputUrl.val(data.url);
-            this.$inputImportExisting.val(data.importExisting);
+            this.$inputImportExisting.prop('checked', data.import_existing);
 
             this._preData = data;
         }
@@ -529,6 +529,7 @@
                 job = results.job;
                 profiles = results.profiles;
 
+                self.job = job;
                 self.renderJob(job);
                 self.$table.addClass('hide');
                 self.$el.removeClass('hide');
@@ -951,11 +952,25 @@
         onExportClick: function (e) {
             var $tr = $(e.target).closest('.item');
             var link = $tr.attr('data-id');
-            var key = 'profile_' + link;
 
-            var profileStr = localStorage.getItem(key);
+            var profileJSON = EXT_API.getProfileLocal({link: link});
+            var data;
 
-            APP.notification({message: profileStr, type: 'success', timeout: 5000}); // TODO
+            delete profileJSON.jobs;
+            profileJSON.linkedin_url = link;
+            profileJSON.import_existing = this.job.import_existing || false;
+            data = {
+                profile: profileJSON
+            };
+
+            EXT_API.importProfile(data, function(err, res) {
+                if (err) {
+                    return APP.error(err);
+                }
+
+                APP.notification({message: 'Successful saved', type: 'success'});
+                //APP.notification({message: JSON.stringify(profileJSON), type: 'success', timeout: 5000});
+            });
         },
 
         onDeleteClick: function (e) {

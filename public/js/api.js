@@ -6,6 +6,7 @@
     var AUTH_URL = BASE_URL + '/api/sessions';
     var RESTORE_URL = BASE_URL + '/api/password_resets';
     var JOBS_URL = BASE_URL + '/api/import/jobs';
+    var IMPORT_URL = BASE_URL + '/api/import/consultants';
 
     window.EXT_API = {
         //AUTH_TOKEN: null,
@@ -295,7 +296,6 @@
 
             callback(null, {success: 'OK'});
         },
-
         getProfileLocal: function(options) {
             var link = options.link;
             var value = localStorage.getItem('profile_' + link);
@@ -313,6 +313,29 @@
             }
 
             return profileJSON;
+        },
+
+        // import:
+        importProfile: function(options, callback) {
+            var profile = options.profile;
+
+            $.ajax({
+                url        : IMPORT_URL,
+                method     : 'POST',
+                headers    : {
+                    'X-Authorization': EXT_API.AUTH_TOKEN
+                },
+                crossDomain: true,
+                contentType: 'application/json',
+                accepts    : 'json',
+                data       : JSON.stringify(profile),
+                success    : function (res) {
+                    callback(null, res);
+                },
+                error      : function (err) {
+                    callback(err);
+                }
+            });
         }
     }
 })();
