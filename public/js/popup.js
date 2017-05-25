@@ -854,47 +854,66 @@
         },
 
         onParsedProfile: function (profile, data) {
-            var $li = this.$list.find('.item[data-id="' + profile.link + '"]');
+            var link = profile.link;
+            var $li = this.$list.find('.item[data-id="' + link + '"]');
             var $action = $li.find('.profileAction');
-            var statusText;
             var self = this;
+
+            if (data && data.name) {
+                profile.status = 1;
+                profile.parsed_at = new Date();
+            } else {
+                profile.status = -1;
+            }
 
             async.parallel({
 
-                // store the profile data in localStorage
-                profile: function(cb) {
+                // store the profile data in localStorage:
+                profile: function (cb) {
                     var _options = {
                         jobId  : self.jobId,
                         profile: data,
                         link   : profile.link
                     };
 
-                    EXT_API.storeProfile(_options, function (err, response) {
+                    EXT_API.storeProfileLocal(_options, function (err, response) {
                         if (err) {
                             return cb(err);
                         }
 
-                        console.log('>>> profile %s was stored locally', profile.link);
+                        console.log('>>> profile %s was stored locally', link);
                         cb(null, response);
                     });
                 },
 
-                job: function(cb) {
-                    cb(); // TODO ???
+                // update the profile status in job instance:
+                job: function (cb) {
+                    var _options = {
+                        id      : self.jobId,
+                        profiles: self.items
+                    };
+
+                    EXT_API.saveJob(_options, function (err, res) {
+                        if (err) {
+                            return cb(err);
+                        }
+
+                        cb(null, res);
+                    });
                 }
 
-            }, function(err, results) {
+            }, function (err, results) {
+                var statusText;
+
                 if (err) {
                     return APP.error(err);
                 }
 
-                if (data && data.name) {
-                    profile.status = 1;
+                if (profile.status === 1) {
                     statusText = 'Successful';
                     $action.find('[data-action="export"]').removeClass('hide');
                     $action.find('[data-action="import"]').addClass('hide');
                 } else {
-                    profile.status = -1;
                     statusText = 'Unsuccessful';
                     $action.find('[data-action="export"]').addClass('hide');
                     $action.find('[data-action="import"]').removeClass('hide');

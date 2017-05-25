@@ -283,39 +283,15 @@
             EXT_API.saveJob(data, callback);
         },
 
-        storeProfile: function (options, callback) {
+        storeProfileLocal: function (options, callback) {
             var jobId = options.jobId;
             var profile = options.profile;
             var link = options.link;
-            var key;
-            var jsonValue;
-            var profiles;
 
-            // store the profile
-            profile.jobId = jobId;
+            profile.jobs = profile.jobs || [];
+            profile.jobs.push(jobId);
+
             localStorage.setItem('profile_' + link, JSON.stringify(profile));
-
-            // change job profile status:
-            key = 'job_profiles_' + jobId;
-
-            try {
-                jsonValue = JSON.parse(localStorage.getItem(key));
-                profiles = jsonValue.profiles || [];
-            } catch (err) {
-                return callback(err);
-            }
-
-            profiles.forEach(function (item) {
-                if (item.link === link) {
-                    item.status = 1;
-                    item.parsedAt = new Date()
-                }
-            });
-
-            localStorage.setItem(key, JSON.stringify({
-                job_id  : jobId,
-                profiles: profiles
-            }));
 
             callback(null, {success: 'OK'});
         }
