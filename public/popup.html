@@ -40,10 +40,68 @@
             top: -22px;
             left: 6px;
         }
+        #messageWrapper {
+            width: 100%;
+            position: absolute;
+            border: none;
+            background-color: #fff;
+        }
+
+        #messageText {
+            margin: 0;
+            padding: 10px;
+            position: relative;
+            width: 100%;
+            z-index: 10;
+            font-weight: bold;
+            color: white;
+        }
+
+        #messageText.error {
+            background-color: #e97660;
+        }
+        #messageText.success {
+            background-color: rgba(56, 168, 152, 1);
+        }
     </style>
 </head>
 <body>
 <div id="templates">
+    <script type="text/template" id="job-list-template">
+        <% items.forEach(function(item) {%>
+        <tr class="item" data-id="<%= item.id%>">
+            <td>
+                <div class="chbWrap checkbox-wrap">
+                    <input type="checkbox" class="checkbox" id="checkbox-<%= item.id%>">
+                    <label for="checkbox-<%= item.id%>">
+                        <span class="check">
+                            <svg class="icon icon-check">
+                                <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                            </svg>
+                        </span>
+                    </label>
+                </div>
+            </td>
+            <td class="cell-avatar">
+                <div class="avatar"><%= item.short_name%></div>
+            </td>
+            <td class="jobLanguage cell-job-name"><%= item.job_name%></td>
+            <td class="jobRegion cell-region"><%= item.region%></td>
+            <td class="cell-cell-profiles"><%= (item.profiles && item.profiles.length) || 0%></td>
+            <td class="cell-settings">
+                <svg class="editJobBtn icon icon-settings">
+                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                </svg>
+                </td>
+            <td class="cell-delete">
+                <svg class="deleteBtn icon icon-delete">
+                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                </svg>
+                </td>
+            </tr>
+        <% }); %>
+    </script>
+
     <script type="text/template" id="job-profiles-list-template">
         <% items.forEach(function(item) {
             var _status = 'Pending';
@@ -82,18 +140,26 @@
             <td class="cell-name" title="' + item.name + '"><%= item.name%></td>
             <td class="cell-job" title="' + item.job + '"><%= item.job%></td>
             <td class="cell-date"><%= item.createdAt %></td>
-            <td class="cell-status"><%= _status %></td>
-            <td class="cell-action">
-                <a href="#">
+            <td class="profileStatus cell-status"><%= _status %></td>
+            <td class="profileAction cell-action">
+                <a class="exportBtn <%= (item.status === 1) ? '' : 'hide'%>" href="#" data-action="export">
                     <svg class="icon icon-export">
                         <use class="icon-svg" xlink:href="../img/sprite.svg#icon-export"></use>
                     </svg>
                     <span>Export</span>
                 </a>
+
+                <a class="importBtn <%= (item.status === -1) ? '' : 'hide'%>" href="#" data-action="import">
+                    <svg class="icon icon-import">
+                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-import"></use>
+                    </svg>
+                    <span>Import</span>
+                </a>
+
             </td>
 
             <td class="cell-delete">
-                <svg class="icon icon-delete">
+                <svg class="deleteBtn icon icon-delete">
                     <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
                 </svg>
             </td>
@@ -102,6 +168,9 @@
     </script>
 </div>
 
+<div id="messageWrapper">
+    <p id="messageText" class="hide">Message text</p>
+</div>
 <div class="wrapper">
 
     <!--<div class="extension-body log-in">-->
@@ -407,7 +476,7 @@
                 <form action="">
                     <div class="input-field">
                         <label for="search-query">Search query</label>
-                        <input type="text" id="search-query" name="search">
+                        <input type="text" id="search-query" name="job_name">
                     </div>
                     <div class="input-field">
                         <label for="region">Region</label>
@@ -416,6 +485,10 @@
                     <div class="input-field">
                         <label for="language">Profile language</label>
                         <input type="text" id="language" name="language">
+                    </div>
+                    <div class="input-field">
+                        <label for="shortName">Short name</label>
+                        <input type="text" id="shortName" name="short_name" maxlength="3">
                     </div>
                     <div class="input-field textarea-wrap">
                         <label for="url">URL</label>
@@ -732,7 +805,7 @@
                             <button class="btn green inactive">Export</button>
                             <button class="btn green">Import</button>
                         </div>
-                        <div class="right-side">
+                        <div class="deleteSelectedBtn right-side">
                             <button class="btn red">Delete</button>
                         </div>
                     </div>

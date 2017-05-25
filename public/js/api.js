@@ -1,12 +1,15 @@
 'use strict';
 
 (function () {
+
     var BASE_URL = 'http://euex-stage.fpdev.xyz';
     var AUTH_URL = BASE_URL + '/api/sessions';
     var RESTORE_URL = BASE_URL + '/api/password_resets';
+    var JOBS_URL = BASE_URL + '/api/import/jobs';
 
     window.EXT_API = {
-        AUTH_TOKEN: null,
+        //AUTH_TOKEN: null,
+        AUTH_TOKEN: 'tbm9yTuwR295oWCOps911A',
 
         // auth:
         login         : function (data, callback) {
@@ -58,7 +61,7 @@
         },
 
         // jobs
-        fetchJobList: function (data, callback) {
+        fetchJobListLocal: function (data, callback) {
             // put ajax method here
 
             setTimeout(function () {
@@ -73,7 +76,26 @@
                 callback(null, _data);
             }, 200);
         },
-        fetchJob    : function (data, callback) {
+        fetchJobList     : function (data, callback) {
+            $.ajax({
+                url        : JOBS_URL,
+                method     : 'GET',
+                headers    : {
+                    'X-Authorization': EXT_API.AUTH_TOKEN
+                },
+                crossDomain: true,
+                contentType: 'application/json',
+                accepts    : 'json',
+                //data       : JSON.stringify(),
+                success    : function (res) {
+                    callback(null, res);
+                },
+                error      : function (err) {
+                    callback(err);
+                }
+            });
+        },
+        fetchJobLocal    : function (data, callback) {
             // put ajax method here
 
             var id = parseInt(data.id, 10);
@@ -86,7 +108,28 @@
                 callback(null, job);
             }, 500);
         },
-        parseJobs   : function (jobsStr) {
+        fetchJob         : function (data, callback) {
+            var url = JOBS_URL + '/' + data.id;
+
+            $.ajax({
+                url        : url,
+                method     : 'GET',
+                headers    : {
+                    'X-Authorization': EXT_API.AUTH_TOKEN
+                },
+                crossDomain: true,
+                contentType: 'application/json',
+                accepts    : 'json',
+                //data       : JSON.stringify(),
+                success    : function (res) {
+                    callback(null, res);
+                },
+                error      : function (err) {
+                    callback(err);
+                }
+            });
+        },
+        parseJobs        : function (jobsStr) {
             var arr;
 
             try {
@@ -98,7 +141,7 @@
 
             return arr;
         },
-        saveJob     : function (_data, callback) {
+        saveJobLocal     : function (_data, callback) {
             // put ajax method here
 
             var data = $.extend({}, _data); // to create a new object
@@ -126,9 +169,38 @@
 
             callback(null, data);
         },
-        deleteJobs  : function (ids, callback) {
-            // put ajax method here
+        saveJob          : function (data, callback) {
+            var method;
+            var url;
 
+            if (data.id) {
+                url = JOBS_URL + '/' + data.id;
+                method = 'PUT';
+            } else {
+                url = JOBS_URL;
+                method = 'POST';
+            }
+
+            $.ajax({
+                url        : url,
+                method     : method,
+                headers    : {
+                    'X-Authorization': EXT_API.AUTH_TOKEN
+                },
+                crossDomain: true,
+                contentType: 'application/json',
+                accepts    : 'json',
+                data       : JSON.stringify(data),
+                success    : function (res) {
+                    callback(null, res);
+                },
+                error      : function (err) {
+                    callback(err);
+                }
+            });
+        },
+
+        deleteJobsLocal: function (ids, callback) {
             var jobs = EXT_API.parseJobs(localStorage.getItem('jobs'));
             var intIds = ids.map(function (id) {
                 return parseInt(id, 10);
@@ -145,15 +217,39 @@
 
             callback();
         },
+        deleteJobs     : function (ids, callback) {
+            var url = JOBS_URL + '/bulk_delete';
+            var intIds = ids.map(function (id) {
+                return parseInt(id, 10);
+            });
+
+            $.ajax({
+                url        : url,
+                method     : 'DELETE',
+                headers    : {
+                    'X-Authorization': EXT_API.AUTH_TOKEN
+                },
+                crossDomain: true,
+                contentType: 'application/json',
+                accepts    : 'json',
+                data       : JSON.stringify({ids: intIds}),
+                success    : function (res) {
+                    callback(null, res);
+                },
+                error      : function (err) {
+                    callback(err);
+                }
+            });
+        },
 
         // profiles:
-        fetchJobProfiles: function (options, callback) {
+        fetchJobProfilesLocal: function (options, callback) {
             var jobId = options.job_id;
             var key = 'job_profiles_' + jobId;
             var jsonValue;
             var profiles;
 
-            try  {
+            try {
                 jsonValue = JSON.parse(localStorage.getItem(key));
                 profiles = jsonValue.profiles || [];
 
@@ -162,11 +258,12 @@
                 callback(null, err);
             }
         },
-        saveJobProfiles : function (options, callback) {
+
+        saveJobProfiles: function (options, callback) {
             var jobId = options.job_id;
             var key = 'job_profiles_' + jobId;
             var value = {
-                job_id  : options.jobId,
+                job_id  : jobId,
                 profiles: options.profiles
             };
 
@@ -175,6 +272,52 @@
             setTimeout(function () {
                 callback(null, value);
             }, 500);
+        },
+
+        API_saveJobProfiles: function (options, callback) {
+            var data = {
+                id      : options.job_id,
+                profiles: options.profiles || []
+            };
+
+            EXT_API.saveJob(data, callback);
+        },
+
+        storeProfile: function (options, callback) {
+            var jobId = options.jobId;
+            var profile = options.profile;
+            var link = options.link;
+            var key;
+            var jsonValue;
+            var profiles;
+
+            // store the profile
+            profile.jobId = jobId;
+            localStorage.setItem('profile_' + link, JSON.stringify(profile));
+
+            // change job profile status:
+            key = 'job_profiles_' + jobId;
+
+            try {
+                jsonValue = JSON.parse(localStorage.getItem(key));
+                profiles = jsonValue.profiles || [];
+            } catch (err) {
+                return callback(err);
+            }
+
+            profiles.forEach(function (item) {
+                if (item.link === link) {
+                    item.status = 1;
+                    item.parsedAt = new Date()
+                }
+            });
+
+            localStorage.setItem(key, JSON.stringify({
+                job_id  : jobId,
+                profiles: profiles
+            }));
+
+            callback(null, {success: 'OK'});
         }
     }
 })();

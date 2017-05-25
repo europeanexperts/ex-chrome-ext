@@ -38,6 +38,7 @@
         show               : function () {
             var self = this;
 
+            self.isOpened = true;
             this.$el.addClass('active');
             setTimeout(function () {
                 self.onShow();
@@ -49,6 +50,7 @@
         },
         hide               : function () {
             this.$el.removeClass('active');
+            this.isOpened = false;
         },
         showValidationError: function (errors) {
             var names = Object.keys(errors);
@@ -339,6 +341,7 @@
         },
 
         renderData: function (options) {
+            var template;
             var listHtml;
             var items;
 
@@ -353,41 +356,8 @@
             }
 
             this.$deleteSelectedBtn.removeClass('hide');
-
-            listHtml = items.map(function (item) {
-                return [
-                    '<tr class="item" data-id="' + item.id + '">',
-                    '<td>',
-                    '  <div class="chbWrap checkbox-wrap">',
-                    '    <input type="checkbox" class="checkbox" id="checkbox-' + item.id + '">',
-                    '    <label for="checkbox-' + item.id + '">',
-                    '      <span class="check">',
-                    '        <svg class="icon icon-check">',
-                    '        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>',
-                    '      </svg>',
-                    '      </span>',
-                    '    </label>',
-                    '  </div>',
-                    '</td>',
-                    '<td class="cell-avatar">',
-                    '  <div class="avatar">' + item.avatar || '' + '</div>',
-                    '</td>',
-                    '<td class="jobLanguage cell-job-name">' + item.search + '</td>',
-                    '<td class="jobRegion cell-region">' + item.region + '</td>',
-                    '<td class="cell-cell-profiles">' + item.profiles || 0 + '</td>',
-                    '<td class="cell-settings">',
-                    '  <svg class="editJobBtn icon icon-settings">',
-                    '    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>',
-                    '  </svg>',
-                    '</td>',
-                    '<td class="cell-delete">',
-                    '  <svg class="deleteBtn icon icon-delete">',
-                    '    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>',
-                    '  </svg>',
-                    '</td>',
-                    '</tr>'
-                ].join('');
-            }).join('\n');
+            template = APP_TEMPLATES.getTemplate('job-list');
+            listHtml = template({items: items});
 
             if (options.prepend) {
                 this.$list.prepend(listHtml);
@@ -401,9 +371,10 @@
         init: function (options) {
             ExtensionPage.prototype.init.call(this, options);
 
-            this.$inputSearch = this.$el.find('input[name="search"]');
+            this.$inputJobName = this.$el.find('input[name="job_name"]');
             this.$inputRegion = this.$el.find('input[name="region"]');
             this.$inputLanguage = this.$el.find('input[name="language"]');
+            this.$inputShortName = this.$el.find('input[name="short_name"]');
             this.$inputUrl = this.$el.find('textarea[name="url"]');
             this.$inputImportExisting = this.$el.find('input[name="import_existing"]');
 
@@ -453,16 +424,17 @@
         serialize: function () {
             return {
                 id            : this.$el.attr('data-id'),
-                search        : this.$inputSearch.val(),
+                job_name      : this.$inputJobName.val(),
                 region        : this.$inputRegion.val(),
                 language      : this.$inputLanguage.val(),
+                short_name    : this.$inputShortName.val(),
                 url           : this.$inputUrl.val(),
                 importExisting: this.$inputImportExisting.val()
             };
         },
 
         validate: function (data) {
-            if (!data.search && !data.region && !data.language && !data.url) {
+            if (!data.job_name && !data.region && !data.language && !data.url) {
                 return {
                     error: 'At least one field must be non empty!'
                 }
@@ -486,22 +458,25 @@
                     return APP.error(err);
                 }
 
-                if (data.id) {
-                    APP.showPage(APP.pages.jobs.name);
-                    APP.events.trigger('jobs:update', res);
-                } else {
-                    APP.showPage(APP.pages.jobs.name, {reset: true});
-                    // APP.events.trigger('jobs:create', res);
-                }
+                APP.notification({message: 'Change are successful saved', type: 'success', timeout: 2000}, function () {
+                    if (data.id) {
+                        APP.showPage(APP.pages.jobs.name);
+                        APP.events.trigger('jobs:update', res);
+                    } else {
+                        APP.showPage(APP.pages.jobs.name, {reset: true});
+                        // APP.events.trigger('jobs:create', res);
+                    }
+                });
             });
         },
 
         renderData: function (data) {
             this.$el.attr('data-id', data.id);
 
-            this.$inputSearch.val(data.search);
+            this.$inputJobName.val(data.job_name);
             this.$inputRegion.val(data.region);
             this.$inputLanguage.val(data.language);
+            this.$inputShortName.val(data.short_name);
             this.$inputUrl.val(data.url);
             this.$inputImportExisting.val(data.importExisting);
 
@@ -522,6 +497,7 @@
             this.$startBtn = this.$el.find('.startBtn');
             this.$pauseBtn = this.$el.find('.pauseBtn');
             this.$restartBtn = this.$el.find('.restartBtn');
+            this.$deleteSelectedBtn = this.$el.find('.deleteSelectedBtn');
 
             this.$el.find('.searchBtn').on('click', $.proxy(this.search, this));
             this.$searchField.on('change', $.proxy(this.search, this));
@@ -529,6 +505,10 @@
             this.$startBtn.on('click', $.proxy(this.onStartClick, this));
             this.$pauseBtn.on('click', $.proxy(this.onPauseClick, this));
             this.$restartBtn.on('click', $.proxy(this.onRestartClick, this));
+
+            this.$el.on('click', '.exportBtn', $.proxy(this.onExportClick, this));
+            this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
+            this.$deleteSelectedBtn.on('click', $.proxy(this.onDeleteSelectedClick, this));
         },
 
         show: function (options) {
@@ -563,31 +543,86 @@
                     return; // do not fetch again !!!
                 }
 
-                // There are no saved profiles for this jobs, need to fetch data ...
-                // open new tab:
-                chrome.tabs.create({url: job.url, active: false}, function (tab) {
-                    self.loader({message: 'Step 1/2 (Fetch list ...)', status: 0});
-                    console.log('tab ' + tab.id + ' load...');
+                self.startListParser({url: job.url}, function (err, results) {
+                    var normalized;
 
-                    // wait until load:
-                    chrome.tabs.onUpdated.addListener(function (tabId, info) {
-                        if (tabId === tab.id && (info.status === "complete")) {
-                            console.log('... complete');
+                    if (err) {
+                        return APP.error(err);
+                    }
 
-                            // send message to contentScript:
-                            chrome.tabs.sendMessage(tab.id, {method: "jobs"}, function (response) {
-                                console.log("response: " + JSON.stringify(response));
+                    console.log("response: " + JSON.stringify(results));
 
-                                var normalized = self.normalizeProfiles(response.data.profiles);
+                    normalized = self.normalizeProfiles(results);
 
-                                self.storeProfileList(normalized);
-                                self.renderItems({items: normalized});
-                                self.loader({status: 1}); // Done, hide the progressbar
-                                self.$table.removeClass('hide');
-                                self.items = normalized;
+                    self.storeProfileList(normalized);
+                    self.renderItems({items: normalized});
+                    self.loader({status: 1}); // Done, hide the progressbar
+                    self.$table.removeClass('hide');
+                    self.items = normalized;
+                    self.renderCounters();
+                });
+            });
+        },
+
+        startListParser: function (options, callback) {
+            var url = options.url;
+            var self = this;
+
+            chrome.tabs.query({active: true}, function (tabs) {
+                var tabId = tabs[0].id;
+                var evt = 'complete:' + tabId;
+
+                var hasElements = true;
+                var page = 1;
+                var profileList = [];
+
+                self.loader({message: 'Step 1/2 (Fetch list ...)', status: 0});
+                console.log('tab ' + tabId + ' load...');
+
+                async.whilst(function test() {
+
+                    return hasElements && self.isOpened;
+                }, function iterate(cb) {
+                    var nextUrl = url + '&page=' + page;
+
+                    chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: nextUrl});
+
+                    APP.events.on(evt, function (e, tab, info) {
+                        console.log('>>> triggered %s for %s', evt, tab.url);
+
+                        APP.events.off(evt);
+
+                        chrome.tabs.sendMessage(tab.id, {method: 'jobs'}, function (response) {
+                            console.log("response: " + JSON.stringify(response));
+
+                            var count = Math.ceil(response.data.total / 10);
+
+                            if (!response.data || !response.data.profiles || !response.data.profiles.length) {
+                                hasElements = false;
+                            }
+
+                            self.loader({
+                                message: 'Fetch list (' + page + '/' + count + ')',
+                                status : page / count
                             });
-                        }
+
+                            page++;
+                            if (page > count) { // profile / page
+                                hasElements = false;
+                            }
+
+                            profileList = profileList.concat(response.data.profiles);
+                            cb();
+                        });
                     });
+
+                }, function (err, results) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    console.log('>>> doWhile results', profileList);
+                    callback(null, profileList);
                 });
             });
         },
@@ -615,19 +650,61 @@
             }
         },
 
-        __parseProfile: function(options, callback) {
+        getSelectedProfiles: function () {
+            return this.$list.find('.item .checkbox:checked')
+                .map(function () {
+                    var $chb = $(this);
+
+                    return $chb.closest('.item').attr('data-id'); // link
+                }).toArray();
+        },
+
+        deleteProfiles: function (options, callback) {
+            var links = options.links;
+            var profiles = _.filter(this.items, function (item) {
+                return links.indexOf(item.link) === -1;
+            });
+            var saveData = {
+                id      : this.jobId,
+                profiles: profiles
+            };
+            var self = this;
+
+            EXT_API.saveJob(saveData, function (err, res) {
+                if (err) {
+                    return callback(err);
+                }
+
+                self.items = profiles;
+                self.$list.find('.item').each(function () {
+                    var $li = $(this);
+                    var link = $li.attr('data-id');
+
+                    if (links.indexOf(link) !== -1) { // need to remove
+                        $li.remove();
+                    }
+                });
+
+                if (!profiles.length) {
+                    self.renderEmptyList();
+                }
+                self.renderCounters();
+            });
+        },
+
+        __parseProfile: function (options, callback) {
             console.log('>>> parseProfile', options);
 
             var url = 'https://www.linkedin.com/in/' + 'tetiana-bysaha-637a427b';
             var _options = {
                 //tabId: this.profileTabId || null,
                 // url  : 'https://www.linkedin.com/in/' + options.link
-                url  : url
+                url: url
             };
 
             var self = this;
 
-            chrome.tabs.create({url: url, active: false}, function(tab) {
+            chrome.tabs.create({url: url, active: false}, function (tab) {
                 chrome.tabs.onUpdated.addListener(function (tabId, info, updTab) {
                     if (updTab.url === url && tabId === tab.id && (info.status === "complete")) {
                         console.log('... complete');
@@ -637,7 +714,7 @@
                             console.log("response: " + JSON.stringify(response));
 
                             //chrome.tabs.remove(tabId, function() {
-                                callback(null, options); // TODO: !!!
+                            callback(null, options); // TODO: !!!
                             //});
                         });
                     }
@@ -645,33 +722,35 @@
             });
 
             /*APP_HELPERS.prepareParseProfile(_options, function(err, res) {
-                if (err) {
-                    return callback(err);
-                }
+             if (err) {
+             return callback(err);
+             }
 
-                console.log('>>> res', res);
-                //self.profileTabId = res.tabId;
+             console.log('>>> res', res);
+             //self.profileTabId = res.tabId;
 
-                setTimeout(function () {
-                    callback(null, options); // TODO: !!!
-                }, 200);
-            });*/
+             setTimeout(function () {
+             callback(null, options); // TODO: !!!
+             }, 200);
+             });*/
         },
 
-        parseProfile: function(options, callback) {
+        parseProfile: function (options, callback) {
+            var profileLink = options.link;
+            var url;
+
+            if (typeof profileLink !== 'string') {
+                return callback({message: 'Invalid value for link'});
+            }
+
+            url = 'https://www.linkedin.com' + profileLink;
             console.log('>>> parseProfile', options);
 
-            // var url = 'https://www.linkedin.com' + options.link;
-            var url = 'https://www.linkedin.com' + '/in/tetiana-bysaha-637a427b';
-            console.log('>>> url', url);
-
-            var self = this;
-
-            chrome.tabs.query({active: true}, function(tabs) {
+            chrome.tabs.query({active: true}, function (tabs) {
                 var tabId = tabs[0].id;
                 var evt = 'complete:' + tabId;
 
-                APP.events.on(evt, function(e, tab, info) {
+                APP.events.on(evt, function (e, tab, info) {
                     if (tab.url !== url) {
                         return;
                     }
@@ -682,78 +761,40 @@
                     chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
                         console.log("response: " + JSON.stringify(response));
 
-                        callback(null, response || {}); // TODO: !!!
+                        callback(null, response || {});
                     });
                 });
 
-                chrome.tabs.update(tabId, {url: url}, function() {
-                    chrome.tabs.reload(tabId, function() {
-
-                        /*chrome.tabs.onUpdated.addListener(function(_tabId, info, tupdTab) {
-                            if (tupdTab.url === url && tabId === _tabId && info.status === "complete") {
-                                //setTimeout(function() {
-
-                                console.log('>>> send message to ', tabId);
-                                chrome.tabs.sendMessage(tabId, {method: "profile"}, function (response) {
-                                    console.log("response: " + JSON.stringify(response));
-
-                                    //chrome.tabs.remove(tabId, function() {
-                                    callback(null, options); // TODO: !!!
-                                    //});
-                                });
-                            }
-                        });*/
-                        //}, 1000);
-                    });
+                chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: url}, function (response) {
+                    console.log("redirect response: " + response);
                 });
-
             });
-
-            /*chrome.tabs.create({url: url, active: false}, function(tab) {
-                chrome.tabs.onUpdated.addListener(function (tabId, info, updTab) {
-                    if (updTab.url === url && tabId === tab.id && (info.status === "complete")) {
-                        console.log('... complete');
-                        //onCompleteTab(tabId, info);
-
-                        chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
-                            console.log("response: " + JSON.stringify(response));
-
-                            //chrome.tabs.remove(tabId, function() {
-                                callback(null, options); // TODO: !!!
-                            //});
-                        });
-                    }
-                });
-            });*/
-
-            /*APP_HELPERS.prepareParseProfile(_options, function(err, res) {
-                if (err) {
-                    return callback(err);
-                }
-
-                console.log('>>> res', res);
-                //self.profileTabId = res.tabId;
-
-                setTimeout(function () {
-                    callback(null, options); // TODO: !!!
-                }, 200);
-            });*/
         },
 
-        parseProfiles: function() {
+        parseProfiles: function () {
             this.parseIndex = this.parseIndex || 0;
             var count = this.items.length;
             var self = this;
 
             console.log('>>> starting parser... from=%d, total=%d', self.parseIndex, count);
 
+            self.loader({
+                message: 'Profile ...',
+                status : 0
+            });
+
             async.whilst(function test() {
                 return (self.parseIndex < count) && (self.status === 'started');
             }, function iterate(cb) {
                 var profile = self.items[self.parseIndex];
 
+                self.loader({
+                    message: 'Profile ' + self.parseIndex + '/' + count,
+                    status : self.parseIndex / count
+                });
+
                 console.log('>>> try to parse', self.parseIndex);
-                self.parseProfile(profile, function(err, res) {
+                self.parseProfile(profile, function (err, res) {
                     if (err) {
                         return cb(err);
                     }
@@ -761,10 +802,27 @@
                     console.log('>>> res', res);
                     self.parseIndex++;
 
+                    if (res) {
+                        self.onParsedProfile(profile.link, res.data);
+                        EXT_API.storeProfile({
+                            jobId  : self.jobId,
+                            profile: res,
+                            link   : profile.link
+                        }, function (err, response) {
+                            if (err) {
+                                return APP.error(err);
+                            }
+
+                            console.log('>>> profile %s was imported successful', profile.link);
+                        });
+                    } else {
+                        self.onParsedProfile(profile.link, false);
+                    }
+
                     cb(null, res);
                 });
 
-            }, function(err) {
+            }, function (err) {
                 if (err) {
                     APP.error(err);
                 }
@@ -774,19 +832,44 @@
                     console.log('>>> PAUSED');
 
                     /*self.$startBtn.addClass('hide');
-                    self.$restartBtn.addClass('hide');
-                    self.$pauseBtn.removeClass('hide');*/
+                     self.$restartBtn.addClass('hide');
+                     self.$pauseBtn.removeClass('hide');*/
                 } else {
                     console.log('>>> DONE');
 
+                    setTimeout(function () {
+                        self.loader({
+                            message: 'Done',
+                            status : 1
+                        });
+                    }, 200);
+
                     /*self.$startBtn.removeClass('hide');
-                    self.$pauseBtn.addClass('hide');*/
+                     self.$pauseBtn.addClass('hide');*/
                 }
                 self.$restartBtn.removeClass('hide');
             });
         },
 
-        onStartClick: function() {
+        onParsedProfile: function (link, profile) {
+            var $li = this.$list.find('.item[data-id="' + link + '"]');
+            var $action = $li.find('.profileAction');
+            var statusText;
+
+            if (profile && profile.name) {
+                statusText = 'Successful';
+                $action.find('[data-action="export"]').removeClass('hide');
+                $action.find('[data-action="import"]').addClass('hide');
+            } else {
+                statusText = 'Unsuccessful';
+                $action.find('[data-action="export"]').addClass('hide');
+                $action.find('[data-action="import"]').removeClass('hide');
+            }
+
+            $li.find('.profileStatus').html(statusText);
+        },
+
+        onStartClick: function () {
             this.$startBtn.addClass('hide');
             this.$restartBtn.addClass('hide');
             this.$pauseBtn.removeClass('hide');
@@ -797,7 +880,7 @@
             this.parseProfiles();
         },
 
-        onPauseClick: function() {
+        onPauseClick: function () {
             this.$startBtn.removeClass('hide');
             this.$pauseBtn.addClass('hide');
             //this.$restartBtn.removeClass('hide'); // hide class will be removed on parse callback
@@ -807,10 +890,50 @@
             this.status = 'paused';
         },
 
-        onRestartClick: function() {
+        onRestartClick: function () {
             this.status = 'restarted';
             this.parseIndex = 0;
             this.onStartClick();
+        },
+
+        onExportClick: function (e) {
+            var $tr = $(e.target).closest('.item');
+            var link = $tr.attr('data-id');
+            var key = 'profile_' + link;
+
+            var profileStr = localStorage.getItem(key);
+
+            APP.notification({message: profileStr, type: 'success', timeout: 5000}); // TODO
+        },
+
+        onDeleteClick: function (e) {
+            var $li = $(e.target).closest('.item');
+            var link = $li.attr('data-id');
+            var links = [link];
+
+            this.deleteProfiles({links: links}, function (err) {
+                if (err) {
+                    return APP.error(err);
+                }
+
+                APP.notification({message: 'Successful removed', type: 'success'});
+            });
+        },
+
+        onDeleteSelectedClick: function () {
+            var links = this.getSelectedProfiles();
+
+            if (!links.length) {
+                return APP.notification({message: 'Select profile You want to delete'});
+            }
+
+            this.deleteProfiles({links: links}, function (err, res) {
+                if (err) {
+                    return APP.error(err);
+                }
+
+                APP.notification({message: 'Successful removed', type: 'success'});
+            });
         },
 
         storeProfileList: function (profiles) {
@@ -833,25 +956,52 @@
             });
         },
 
+        __fetchAll: function (options, callback) {
+            var jobId = options.id;
+            var _options = {
+                id: jobId
+            };
+
+            EXT_API.fetchJob(_options, function (err, res) {
+                var result;
+
+                if (err) {
+                    return callback(err);
+                }
+
+                if (!res || !res.id) {
+                    return callback({message: 'The job was not found'});
+                }
+
+                result = {
+                    job     : res,
+                    profiles: res.profiles || []
+                };
+
+                callback(null, result);
+            });
+        },
+
         fetchAll: function (options, callback) {
             var jobId = options.id;
 
             async.parallel({
+
                 job: function (cb) {
                     var _options = {
                         id: jobId
                     };
 
-                    EXT_API.fetchJob(_options, function (err, job) {
+                    EXT_API.fetchJob(_options, function (err, res) {
                         if (err) {
                             return cb(err);
                         }
 
-                        if (!job || !job.id) {
-                            return cb('The job was not found');
+                        if (!res || !res.id) {
+                            return cb({message: 'The job was not found'});
                         }
 
-                        cb(null, job);
+                        cb(null, res);
                     });
                 },
 
@@ -860,53 +1010,16 @@
                         job_id: jobId
                     };
 
-                    EXT_API.fetchJobProfiles(_options, function (err, profiles) {
+                    EXT_API.fetchJobProfilesLocal(_options, function (err, res) {
                         if (err) {
                             return cb(err);
                         }
 
-                        cb(null, profiles);
+                        cb(null, res || []);
                     });
 
-                    /*var _jobs = [
-                     {
-                     "link": "/in/synov/",
-                     "name": "Nikita Synov",
-                     "job" : "Taking Care of Your Business with Innovative Marketing Strategies"
-                     },
-                     {
-                     "link": "#",
-                     "name": "LinkedIn Member",
-                     "job" : "Program Development Professional"
-                     },
-                     {
-                     "link": "/in/victoroleksuh/",
-                     "name": "Victor Oleksuh",
-                     "job" : "Looking for Junior PHP/WordPress developer position"
-                     },
-                     {
-                     "link": "#",
-                     "name": "LinkedIn Member",
-                     "job" : "System administrator - Ergopack LLC"
-                     },
-                     {
-                     "link": "/in/%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%B0%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%BD%D0%BA%D0%BE-46418876/",
-                     "name": "Светлана Protsenko",
-                     "job" : "Senior Marketing Manager  Pilog Internftionfl Group, CIS\n"
-                     }
-                     ];
-
-                     cb(null, _jobs);*/
                 }
-
-            }, function (err, results) {
-                if (err) {
-                    return callback(err);
-                }
-
-                console.log('>>> results', results);
-                callback(null, results);
-            });
+            }, callback);
         },
 
         getProfileShortName: function (name) {
@@ -950,6 +1063,10 @@
             return template(templateOptions);
         },
 
+        renderEmptyList: function() {
+            this.$list.html('<tr><td colspan="8">There are no data</td></td></tr>');
+        },
+
         renderItems: function (options) {
             var profiles = options.items;
             var html;
@@ -961,17 +1078,34 @@
             }
 
             this.$list.html(html);
+            this.renderCounters();
+        },
+
+        renderCounters: function () {
+            var counts = {
+                "-1": 0, // unsuccessful,
+                "0" : 0, // pending,
+                "1" : 0  // successful
+            };
+
+            this.items.forEach(function (profile) {
+                var _status = profile.status || 0;
+
+                counts[_status] += 1;
+            });
+
+            this.$header.find('.countSuccessful').html(counts["1"]);
+            this.$header.find('.countUnSuccessful').html(counts["-1"]);
+            this.$header.find('.countPending').html(counts["0"]);
         },
 
         renderJob: function (job) {
-            var _date = new Date(job.updatedAt);
+            var _date = new Date(job.updated_at);
 
             this.$header.find('.jobProfileRegion').html(job.region || '');
             this.$header.find('.jobProfileDate').html(_date.toLocaleDateString());
 
-            this.$header.find('.countSuccessful').html(job.count_successful || 0);
-            this.$header.find('.countUnSuccessful').html(job.count_unsuccessful || 0);
-            this.$header.find('.countPending').html(job.count_pending || 0);
+            this.renderCounters();
         }
     });
 
@@ -1046,10 +1180,27 @@
             APP.$logoutBtn.addClass('hide');
             APP.showPage(APP.pages.login.name);
         },
-        notification : function (options) {
+        notification : function (options, callback) {
             var message = options.message || 'Some thing went wrong';
+            var className = options.type || 'error';
+            var timeout = options.timeout || 3000;
+            // alert(message);
 
-            alert(message);
+            var $messageText = $('#messageText');
+
+            $messageText
+                .removeClass('success')
+                .removeClass('error')
+                .addClass(className)
+                .removeClass('hide')
+                .html(message);
+
+            setTimeout(function () {
+                $messageText.addClass('hide');
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }, timeout);
         },
         error        : function (e) {
             console.log('>>> APP.error', e);
@@ -1120,11 +1271,10 @@
      source: 'DOMtoString(document)'
      });*/
 
-
-    chrome.tabs.query({active: true}, function(tabs) {
+    chrome.tabs.query({active: true}, function (tabs) {
         var tabId = tabs[0].id;
 
-        chrome.tabs.onUpdated.addListener(function(_tabId, info, updTab) {
+        chrome.tabs.onUpdated.addListener(function (_tabId, info, updTab) {
             var evt;
 
             if (tabId === _tabId && info.status === "complete") {
