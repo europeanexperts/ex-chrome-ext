@@ -737,10 +737,20 @@
 
         parseProfile: function (options, callback) {
             var profileLink = options.link;
+            var storedProfile;
             var url;
 
             if (typeof profileLink !== 'string') {
                 return callback({message: 'Invalid value for link'});
+            }
+
+            storedProfile = EXT_API.getProfileLocal({
+                jobId: this.jobId,
+                link: profileLink
+            });
+
+            if (storedProfile && storedProfile.name) {
+                return callback(null, {data: storedProfile, isNew: false});
             }
 
             url = 'https://www.linkedin.com' + profileLink;
@@ -756,12 +766,16 @@
                     }
 
                     APP.events.off(evt);
-                    console.log('>>> send message to ', tab.id);
-
                     chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
+                        response = response || {};
+
+                        response.isNew = true;
                         console.log("response: " + JSON.stringify(response));
 
-                        callback(null, response || {});
+                        /*
+                        * response = {isNew: true, data: {{parsed profile data}}}
+                        * */
+                        callback(null, response);
                     });
                 });
 
@@ -799,27 +813,10 @@
                         return cb(err);
                     }
 
-                    console.log('>>> res', res);
                     self.parseIndex++;
-
-                    self.onParsedProfile(profile, res.data);
-
-                    /*if (res) {
-                        self.onParsedProfile(profile.link, res.data);
-                        EXT_API.storeProfile({
-                            jobId  : self.jobId,
-                            profile: res,
-                            link   : profile.link
-                        }, function (err, response) {
-                            if (err) {
-                                return APP.error(err);
-                            }
-
-                            console.log('>>> profile %s was imported successful', profile.link);
-                        });
-                    } else {
-                        self.onParsedProfile(profile.link, false);
-                    }*/
+                    if (res.isNew) {
+                        self.onParsedProfile(profile, res.data);
+                    }
 
                     cb(null, res);
                 });

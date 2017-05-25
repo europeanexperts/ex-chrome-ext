@@ -294,6 +294,25 @@
             localStorage.setItem('profile_' + link, JSON.stringify(profile));
 
             callback(null, {success: 'OK'});
+        },
+
+        getProfileLocal: function(options) {
+            var link = options.link;
+            var value = localStorage.getItem('profile_' + link);
+            var profileJSON;
+
+            if (!value) {
+                return null;
+            }
+
+            try {
+                profileJSON = JSON.parse(value);
+            } catch(err) {
+                console.error(err);
+                profileJSON = null;
+            }
+
+            return profileJSON;
         }
     }
 })();
