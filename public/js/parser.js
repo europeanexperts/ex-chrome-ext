@@ -1,13 +1,83 @@
 window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
-/*
-*
-* */
 (function () {
+    'use strict';
+
     var SELECTORS = {
         TOTAL                 : '.search-results__total',
         SEARCH_RESULT         : '.results-list',
         SEARCH_RESULT_PROFILES: '.results-list li'
+    };
+
+    function parseVisuallyHidden(str) {
+        var rows;
+
+        str = str || '';
+        if (!str) {
+            return '';
+        }
+
+        rows = str.split('\n');
+        if (!rows || rows.length < 3) {
+            console.warn('warn: parseVisuallyHidden function was called with invalid param "%s"', str);
+
+            return '';
+        }
+
+        return rows[2].trim();
+    }
+
+    function parseEntityRange(str, options) {
+        var delimiter = (options && options.delimiter) || ' – ';
+
+        return str.split(delimiter).map(function(item) {
+            return item.trim();
+        });
+    }
+
+    SOCIAL_PARSER.onLoadJobs = function (callback) {
+        $(document).ready(function () {
+            /*$('body').animate({scrollTop: $('.search-results-container').height()}, 1000, function() {
+             var timeout = 20; // 10 sec
+             var currentTime = new Date();
+             var maxTime = currentTime.setSeconds(currentTime.getSeconds() + timeout);
+
+             var intervalId = setInterval(function() {
+             var isLoadedLi = $(SELECTORS.SEARCH_RESULT_PROFILES + '.search-result__occlusion-hint').length === 0;
+             var now = new Date();
+
+             console.log('>>> check interval');
+
+             if (isLoadedLi) {
+             console.log('>>> clear interval html', intervalId);
+             clearInterval(intervalId);
+             callback();
+             } else if (now > maxTime) {
+             console.log('>>> clear interval timeout', intervalId);
+             clearInterval(intervalId);
+             callback({'message': 'Timeout error'});
+             }
+
+             }, 100);
+             });*/
+
+            var positions = $('.results-list li')
+                .map(function () {
+                    return $(this).position().top;
+                }).toArray();
+
+            var i = 0;
+            var t = setInterval(function () {
+                if (i === 10) {
+                    clearInterval(t);
+                    return callback();
+                }
+
+                $('body').animate({scrollTop: positions[i]}, 100);
+
+                i++;
+            }, 200);
+        });
     };
 
     SOCIAL_PARSER.parseJobs = function () {
@@ -38,16 +108,16 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return result;
     };
 
-    SOCIAL_PARSER.onLoadProfile = function(callback) {
+    SOCIAL_PARSER.__onLoadProfile = function (callback) {
 
-        $(document).ready(function() {
-            var timeout = 20; // 10 sec
+        $(document).ready(function () {
+            var timeout = 10; // 10 sec
             var currentTime = new Date();
             var maxTime = currentTime.setSeconds(currentTime.getSeconds() + timeout);
 
             $('html, body').animate({scrollTop: $('#profile-wrapper').height()});
 
-            var intervalId = setInterval(function() {
+            var intervalId = setInterval(function () {
                 var $langEl = $('#ember2098');
                 var $skillsEl = $('#ember2096');
                 var now = new Date();
@@ -69,10 +139,53 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         });
     };
 
+    SOCIAL_PARSER.onLoadProfile = function (callback) {
+
+        $(document).ready(function () {
+            $('body').animate({scrollTop: $('.profile-detail').height()}, 3000, function () {
+                return callback();
+            });
+        });
+    };
+
     SOCIAL_PARSER.parseProfile = function () {
         var $el = $('body');
         var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
         var _title = (_titleArr.length) ? _titleArr[0] : '';
+        var _languages;
+        var _projects;
+
+        // expand languages container
+        $el.find('button[data-control-name="accomplishments_expand_languages"]').click();
+        _languages =  $el.find('.pv-accomplishments-section .languages li')
+            .map(function () {
+                var $li = $(this);
+                var lang = $li.find('h4').html();
+                var level = $li.find('.pv-accomplishment-entity__proficiency').html() || '';
+
+                return {
+                    language: parseVisuallyHidden(lang),
+                    level   : level.trim()
+                };
+            })
+            .toArray();
+
+        $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
+        _projects =  $el.find('.pv-accomplishments-section .projects li')
+            .map(function () {
+                var $li = $(this);
+                var prTitle = $li.find('h4').html();
+                var prDescription = $li.find('.pv-accomplishment-entity__description').html();
+                var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+
+                return {
+                    title      : parseVisuallyHidden(prTitle),
+                    description: parseVisuallyHidden(prDescription),
+                    start_date : dateRange[0],
+                    end_date   : dateRange[1]
+                };
+            })
+            .toArray();
 
         return {
             name     : $el.find('.pv-top-card-section__name').html(),
@@ -80,39 +193,41 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             country  : $el.find('.pv-top-card-section__location').html(),
             summary  : '', // TODO
             picture  : $el.find('.pv-top-card-section__photo img').attr('src'),
-            education: $el.find('.pv-education-entity').map(function () {
-                var $li = $(this);
-
-                return {
-                    name: $li.find('.pv-entity__school-name').html(),
-                    description: $li.find('.pv-entity__comma-item')
-                        .map(function() {return $(this).html();})
-                        .toArray()
-                        .join(', '),
-                    start_date : $li.find('.pv-education-entity__date time:first').html(),
-                    end_date : $li.find('.pv-education-entity__date time:last').html()
-                }
-                })
-                .toArray(),
-
-            languages: $el.find('.pv-accomplishments-section .languages li')
-                .map(function() {return $(this).html()})
-                .toArray(),
-
-            skills: $el.find('.pv-skill-entity__skill-name')
-                .map(function() {return $(this).html();})
-                .toArray(),
-
-            companies: $el.find('.pv-position-entity')
-                .map(function() {
+            languages: _languages,
+            projects: _projects,
+            education: $el.find('.pv-education-entity')
+                .map(function () {
                     var $li = $(this);
 
                     return {
-                        title: $li.find('h3').html(),
-                        company: $li.find('.pv-entity__secondary-title').html(),
-                        location: '', // TODO
-                        start_date: $li.find('.pv-entity__date-range span:last').html().split(' – ')[0],
-                        end_date: $li.find('.pv-entity__date-range span:last').html().split(' – ')[1],
+                        name       : $li.find('.pv-entity__school-name').html(),
+                        description: $li.find('.pv-entity__comma-item')
+                            .map(function () {
+                                return $(this).html();
+                            })
+                            .toArray()
+                            .join(', '),
+                        start_date : $li.find('.pv-entity__dates time:first').html(),
+                        end_date   : $li.find('.pv-entity__dates time:last').html()
+                    }
+                })
+                .toArray(),
+            skills: $el.find('.pv-skill-entity__skill-name')
+                .map(function () {
+                    return $(this).html();
+                })
+                .toArray(),
+
+            companies: $el.find('.pv-position-entity')
+                .map(function () {
+                    var $li = $(this);
+
+                    return {
+                        title      : $li.find('h3').html(),
+                        company    : $li.find('.pv-entity__secondary-title').html(),
+                        location   : '', // TODO
+                        start_date : $li.find('.pv-entity__date-range span:last').html().split(' – ')[0],
+                        end_date   : $li.find('.pv-entity__date-range span:last').html().split(' – ')[1],
                         description: '' // // TODO
                     }
                 })
@@ -120,55 +235,30 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         };
     };
 
-    SOCIAL_PARSER.parserOnProfileLoaded = function(callback) {
+    SOCIAL_PARSER.parserOnProfileLoaded = function (callback) {
         $(document).ready(callback);
-    }
+    };
+
+    SOCIAL_PARSER.loadURL = function (url) {
+        window.location.href = url;
+    };
 })();
 
-SOCIAL_PARSER.onLoadProfile(function(err) {
+/*SOCIAL_PARSER.onLoadProfile(function (err) {
+    var data;
+
     if (err) {
         return console.error(err);
     }
 
-    var data = SOCIAL_PARSER.parseProfile();
+    data = SOCIAL_PARSER.parseProfile();
     console.log('>>> data', data);
-});
+    console.log('>>> data', JSON.stringify(data));
+});*/
 
-/*
+/*SOCIAL_PARSER.onLoadJobs(function() {
+ var data = SOCIAL_PARSER.parseJobs();
 
- {
+ console.log('>>> data', data);
+ });*/
 
- job_id 1495180474989
-
-
- "total":"5",
- "profiles":[
- {
- "link":"/in/synov/",
- "name":"Nikita Synov",
- "job":"Taking Care of Your Business with Innovative Marketing Strategies"
- },
- {
- "link":"#",
- "name":"LinkedIn Member",
- "job":"Program Development Professional"
- },
- {
- "link":"/in/victoroleksuh/",
- "name":"Victor Oleksuh",
- "job":"Looking for Junior PHP/WordPress developer position"
- },
- {
- "link":"#",
- "name":"LinkedIn Member",
- "job":"System administrator - Ergopack LLC"
- },
- {
- "link":"/in/%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%B0%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%BD%D0%BA%D0%BE-46418876/",
- "name":"Светлана Protsenko",
- "job":"Senior Marketing Manager  Pilog Internftionfl Group, CIS\n"
- }
- ]
- }
-
- */
