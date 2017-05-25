@@ -105,6 +105,7 @@
     <script type="text/template" id="job-profiles-list-template">
         <% items.forEach(function(item) {
             var _status = 'Pending';
+            var _addDate = new Date(item.created_at);
 
             if (item.status === 1) {
                 _status = 'Successful';
@@ -139,7 +140,7 @@
             <!-- profile info -->
             <td class="cell-name" title="' + item.name + '"><%= item.name%></td>
             <td class="cell-job" title="' + item.job + '"><%= item.job%></td>
-            <td class="cell-date"><%= item.createdAt %></td>
+            <td class="cell-date"><%= _addDate.toLocaleDateString() %></td>
             <td class="profileStatus cell-status"><%= _status %></td>
             <td class="profileAction cell-action">
                 <a class="exportBtn <%= (item.status === 1) ? '' : 'hide'%>" href="#" data-action="export">
@@ -525,15 +526,15 @@
                         </div>
                         <ul class="counter">
                             <li class="count-item">
-                                <span class="countSuccessful number"></span>
+                                <span class="countSuccessful number">-</span>
                                 <span class="caption">successful</span>
                             </li>
                             <li class="count-item">
-                                <span class="countUnSuccessful number"></span>
+                                <span class="countUnSuccessful number">-</span>
                                 <span class="caption">unsuccessful</span>
                             </li>
                             <li class="count-item">
-                                <span class="countPending number"></span>
+                                <span class="countPending number">-</span>
                                 <span class="caption">pending</span>
                             </li>
                         </ul>
