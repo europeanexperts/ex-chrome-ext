@@ -730,17 +730,13 @@
 
                     if (_parseStatus === PARSE_STATUSES.STARTED) {
                         self.parseStatus(PARSE_STATUSES.STOPPED);
-                        _loaderStatus = 1;
-                    } else if (_parseStatus === PARSE_STATUSES.PAUSED) {
-                        _loaderStatus = 0;
-                    }
+                        setTimeout(function() {
+                            self.loader({message: 'Done successful',status : 1});
+                        }, 200);
 
-                    setTimeout(function() {
-                        self.loader({
-                            message: '',
-                            status : _loaderStatus
-                        });
-                    }, 200);
+                    } else if (_parseStatus === PARSE_STATUSES.PAUSED) {
+                        self.loader({message: '',status : 1}); // hide the progressbar
+                    }
 
                     self.$restartBtn.removeClass('hide');
                     callback(null, results);
