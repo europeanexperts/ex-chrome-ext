@@ -528,6 +528,7 @@
             var self = this;
 
             ExtensionPage.prototype.show.call(this, options);
+
             this.jobId = options.id;
             this.$el.addClass('hide'); // hide until loading data
 
@@ -1277,7 +1278,7 @@
         },
 
         onNextClick: function (e) {
-            var url = this.$inputUrl.html().trim();
+            var url = this.$inputUrl.val().trim();
             var self = this;
 
             e.stopPropagation();
