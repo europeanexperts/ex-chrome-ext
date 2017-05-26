@@ -8,6 +8,12 @@
 
     var EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var PASSWORD_MIN_LENGTH = 6;
+    var PARSE_STATUSES = {
+        STARTED  : 'started',
+        PAUSED   : 'paused',
+        RESTARTED: 'restarted',
+        STOPPED  : 'stopped'
+    };
 
     function inherit(Child, Parent, proto) {
         proto = proto || {};
@@ -504,6 +510,7 @@
             ExtensionPage.prototype.init.call(this, options);
 
             this.items = [];
+            this._status = PARSE_STATUSES.STOPPED;
 
             this.$header = this.$el.find('.jobProfileHeader');
             this.$table = this.$el.find('.table');
@@ -537,8 +544,11 @@
 
             this.jobId = options.id;
             this.$el.addClass('hide'); // hide until loading data
+            this.items = [];
+            this.parseStatus(PARSE_STATUSES.STOPPED);
 
             this.parseIndex = 0;
+            this.parsePageIndex = 1;
              // this.status = 'stopped';
 
             this.fetchAll({id: options.id}, function (err, results) {
@@ -557,17 +567,22 @@
                 self.$table.addClass('hide');
                 self.$el.removeClass('hide');
 
+                self.items = profiles;
+                self.renderItems({items: profiles});
+                self.loader({status: 1}); // Done, hide the progressbar
+                self.$table.removeClass('hide');
+
                 // check saved profiles:
-                if (profiles && profiles.length) {
+                /*if (profiles && profiles.length) {
                     self.items = profiles;
                     self.renderItems({items: profiles});
                     self.loader({status: 1}); // Done, hide the progressbar
                     self.$table.removeClass('hide');
 
                     return; // do not fetch again !!!
-                }
+                }*/
 
-                self.startListParser({url: job.url}, function (err, results) {
+                /*self.startListParser({url: job.url}, function (err, results) {
                     var normalized;
 
                     if (err) {
@@ -576,15 +591,16 @@
 
                     console.log("response: " + JSON.stringify(results));
 
-                    normalized = self.normalizeProfiles(results);
+                    // normalized = self.normalizeProfiles(results);
 
-                    self.storeProfileList(normalized);
-                    self.renderItems({items: normalized});
+                    // self.storeProfileList(normalized);
+                    // self.renderItems({items: normalized});
                     self.loader({status: 1}); // Done, hide the progressbar
-                    self.$table.removeClass('hide');
-                    self.items = normalized;
-                    self.renderCounters();
-                });
+
+                    // self.$table.removeClass('hide');
+                    // self.items = normalized;
+                    // self.renderCounters();
+                });*/
             });
         },
 
@@ -592,6 +608,31 @@
             ExtensionPage.prototype.hide.call(this);
             /*this.parseIndex = this.items.length;
              this.status = 'stopped';*/
+        },
+
+        _getStatus: function() {
+            return this._status || PARSE_STATUSES.STOPPED;
+        },
+
+        _setStatus: function(value) {
+            this._status = value;
+        },
+
+        parseStatus: function(value) {
+            if (value === undefined) {
+                return this._getStatus();
+            }
+
+            this._setStatus(value);
+        },
+
+        appendProfiles: function(normalized) {
+            if (normalized.length) {
+                this.storeProfileList(normalized);
+                // this.renderItems({items: normalized, append: true});
+                this.renderItems({items: this.items}); // TODO: use normalized with append
+                this.$table.removeClass('hide');
+            }
         },
 
         startListParser: function (options, callback) {
@@ -603,56 +644,106 @@
                 var evt = 'complete:' + tabId;
 
                 var hasElements = true;
-                var page = 1;
-                var profileList = [];
+                var page = self.parsePageIndex || 1;
 
-                self.loader({message: 'Step 1/2 (Fetch list ...)', status: 0});
-                console.log('tab ' + tabId + ' load...');
+                function isRun() {
+                    return hasElements && self.isOpened && [PARSE_STATUSES.STARTED, PARSE_STATUSES.RESTARTED].indexOf(self.parseStatus()) !== -1 ;
+                }
+
+
+                // var profileList = [];
+                self.loader({message: 'Fetch list ...', status: 0});
+                self.status = 'started';
 
                 async.whilst(function test() {
+                    // return hasElements && self.isOpened && self.status === 'started';
+                    return isRun();
 
-                    return hasElements && self.isOpened;
                 }, function iterate(cb) {
-                    var nextUrl = url + '&page=' + page;
+                    var nextUrl = url + '&page=' + self.parsePageIndex;
 
                     chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: nextUrl});
 
                     APP.events.on(evt, function (e, tab, info) {
-                        console.log('>>> triggered %s for %s', evt, tab.url);
-
                         APP.events.off(evt);
 
                         chrome.tabs.sendMessage(tab.id, {method: 'jobs'}, function (response) {
-                            console.log("response: " + JSON.stringify(response));
-
                             var count = Math.ceil(response.data.total / 10);
+                            var profileList = (response && response.data && response.data.profiles) || [];
+                            var normalized;
 
-                            if (!response.data || !response.data.profiles || !response.data.profiles.length) {
+                            if (!profileList.length) {
                                 hasElements = false;
                             }
 
                             self.loader({
-                                message: 'Fetch list (' + page + '/' + count + ')',
-                                status : page / count
+                                message: 'Fetch list (' + self.parsePageIndex + '/' + count + ')',
+                                status : self.parsePageIndex / count
                             });
 
-                            page++;
-                            if (page > count) { // profile / page
-                                hasElements = false;
-                            }
+                            normalized = self.normalizeProfiles(profileList);
+                            self.appendProfiles(normalized);
+                            
+                            async.mapSeries(normalized, function(profileData, mapCb) {
+                                if (!isRun()) {
 
-                            profileList = profileList.concat(response.data.profiles);
-                            cb();
+                                    console.warn('The parse process was canceled');
+                                    return mapCb(null, null);
+                                }
+
+                                self.parseProfile(profileData, function(err, res) {
+                                    if (err) {
+                                        return mapCb(err);
+                                    }
+
+                                    console.log('>>> res', res);
+
+                                    if (res.isNew) {
+                                        self.onParsedProfile(profileData, res.data);
+                                    }
+
+                                    mapCb(null, res.data);
+                                });
+
+                            }, function(err, parsedProfiles) {
+                                if (err) {
+                                    return cb(err);
+                                }
+
+                                self.parsePageIndex++;
+                                if (self.parsePageIndex > count) { // profile / page
+                                    hasElements = false;
+                                }
+
+                                cb(); 
+                            });
                         });
                     });
 
                 }, function (err, results) {
+                    var _parseStatus = self.parseStatus();
+                    var _loaderStatus;
+
                     if (err) {
                         return callback(err);
                     }
 
-                    console.log('>>> doWhile results', profileList);
-                    callback(null, profileList);
+                    if (_parseStatus === PARSE_STATUSES.STARTED) {
+                        self.parseStatus(PARSE_STATUSES.STOPPED);
+                        _loaderStatus = 1;
+                    } else if (_parseStatus === PARSE_STATUSES.PAUSED) {
+                        _loaderStatus = 0;
+                    }
+
+                    setTimeout(function() {
+                        self.loader({
+                            message: '',
+                            status : _loaderStatus
+                        });
+                    }, 200);
+
+                    self.$restartBtn.removeClass('hide');
+                    callback(null, results);
                 });
             });
         },
@@ -767,21 +858,25 @@
 
         parseProfile: function (options, callback) {
             var profileLink = options.link;
-            var storedProfile;
+            // var storedProfile;
             var url;
 
             if (typeof profileLink !== 'string') {
                 return callback({message: 'Invalid value for link'});
             }
 
-            storedProfile = EXT_API.getProfileLocal({
+            this.loader({
+                message: 'Parse <b>' + options.name + '</b> ...'
+            });
+
+            /*storedProfile = EXT_API.getProfileLocal({
                 jobId: this.jobId,
                 link : profileLink
             });
 
             if (storedProfile && storedProfile.name) {
                 return callback(null, {data: storedProfile, isNew: false});
-            }
+            }*/
 
             url = 'https://www.linkedin.com' + profileLink;
             console.log('>>> parseProfile', options);
@@ -955,11 +1050,22 @@
             this.$startBtn.addClass('hide');
             this.$restartBtn.addClass('hide');
             this.$pauseBtn.removeClass('hide');
+            var self = this;
 
-            console.log('>>> start');
+            if (this.parseStatus() === PARSE_STATUSES.PAUSED && this.parsePageIndex > 1) {
+                this.parsePageIndex--;
+            }
 
-            this.status = 'started';
-            this.parseProfiles();
+            this.parseStatus(PARSE_STATUSES.STARTED);
+            this.startListParser({url: this.job.url}, function (err, results) {
+                if (err) {
+                    return APP.error(err);
+                }
+
+                if (self.parseStatus() === PARSE_STATUSES.STOPPED) {
+                    self.loader({status: 1});
+                }
+            });
         },
 
         onPauseClick: function () {
@@ -967,14 +1073,16 @@
             this.$pauseBtn.addClass('hide');
             //this.$restartBtn.removeClass('hide'); // hide class will be removed on parse callback
 
-            console.log('>>> pause');
-
-            this.status = 'paused';
+            this.loader({message: 'Close the current process ...'});
+            this.parseStatus(PARSE_STATUSES.PAUSED);
         },
 
         onRestartClick: function () {
-            this.status = 'restarted';
-            this.parseIndex = 0;
+            this.parseStatus(PARSE_STATUSES.RESTARTED);
+
+            this.items = [];
+
+            this.parsePageIndex = 0;
             this.onStartClick();
         },
 
@@ -1070,9 +1178,19 @@
         },
 
         storeProfileList: function (profiles) {
-            var _options = {
-                id      : this.jobId,
-                profiles: profiles
+            var jobProfileLinks = _.map(this.items, 'link');
+            var newProfiles = _.filter(profiles, function(item) {
+                return jobProfileLinks.indexOf(item.link) === -1;
+            });
+
+            var _options;
+
+            this.items = this.items.concat(newProfiles);
+            this.job.profiles = this.items;
+
+            _options = {
+                id      : this.job.id,
+                profiles: this.job.profiles
             };
 
             EXT_API.saveJob(_options, function (err, res) {
@@ -1200,13 +1318,22 @@
             var profiles = options.items;
             var html;
 
-            if (!profiles || !profiles.length) {
-                html = '<tr><td colspan="7">There are no data</td></td></tr>';
-            } else {
-                html = this.generateListTemplate(profiles);
+            if (!this.items || !this.items.length) {
+                html = '<tr><td colspan="8">There are no data</td></td></tr>';
+                this.$list.html(html);
+                this.renderCounters();
+
+                return;
             }
 
-            this.$list.html(html);
+            html = this.generateListTemplate(profiles);
+
+            if (options.append) {
+                this.$list.append(html);
+            } else {
+                this.$list.html(html);
+            }
+
             this.renderCounters();
         },
 
