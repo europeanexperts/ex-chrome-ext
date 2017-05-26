@@ -340,11 +340,17 @@
             console.log('>>> fetch job list...');
 
             EXT_API.fetchJobList({}, function (err, data) {
+                var sorted;
+
                 if (err) {
                     return APP.error(err);
                 }
 
-                self.items = data;
+                sorted = data.sort(function(a, b) {
+                    return a.job_name.toLowerCase() > b.job_name.toLowerCase();
+                });
+
+                self.items = sorted;
                 self.renderData();
             });
         },
