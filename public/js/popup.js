@@ -1445,7 +1445,9 @@
                 }
 
                 self.items = results;
-                APP.notification({message: 'The profile was imported successful', type: 'success'});
+                APP.notification({message: 'The profile was imported successful', type: 'success'}, function() {
+                    APP.showPage(APP.pages.jobs.name);
+                });
             });
         },
 
