@@ -82,6 +82,15 @@
         }
     };
 
+    function getProfileShortName(name) {
+        return name.split(' ')
+            .map(function (str) {
+                return str[0] || ''
+            })
+            .slice(0, 3)
+            .join('');
+    }
+
     var LoginPage = ExtensionPage.extend({
         init     : function (options) {
             ExtensionPage.prototype.init.call(this, options);
@@ -423,12 +432,12 @@
 
         serialize: function () {
             return {
-                id            : this.$el.attr('data-id'),
-                job_name      : this.$inputJobName.val(),
-                region        : this.$inputRegion.val(),
-                language      : this.$inputLanguage.val(),
-                short_name    : this.$inputShortName.val(),
-                url           : this.$inputUrl.val(),
+                id             : this.$el.attr('data-id'),
+                job_name       : this.$inputJobName.val(),
+                region         : this.$inputRegion.val(),
+                language       : this.$inputLanguage.val(),
+                short_name     : this.$inputShortName.val(),
+                url            : this.$inputUrl.val(),
                 import_existing: this.$inputImportExisting.prop('checked')
             };
         },
@@ -498,6 +507,7 @@
             this.$pauseBtn = this.$el.find('.pauseBtn');
             this.$restartBtn = this.$el.find('.restartBtn');
             this.$exportSelectedBtn = this.$el.find('.exportSelectedBtn');
+            this.$importSelectedBtn = this.$el.find('.importSelectedBtn');
             this.$deleteSelectedBtn = this.$el.find('.deleteSelectedBtn');
 
             this.$el.find('.searchBtn').on('click', $.proxy(this.search, this));
@@ -510,6 +520,7 @@
             this.$el.on('click', '.exportBtn', $.proxy(this.onExportClick, this));
             this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
             this.$exportSelectedBtn.on('click', $.proxy(this.onExportSelectedClick, this));
+            this.$importSelectedBtn.on('click', $.proxy(this.onImportSelectedClick, this));
             this.$deleteSelectedBtn.on('click', $.proxy(this.onDeleteSelectedClick, this));
         },
 
@@ -520,8 +531,8 @@
             this.jobId = options.id;
             this.$el.addClass('hide'); // hide until loading data
 
-            /*this.parseIndex = this.items.length;
-            this.status = '';*/
+            this.parseIndex = 0;
+             // this.status = 'stopped';
 
             this.fetchAll({id: options.id}, function (err, results) {
                 var job;
@@ -570,10 +581,10 @@
             });
         },
 
-        hide: function() {
+        hide: function () {
             ExtensionPage.prototype.hide.call(this);
             /*this.parseIndex = this.items.length;
-            this.status = 'stoped';*/
+             this.status = 'stopped';*/
         },
 
         startListParser: function (options, callback) {
@@ -758,7 +769,7 @@
 
             storedProfile = EXT_API.getProfileLocal({
                 jobId: this.jobId,
-                link: profileLink
+                link : profileLink
             });
 
             if (storedProfile && storedProfile.name) {
@@ -785,8 +796,8 @@
                         console.log("response: " + JSON.stringify(response));
 
                         /*
-                        * response = {isNew: true, data: {{parsed profile data}}}
-                        * */
+                         * response = {isNew: true, data: {{parsed profile data}}}
+                         * */
                         callback(null, response);
                     });
                 });
@@ -960,10 +971,10 @@
             this.onStartClick();
         },
 
-        importProfiles: function(links) {
+        importProfiles: function (links) {
             var jobJSON = this.job;
 
-            async.eachLimit(links, 10, function(link, cb) {
+            async.eachLimit(links, 10, function (link, cb) {
                 var profileJSON = EXT_API.getProfileLocal({link: link});
                 var data;
 
@@ -974,7 +985,7 @@
                     profile: profileJSON
                 };
 
-                EXT_API.importProfile(data, function(err, res) {
+                EXT_API.importProfile(data, function (err, res) {
                     if (err) {
                         return cb(err);
                     }
@@ -982,7 +993,7 @@
                     cb(null, res);
                 });
 
-            }, function(err, res) {
+            }, function (err, res) {
                 if (err) {
                     return APP.error(err);
                 }
@@ -998,10 +1009,14 @@
             this.importProfiles([link]);
         },
 
-        onExportSelectedClick: function() {
+        onExportSelectedClick: function () {
             var links = this.getSelectedProfiles();
 
             this.importProfiles(links);
+        },
+
+        onImportSelectedClick: function (e) {
+            APP.showPage('importProfile');
         },
 
         onDeleteClick: function (e) {
@@ -1034,7 +1049,7 @@
             });
         },
 
-        storeProfileListLocal: function(profiles) {
+        storeProfileListLocal: function (profiles) {
             var _options = {
                 job_id  : this.jobId,
                 profiles: profiles
@@ -1049,11 +1064,11 @@
 
         storeProfileList: function (profiles) {
             var _options = {
-                id: this.jobId,
+                id      : this.jobId,
                 profiles: profiles
             };
 
-            EXT_API.saveJob(_options, function(err, res) {
+            EXT_API.saveJob(_options, function (err, res) {
                 if (err) {
                     return APP.error(err);
                 }
@@ -1133,15 +1148,6 @@
             }, callback);
         },
 
-        getProfileShortName: function (name) {
-            return name.split(' ')
-                .map(function (str) {
-                    return str[0] || ''
-                })
-                .slice(0, 3)
-                .join('');
-        },
-
         normalizeProfiles: function (profiles) {
             var self = this;
 
@@ -1154,10 +1160,10 @@
 
                 now = new Date();
                 memo.push({
-                    name     : profile.name,
-                    job      : profile.job,
-                    link     : profile.link,
-                    shortName: self.getProfileShortName(profile.name),
+                    name      : profile.name,
+                    job       : profile.job,
+                    link      : profile.link,
+                    shortName : getProfileShortName(profile.name),
                     created_at: now,
                     updated_at: now
                 });
@@ -1179,7 +1185,7 @@
             return template(templateOptions);
         },
 
-        renderEmptyList: function() {
+        renderEmptyList: function () {
             this.$list.html('<tr><td colspan="8">There are no data</td></td></tr>');
         },
 
@@ -1222,6 +1228,249 @@
             this.$header.find('.jobProfileDate').html(_date.toLocaleDateString());
 
             this.renderCounters();
+        }
+    });
+
+    var ImportProfilePage = ExtensionPage.extend({
+        init: function (options) {
+            ExtensionPage.prototype.init.call(this, options);
+
+            this.$inputUrl = this.$el.find('#importUrl');
+            this.$nextBtn = this.$el.find('.nextBtn');
+
+            this.$nextBtn.on('click', $.proxy(this.onNextClick, this));
+
+        },
+        show: function (options) {
+            ExtensionPage.prototype.show.call(this, options);
+
+            self.profileJSON = null;
+            this.renderProfile(); // empty profile
+            this.$inputUrl.focus();
+        },
+
+        loadProfile: function (url, callback) {
+            chrome.tabs.query({active: true}, function (tabs) {
+                var tabId = tabs[0].id;
+                var evt = 'complete:' + tabId;
+
+                APP.events.off(evt);
+                APP.events.on(evt, function (e, tab, info) {
+                    if (tab.url !== url) {
+                        return;
+                    }
+
+                    APP.events.off(evt);
+                    // callback(null, 'response');
+
+                    chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
+                        response = response || {};
+                        console.log("response: " + JSON.stringify(response));
+                        callback(null, response);
+                    });
+                });
+
+                chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: url}, function (response) {
+                    console.log("redirect response: " + response);
+                });
+            });
+        },
+
+        onNextClick: function (e) {
+            var url = this.$inputUrl.html().trim();
+            var self = this;
+
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (this.profileJSON && this.profileJSON.url && this.profileJSON.url === url) {
+                return APP.showPage('importJobListPage', {profile: this.profileJSON})
+            }
+
+            if (!url) {
+                return APP.notification({message: 'Please input a valid url address', type: 'error'});
+            }
+
+            this.loadProfile(url, function (err, res) {
+                var profile;
+
+                if (err) {
+                    return APP.error(err);
+                }
+
+                profile = res.data;
+                profile.shortName = profile.shortName || getProfileShortName(profile.name);
+                profile.url = url;
+                profile.linkedin_url = url.slice(24, -1);
+
+                self.profileJSON = profile;
+                self.renderProfile();
+            });
+        },
+
+        renderProfile: function () {
+            var profile = this.profileJSON;
+            var template = APP_TEMPLATES.getTemplate('import-profile');
+
+            this.$el.find('#importProfileWrapper').html(template({profile: profile}));
+        }
+    });
+
+    var ImportJobListPage = ExtensionPage.extend({
+        init: function (options) {
+            ExtensionPage.prototype.init.call(this, options);
+
+            this.$list = this.$el.find('.items');
+            this.$el.find('.importBtn').on('click', $.proxy(this.onImportClick, this));
+        },
+
+        show: function (options) {
+            var self = this;
+
+            ExtensionPage.prototype.show.call(this, options);
+
+            console.log('>>> ImportJobListPage.show', options);
+
+            this.profile = options.profile || null;
+            this.items = [];
+            this.fetchJobs(function (err, data) {
+                if (err) {
+                    return APP.error(err);
+                }
+
+                self.items = data;
+                console.log('>>> data', data);
+
+                self.renderList();
+            });
+        },
+
+        fetchJobs: function (callback) {
+            EXT_API.fetchJobList({}, function (err, jobs) {
+                if (err) {
+                    return callback(err);
+                }
+
+                callback(null, jobs);
+            });
+        },
+
+        getSelectedIds: function () {
+            return this.$list.find('.item .checkbox:checked')
+                .map(function () {
+                    var $chb = $(this);
+                    var id = $chb.closest('.item').attr('data-id');
+
+                    return parseInt(id, 10);
+                }).toArray();
+        },
+
+        normalizeProfile: function (profile, props) {
+            var now = new Date();
+            var result;
+
+            profile = profile || this.profile;
+            result = {
+                name      : profile.name,
+                job       : profile.title,
+                link      : profile.linkedin_url,
+                shortName : getProfileShortName(profile.name),
+                created_at: profile.created_at || now,
+                updated_at: profile.updated_at || now
+            };
+
+            if (props) {
+                $.extend(result, props);
+            }
+
+            return result;
+        },
+
+        onImportClick: function () {
+            var ids = this.getSelectedIds();
+            var profile;
+            var self = this;
+
+            async.mapSeries(this.items, function iterator(job, cb) {
+                var jobProfile = self.normalizeProfile(self.profile, {status: 1}); // TODO: status ???
+                var jobProfiles = job.profiles;
+                var profile;
+
+                if (ids.indexOf(job.id) === -1) {
+                    // The job is not in selected ids. Do not import!
+                    async.setImmediate(function () {
+                        cb(null, job);
+                    });
+
+                    return;
+                }
+
+                // try to save the parsed profile:
+                profile = $.extend({
+                    import_existing: job.import_existing
+                }, self.profile);
+
+                EXT_API.storeProfileLocal({jobId: job.id, profile: jobProfile, link: jobProfile.link}, function(err, res) {
+                    console.log('>>> stored locally', jobProfile.link);
+                });
+
+                EXT_API.importProfile({profile: profile}, function (err, res) {
+                    if (err) {
+                        return cb(err);
+                    }
+
+                    if (_.some(jobProfiles, {link: jobProfile.link})) {
+                        // The profile already was added to this job. Do not import!
+                        async.setImmediate(function () {
+                            cb(null, job);
+                        });
+
+                        return;
+                    }
+
+                    // push the profile into job.profiles, and update the job:
+                    jobProfiles.push(jobProfile);
+                    EXT_API.saveJob({id: job.id, profiles: jobProfiles}, function (err, res) {
+                        if (err) {
+                            return cb(err);
+                        }
+
+                        cb(null, res);
+                    });
+                });
+
+            }, function (err, results) {
+                if (err) {
+                    return APP.error(err);
+                }
+
+                self.items = results;
+                APP.notification({message: 'The profile was imported successful', type: 'success'});
+            });
+        },
+
+        renderList: function (options) {
+            var template;
+            var listHtml;
+            var items;
+
+            options = options || {};
+            items = options.items || this.items;
+
+            /*if (!items || !items.length) {
+             this.$list.html('<tr><td colspan="7">' + this.emptyListText + '</td></tr>');
+
+             return;
+             }*/
+
+            template = APP_TEMPLATES.getTemplate('import-job-list');
+            listHtml = template({items: items});
+
+            if (options.prepend) {
+                this.$list.prepend(listHtml);
+            } else {
+                this.$list.html(listHtml);
+            }
         }
     });
 
@@ -1371,6 +1620,8 @@
     APP.addPage(JobsPage, {name: 'jobs'});
     APP.addPage(JobItemPage, {name: 'job'});
     APP.addPage(JobProfileListPage, {name: 'jobProfiles'});
+    APP.addPage(ImportProfilePage, {name: 'importProfile'});
+    APP.addPage(ImportJobListPage, {name: 'importJobListPage'});
 
     APP.showPage('jobs');
 
