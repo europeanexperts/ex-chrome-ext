@@ -63,7 +63,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var _total = $el.find(SELECTORS.TOTAL).html();
 
         _total = _total.replace(/[a-zA-Z\s.]/g, '');
-        _total = _total.replace(/,/g, '.');
+        _total = _total.replace(/,/g, '');
+        _total = _total.replace(/\./g, '');
 
         var _profiles = $el.find(SELECTORS.SEARCH_RESULT_PROFILES).map(function () {
             var $li = $(this);
