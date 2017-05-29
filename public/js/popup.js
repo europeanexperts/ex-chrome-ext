@@ -1702,29 +1702,17 @@
         },
         run: function() {
             var authToken = localStorage.getItem('AUTH_TOKEN');
-            var lastPage = APP.retrieveLastPage();
-            var authOptions;
 
             if (!authToken) {
                 return APP.unauthorize();
             }
 
-            console.log('>>> lastPage', lastPage);
-
-            authOptions = {
-                token      : authToken,
-                pageName   : lastPage && lastPage.name,
-                pageOptions: lastPage && lastPage.opts
-            };
-
-            APP.authorize(authOptions);
+            APP.authorize({token: authToken});
         },
         notification : function (options, callback) {
             var message = options.message || 'Some thing went wrong';
             var className = options.type || 'error';
             var timeout = options.timeout || 3000;
-            // alert(message);
-
             var $messageText = $('#messageText');
 
             $messageText
