@@ -1633,6 +1633,26 @@
             APP.history.push({page: page, opts: options});
             page.show(options);
             APP.afterShowPage();
+            APP.storeLastPage(page.name, options);
+        },
+        storeLastPage: function(name, options) {
+            localStorage.setItem('currentPage', JSON.stringify({name: name, opts: options}));
+        },
+        retrieveLastPage: function() {
+            var value = localStorage.getItem('currentPage');
+            var result = null;
+
+            if (!value) {
+                return result;
+            }
+
+            try {
+                result = JSON.parse(value);
+            } catch(err) {
+                console.warn(err);
+            }
+
+            return result;
         },
         afterShowPage: function () {
             var page = APP.currentPage;
@@ -1664,9 +1684,12 @@
             APP.showPage(prev.page.name, prev.opts);
         },
         authorize    : function (options) {
+            var pageName = options.pageName || APP.pages.jobs.name;
+            var pageOptions = options.pageOptions || {};
+
             EXT_API.AUTH_TOKEN = options.token;
             localStorage.setItem('AUTH_TOKEN', options.token);
-            APP.showPage(APP.pages.jobs.name);
+            APP.showPage(pageName, pageOptions);
             APP.isAuth = true;
             APP.$logoutBtn.removeClass('hide');
         },
@@ -1679,12 +1702,22 @@
         },
         run: function() {
             var authToken = localStorage.getItem('AUTH_TOKEN');
+            var lastPage = APP.retrieveLastPage();
+            var authOptions;
 
-            if (authToken) {
-                APP.authorize({token: authToken});
-            } else {
-                APP.unauthorize();
+            if (!authToken) {
+                return APP.unauthorize();
             }
+
+            console.log('>>> lastPage', lastPage);
+
+            authOptions = {
+                token      : authToken,
+                pageName   : lastPage && lastPage.name,
+                pageOptions: lastPage && lastPage.opts
+            };
+
+            APP.authorize(authOptions);
         },
         notification : function (options, callback) {
             var message = options.message || 'Some thing went wrong';
