@@ -60,7 +60,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var result = {};
         var $el = $('body');
 
-        var _total = $el.find(SELECTORS.TOTAL).html();
+        var _total = $el.find(SELECTORS.TOTAL).html() || '';
 
         _total = _total.replace(/[a-zA-Z\s.]/g, '');
         _total = _total.replace(/,/g, '');
