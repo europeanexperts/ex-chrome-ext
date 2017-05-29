@@ -9,8 +9,7 @@
     var IMPORT_URL = BASE_URL + '/api/import/consultants';
 
     window.EXT_API = {
-        //AUTH_TOKEN: null,
-        AUTH_TOKEN: 'tbm9yTuwR295oWCOps911A',
+        AUTH_TOKEN: null,
 
         // auth:
         login         : function (data, callback) {

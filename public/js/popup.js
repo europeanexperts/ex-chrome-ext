@@ -150,9 +150,6 @@
                     return APP.error(err);
                 }
 
-                console.log('>>> success', res);
-                alert('success');
-
                 APP.authorize({token: res.recruiter.basic.token});
             });
         }
@@ -1667,15 +1664,26 @@
         },
         authorize    : function (options) {
             EXT_API.AUTH_TOKEN = options.token;
+            localStorage.setItem('AUTH_TOKEN', options.token);
             APP.showPage(APP.pages.jobs.name);
             APP.isAuth = true;
             APP.$logoutBtn.removeClass('hide');
         },
         unauthorize  : function () {
             EXT_API.AUTH_TOKEN = null;
+            localStorage.setItem('AUTH_TOKEN', '');
             APP.isAuth = false;
             APP.$logoutBtn.addClass('hide');
             APP.showPage(APP.pages.login.name);
+        },
+        run: function() {
+            var authToken = localStorage.getItem('AUTH_TOKEN');
+
+            if (authToken) {
+                APP.authorize({token: authToken});
+            } else {
+                APP.unauthorize();
+            }
         },
         notification : function (options, callback) {
             var message = options.message || 'Some thing went wrong';
@@ -1702,20 +1710,28 @@
         error        : function (e) {
             console.log('>>> APP.error', e);
 
-            var message;
+            var status;
+            var _notificationOptions = {
+                type: 'error'
+            };
 
             if (e.responseJSON) {
-                message = e.responseJSON.errors;
+                _notificationOptions.message = e.responseJSON.errors;
+                status = e.status || 500;
             } else if (e.responseText) {
-                message = e.responseText;
+                _notificationOptions.message = e.responseText;
+                status = e.status || 500;
             } else {
-                message = e;
+                _notificationOptions.message = e;
             }
 
-            APP.notification({
-                type   : 'error',
-                message: message
-            });
+            if (status === 401 || status || 403) {
+                APP.notification(_notificationOptions, function() {
+                    APP.unauthorize();
+                });
+            } else {
+                APP.notification(_notificationOptions);
+            }
         },
         init         : function () {
             APP.$extensionBody = $('.extensionBody');
@@ -1755,20 +1771,7 @@
     APP.addPage(ImportProfilePage, {name: 'importProfile'});
     APP.addPage(ImportJobListPage, {name: 'importJobListPage'});
 
-    APP.showPage('jobs');
-
-    /*chrome.runtime.onMessage.addListener(function(request, sender) {
-     console.log('>>> popup.js onMessage', arguments);
-
-     if (request.action == "getSource") {
-     message.innerText = request.source;
-     }
-     });
-
-     chrome.runtime.sendMessage({
-     action: "getSource",
-     source: 'DOMtoString(document)'
-     });*/
+    APP.run();
 
     chrome.tabs.query({active: true}, function (tabs) {
         var tabId = tabs[0].id;
@@ -1777,9 +1780,8 @@
             var evt;
 
             if (tabId === _tabId && info.status === "complete") {
-
-                //evt = 'complete:' + tabId + ':url';
                 evt = 'complete:' + tabId;
+
                 APP.events.trigger(evt, [updTab, info]);
             }
         });
