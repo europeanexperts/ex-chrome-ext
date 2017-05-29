@@ -537,16 +537,18 @@
 
         show: function (options) {
             var self = this;
+            var _status;
 
             ExtensionPage.prototype.show.call(this, options);
 
+            _status = self.getParseStatus({jobId: options.id});
             this.jobId = options.id;
             this.$el.addClass('hide'); // hide until loading data
             this.items = [];
             this.parseStatus(PARSE_STATUSES.STOPPED);
 
             this.parseIndex = 0;
-            this.parsePageIndex = 1;
+            this.parsePageIndex = _status.page || 1;
              // this.status = 'stopped';
 
             this.fetchAll({id: options.id}, function (err, results) {
@@ -633,6 +635,36 @@
             }
         },
 
+        getParseStatus: function(options) {
+            var jobId = (options && options.jobId) || this.jobId;
+            var name = 'job_profile_statuses_' + jobId;
+            var result;
+
+            try {
+                result = JSON.parse(localStorage.getItem(name));
+            } catch (e) {
+                console.warn(e);
+            }
+
+            return result || {};
+        },
+
+        storeParseStatus: function(options) {
+            var page = options.page;
+            var count = options.count;
+            var index = options.index;
+
+            var name = 'job_profile_statuses_' + this.jobId;
+            var params = {
+                status: this.parseStatus(),
+                index : index,
+                count : count,
+                page  : page
+            };
+
+            localStorage.setItem(name, JSON.stringify(params));
+        },
+
         startListParser: function (options, callback) {
             var url = options.url;
             var self = this;
@@ -647,7 +679,6 @@
                 function isRun() {
                     return hasElements && self.isOpened && [PARSE_STATUSES.STARTED, PARSE_STATUSES.RESTARTED].indexOf(self.parseStatus()) !== -1 ;
                 }
-
 
                 // var profileList = [];
                 self.loader({message: 'Fetch list ...', status: 0});
@@ -670,6 +701,11 @@
                             var profileList = (response && response.data && response.data.profiles) || [];
                             var normalized;
 
+                            self.storeParseStatus({
+                                count: count,
+                                page : self.parsePageIndex
+                            });
+
                             if (!profileList.length) {
                                 hasElements = false;
                             }
@@ -681,7 +717,7 @@
 
                             normalized = self.normalizeProfiles(profileList);
                             self.appendProfiles(normalized);
-                            
+
                             async.mapSeries(normalized, function(profileData, mapCb) {
                                 if (!isRun()) {
 
@@ -713,7 +749,7 @@
                                     hasElements = false;
                                 }
 
-                                cb(); 
+                                cb();
                             });
                         });
                     });
