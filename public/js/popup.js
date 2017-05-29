@@ -9,6 +9,7 @@
     var EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var PASSWORD_MIN_LENGTH = 6;
     var PARSE_STATUSES = {
+        CREATED  : 'created',
         STARTED  : 'started',
         PAUSED   : 'paused',
         RESTARTED: 'restarted',
@@ -515,7 +516,7 @@
         init: function (options) {
             ExtensionPage.prototype.init.call(this, options);
 
-            this.items = [];
+            this._items = [];
             this._status = PARSE_STATUSES.STOPPED;
 
             this.$header = this.$el.find('.jobProfileHeader');
@@ -548,15 +549,20 @@
             var _status;
 
             ExtensionPage.prototype.show.call(this, options);
+            this.$el.addClass('hide'); // hide until loading data
 
             _status = self.getParseStatus({jobId: options.id});
             this.jobId = options.id;
-            this.$el.addClass('hide'); // hide until loading data
-            this.items = [];
-            this.parseStatus(PARSE_STATUSES.STOPPED);
+            this.parseStatus(_status.status || PARSE_STATUSES.CREATED);
+            this.setItems([]);
 
-            this.parseIndex = 0;
-            this.parsePageIndex = _status.page || 1;
+            if (_status.status === PARSE_STATUSES.STARTED || _status.status === PARSE_STATUSES.PAUSED) {
+                this.$startBtn.find('span').html('Continue');
+                this.parsePageIndex = _status.page || 1;
+            } else {
+                this.$startBtn.find('span').html('Start');
+                this.parsePageIndex = 1;
+            }
 
             this.fetchAll({id: options.id}, function (err, results) {
                 var job;
@@ -574,47 +580,19 @@
                 self.$table.addClass('hide');
                 self.$el.removeClass('hide');
 
-                self.items = profiles;
+                self.setItems(profiles);
                 self.renderItems({items: profiles});
                 self.loader({status: 1}); // Done, hide the progressbar
                 self.$table.removeClass('hide');
-
-                // check saved profiles:
-                /*if (profiles && profiles.length) {
-                    self.items = profiles;
-                    self.renderItems({items: profiles});
-                    self.loader({status: 1}); // Done, hide the progressbar
-                    self.$table.removeClass('hide');
-
-                    return; // do not fetch again !!!
-                }*/
-
-                /*self.startListParser({url: job.url}, function (err, results) {
-                    var normalized;
-
-                    if (err) {
-                        return APP.error(err);
-                    }
-
-                    console.log("response: " + JSON.stringify(results));
-
-                    // normalized = self.normalizeProfiles(results);
-
-                    // self.storeProfileList(normalized);
-                    // self.renderItems({items: normalized});
-                    self.loader({status: 1}); // Done, hide the progressbar
-
-                    // self.$table.removeClass('hide');
-                    // self.items = normalized;
-                    // self.renderCounters();
-                });*/
             });
         },
 
-        hide: function () {
-            ExtensionPage.prototype.hide.call(this);
-            /*this.parseIndex = this.items.length;
-             this.status = 'stopped';*/
+        setItems: function(items) {
+            this._items = items; // TODO: merge the links
+        },
+
+        getItems: function() {
+            return this._items;
         },
 
         _getStatus: function() {
@@ -634,11 +612,15 @@
         },
 
         appendProfiles: function(normalized) {
-            if (normalized.length) {
-                this.storeProfileList(normalized);
-                this.renderItems({items: normalized, append: true});
-                this.$table.removeClass('hide');
+            var newProfiles = this.filterNewItems(normalized);
+
+            if (!newProfiles.length) {
+                return false;
             }
+
+            this.storeProfileList(newProfiles);
+            this.renderItems({items: newProfiles, append: true});
+            this.$table.removeClass('hide');
         },
 
         getParseStatus: function(options) {
@@ -671,6 +653,12 @@
             localStorage.setItem(name, JSON.stringify(params));
         },
 
+        clearProfileStatus: function() {
+            var name = 'job_profile_statuses_' + this.jobId;
+
+            localStorage.removeItem(name);
+        },
+
         startListParser: function (options, callback) {
             var url = options.url;
             var self = this;
@@ -681,6 +669,7 @@
 
                 var hasElements = true;
                 var page = self.parsePageIndex || 1;
+                var count;
 
                 function isRun() {
                     return hasElements && self.isOpened && [PARSE_STATUSES.STARTED, PARSE_STATUSES.RESTARTED].indexOf(self.parseStatus()) !== -1 ;
@@ -703,10 +692,19 @@
                         APP.events.off(evt);
 
                         chrome.tabs.sendMessage(tab.id, {method: 'jobs'}, function (response) {
-                            var count = Math.ceil(response.data.total / 10);
-                            var profileList = (response && response.data && response.data.profiles) || [];
+                            var profileList;
+                            var _total;
                             var normalized;
 
+                            if (response && response.data) {
+                                _total = response.data.total || 0;
+                                profileList = response.data.profiles || [];
+                            } else {
+                                _total = 0;
+                                profileList = [];
+                            }
+
+                            count = Math.ceil(_total / 10);
                             self.storeParseStatus({
                                 count: count,
                                 page : self.parsePageIndex
@@ -762,7 +760,6 @@
 
                 }, function (err, results) {
                     var _parseStatus = self.parseStatus();
-                    var _loaderStatus;
 
                     if (err) {
                         return callback(err);
@@ -770,6 +767,9 @@
 
                     if (_parseStatus === PARSE_STATUSES.STARTED) {
                         self.parseStatus(PARSE_STATUSES.STOPPED);
+                        self.$startBtn.removeClass('hide').find('span').html('Finished');
+                        self.$pauseBtn.addClass('hide');
+
                         setTimeout(function() {
                             self.loader({message: 'Done successful',status : 1});
                         }, 200);
@@ -779,6 +779,11 @@
                     }
 
                     self.$restartBtn.removeClass('hide');
+                    self.storeParseStatus({
+                        count: count,
+                        page : self.parsePageIndex
+                    });
+
                     callback(null, results);
                 });
             });
@@ -790,10 +795,10 @@
             var filtered;
 
             if (!term) {
-                filtered = this.items;
+                filtered = this.getItems();
             } else {
                 regExp = new RegExp(term, 'ig');
-                filtered = _.filter(this.items, function (item) {
+                filtered = _.filter(this.getItems(), function (item) {
                     return regExp.test(item.name);
                 });
             }
@@ -818,7 +823,7 @@
 
         deleteProfiles: function (options, callback) {
             var links = options.links;
-            var profiles = _.filter(this.items, function (item) {
+            var profiles = _.filter(this.getItems(), function (item) {
                 return links.indexOf(item.link) === -1;
             });
             var saveData = {
@@ -832,7 +837,7 @@
                     return callback(err);
                 }
 
-                self.items = profiles;
+                self.setItems(profiles);
                 self.$list.find('.item').each(function () {
                     var $li = $(this);
                     var link = $li.attr('data-id');
@@ -841,6 +846,9 @@
                         $li.remove();
                     }
                 });
+
+                self.parsePageIndex = 1; // the items are changed the parse need to start from page=1
+                self.clearProfileStatus();
 
                 if (!profiles.length) {
                     self.renderItems({items: []}); // Show 'There are no data' message and update the counters;
@@ -947,71 +955,6 @@
             });
         },
 
-        parseProfiles: function () {
-            this.parseIndex = this.parseIndex || 0;
-            var count = this.items.length;
-            var self = this;
-
-            console.log('>>> starting parser... from=%d, total=%d', self.parseIndex, count);
-
-            self.loader({
-                message: 'Profile ...',
-                status : 0
-            });
-
-            async.whilst(function test() {
-                return (self.parseIndex < count) && (self.status === 'started');
-            }, function iterate(cb) {
-                var profile = self.items[self.parseIndex];
-
-                self.loader({
-                    message: 'Profile ' + self.parseIndex + '/' + count,
-                    status : self.parseIndex / count
-                });
-
-                console.log('>>> try to parse', self.parseIndex);
-                self.parseProfile(profile, function (err, res) {
-                    if (err) {
-                        return cb(err);
-                    }
-
-                    self.parseIndex++;
-                    if (res.isNew) {
-                        self.onParsedProfile(profile, res.data);
-                    }
-
-                    cb(null, res);
-                });
-
-            }, function (err) {
-                if (err) {
-                    APP.error(err);
-                }
-
-                console.log('>>> this.parseIndex', self.parseIndex);
-                if (self.parseIndex < count) {
-                    console.log('>>> PAUSED');
-
-                    /*self.$startBtn.addClass('hide');
-                     self.$restartBtn.addClass('hide');
-                     self.$pauseBtn.removeClass('hide');*/
-                } else {
-                    console.log('>>> DONE');
-
-                    setTimeout(function () {
-                        self.loader({
-                            message: 'Done',
-                            status : 1
-                        });
-                    }, 200);
-
-                    /*self.$startBtn.removeClass('hide');
-                     self.$pauseBtn.addClass('hide');*/
-                }
-                self.$restartBtn.removeClass('hide');
-            });
-        },
-
         onParsedProfile: function (profile, data) {
             var link = profile.link;
             var $li = this.$list.find('.item[data-id="' + link + '"]');
@@ -1106,7 +1049,7 @@
         },
 
         onPauseClick: function () {
-            this.$startBtn.removeClass('hide');
+            this.$startBtn.removeClass('hide').find('span').html('start');
             this.$pauseBtn.addClass('hide');
             //this.$restartBtn.removeClass('hide'); // hide class will be removed on parse callback
 
@@ -1117,7 +1060,8 @@
         onRestartClick: function () {
             this.parseStatus(PARSE_STATUSES.RESTARTED);
 
-            this.items = [];
+            this.setItems([]);
+            this.renderItems({items: []});
 
             this.parsePageIndex = 0;
             this.onStartClick();
@@ -1201,6 +1145,15 @@
             });
         },
 
+        filterNewItems: function(profiles) {
+            var jobProfileLinks = _.map(this.getItems(), 'link');
+            var newProfiles = _.filter(profiles, function(item) {
+                return jobProfileLinks.indexOf(item.link) === -1;
+            });
+
+            return newProfiles;
+        },
+
         storeProfileListLocal: function (profiles) {
             var _options = {
                 job_id  : this.jobId,
@@ -1214,16 +1167,11 @@
             });
         },
 
-        storeProfileList: function (profiles) {
-            var jobProfileLinks = _.map(this.items, 'link');
-            var newProfiles = _.filter(profiles, function(item) {
-                return jobProfileLinks.indexOf(item.link) === -1;
-            });
-
+        storeProfileList: function (newProfiles) {
             var _options;
 
-            this.items = this.items.concat(newProfiles);
-            this.job.profiles = this.items;
+            this.setItems(this.getItems().concat(newProfiles));
+            this.job.profiles = this.getItems();
 
             _options = {
                 id      : this.job.id,
@@ -1339,8 +1287,9 @@
             var template;
             var templateOptions;
             var html;
+            var thisItems = this.getItems();
 
-            if (!this.items || !this.items.length) {
+            if (!thisItems || !thisItems.length) {
                 html = '<tr class="noItems"><td colspan="8">There are no data</td></td></tr>';
                 this.$list.html(html);
                 this.renderCounters();
@@ -1376,7 +1325,7 @@
                 "1" : 0  // successful
             };
 
-            this.items.forEach(function (profile) {
+            this.getItems().forEach(function (profile) {
                 var _status = profile.status || 0;
 
                 counts[_status] += 1;
@@ -1557,7 +1506,7 @@
             var profile;
             var self = this;
 
-            async.mapSeries(this.items, function iterator(job, cb) {
+            async.mapSeries(this.getItems(), function iterator(job, cb) {
                 var jobProfile = self.normalizeProfile(self.profile, {status: 1}); // TODO: status ???
                 var jobProfiles = job.profiles;
                 var profile;
