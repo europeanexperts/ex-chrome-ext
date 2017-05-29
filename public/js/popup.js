@@ -557,7 +557,6 @@
 
             this.parseIndex = 0;
             this.parsePageIndex = _status.page || 1;
-             // this.status = 'stopped';
 
             this.fetchAll({id: options.id}, function (err, results) {
                 var job;
@@ -637,8 +636,7 @@
         appendProfiles: function(normalized) {
             if (normalized.length) {
                 this.storeProfileList(normalized);
-                // this.renderItems({items: normalized, append: true});
-                this.renderItems({items: this.items}); // TODO: use normalized with append
+                this.renderItems({items: normalized, append: true});
                 this.$table.removeClass('hide');
             }
         },
@@ -845,9 +843,10 @@
                 });
 
                 if (!profiles.length) {
-                    self.renderEmptyList();
+                    self.renderItems({items: []}); // Show 'There are no data' message and update the counters;
+                } else {
+                    self.renderCounters();         // Update the counters only;
                 }
-                self.renderCounters();
             });
         },
 
@@ -1335,37 +1334,32 @@
             }, []);
         },
 
-        generateListTemplate: function (items) {
-            var template = APP_TEMPLATES.getTemplate('job-profiles-list');
-            var templateOptions = {
-                items: items.map(function (item, index) {
+        renderItems: function (options) {
+            var profiles = options.items;
+            var template;
+            var templateOptions;
+            var html;
+
+            if (!this.items || !this.items.length) {
+                html = '<tr class="noItems"><td colspan="8">There are no data</td></td></tr>';
+                this.$list.html(html);
+                this.renderCounters();
+
+                return;
+            } else {
+                this.$list.find('.noItems').remove();
+            }
+
+            template = APP_TEMPLATES.getTemplate('job-profiles-list');
+            templateOptions = {
+                items: profiles.map(function (item, index) {
                     item.cid = new Date().valueOf() + '_' + index;
 
                     return item;
                 })
             };
 
-            return template(templateOptions);
-        },
-
-        renderEmptyList: function () {
-            this.$list.html('<tr><td colspan="8">There are no data</td></td></tr>');
-        },
-
-        renderItems: function (options) {
-            var profiles = options.items;
-            var html;
-
-            if (!this.items || !this.items.length) {
-                html = '<tr><td colspan="8">There are no data</td></td></tr>';
-                this.$list.html(html);
-                this.renderCounters();
-
-                return;
-            }
-
-            html = this.generateListTemplate(profiles);
-
+            html = template(templateOptions);
             if (options.append) {
                 this.$list.append(html);
             } else {
