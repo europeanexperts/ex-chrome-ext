@@ -146,11 +146,19 @@
             }
 
             EXT_API.login(data, function (err, res) {
+                var authToken;
+
                 if (err) {
                     return APP.error(err);
                 }
 
-                APP.authorize({token: res.recruiter.basic.token});
+                authToken = res && res.recruiter && res.recruiter.basic && res.recruiter.basic.token;
+
+                if (!authToken) {
+                    return APP.notification({message: 'Unauthorized'});
+                }
+
+                APP.authorize({token: authToken});
             });
         }
     });
