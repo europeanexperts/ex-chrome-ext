@@ -270,6 +270,7 @@
 
             $tr.find('.jobLanguage').html(data.job_name);
             $tr.find('.jobRegion').html(data.region);
+            $tr.find('.avatar').html(data.short_name);
         },
 
         onItemClick: function (e) {
