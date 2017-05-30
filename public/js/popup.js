@@ -286,7 +286,7 @@
             }
 
             if (data.short_name) {
-                $tr.find('.short_name').html(data.short_name);
+                $tr.find('.avatar').html(data.short_name);
             }
 
             if (Array.isArray(data.profiles)) {
