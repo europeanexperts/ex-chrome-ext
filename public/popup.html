@@ -63,6 +63,13 @@
         #messageText.success {
             background-color: rgba(56, 168, 152, 1);
         }
+
+        .sortable[data-order="asc"]:after {
+            content: " \2191";
+        }
+        .sortable[data-order="desc"]:after {
+            content: " \2193";
+        }
     </style>
 </head>
 <body>
@@ -426,10 +433,10 @@
                             </div>
                         </th>
                         <th class="cell-job">Job</th>
-                        <th class="cell-date">
+                        <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
                             <a href="#">
                                 <span>Add date</span>
-                                <svg class="icon icon-up">
+                                <svg class="hide icon icon-up">
                                     <use class="icon-svg" xlink:href="../img/sprite.svg#icon-up"></use>
                                 </svg>
                             </a>

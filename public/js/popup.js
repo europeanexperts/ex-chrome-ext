@@ -549,7 +549,8 @@
             this.$pauseBtn.on('click', $.proxy(this.onPauseClick, this));
             this.$restartBtn.on('click', $.proxy(this.onRestartClick, this));
 
-            this.$el.on('click', '.exportBtn', $.proxy(this.onExportClick, this));
+            this.$el.on('click', '.sortable', $.proxy(this.onSortClick, this));
+            this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
             this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
             this.$exportSelectedBtn.on('click', $.proxy(this.onExportSelectedClick, this));
             this.$importSelectedBtn.on('click', $.proxy(this.onImportSelectedClick, this));
@@ -567,6 +568,7 @@
             this.jobId = options.id;
             this.parseStatus(_status.status || PARSE_STATUSES.CREATED);
             this.setItems([], {trigger: false});
+            this.$el.find('.sortable').attr('data-order', 'asc');
 
             if (_status.status === PARSE_STATUSES.STARTED || _status.status === PARSE_STATUSES.PAUSED) {
                 this.$startBtn.find('span').html('Continue');
@@ -810,6 +812,33 @@
                     callback(null, results);
                 });
             });
+        },
+
+        onSortClick: function(e) {
+            var $sortable = $(e.target).closest('.sortable');
+            //var $icon = $sortable.find('.icon');
+            var sortBy = $sortable.attr('data-sort-by');
+            var order = $sortable.attr('data-order');
+            var sorted;
+
+            if(order === 'asc') {
+                $sortable.attr('data-order', 'desc');
+                //$icon.removeClass('icon-up').addClass('icon-down');
+            } else {
+                //$icon.removeClass('icon-down').addClass('icon-up');
+                $sortable.attr('data-order', 'asc');
+            }
+
+            sorted = this.getItems().sort(function(a, b) {
+                if (order === 'asc') {
+                    return a[sortBy] <= b[sortBy];
+                }
+
+                return a[sortBy] >= b[sortBy]; // DESC
+            });
+
+            this.setItems(sorted);
+            this.renderItems({items: sorted});
         },
 
         search: function () {
