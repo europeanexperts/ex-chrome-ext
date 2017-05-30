@@ -234,7 +234,6 @@
             this.$selectAllBtn = this.$el.find('.selectAllBtn');
             this.$deleteSelectedBtn = this.$el.find('.deleteSelectedBtn');
 
-
             this.$el.find('.createJobBtn').on('click', function (e) {
                 e.preventDefault();
 
@@ -244,6 +243,7 @@
             this.$selectAllBtn.on('click', $.proxy(this.onSelectAllClick, this));
             this.$deleteSelectedBtn.on('click', $.proxy(this.onDeleteSelectedClick, this));
 
+            this.$el.on('click', '.sortable', $.proxy(this.onSortClick, this));
             this.$el.on('click', '.editJobBtn', $.proxy(this.onSettingsClick, this));
             this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteItemClick, this));
             this.$el.on('click', '.chbWrap', function (e) {
@@ -283,6 +283,30 @@
             if (this.$list.find('.item').length === 0) {
                 this.$list.html('<tr><td colspan="7">' + this.emptyListText + '</td></tr>');
             }
+        },
+
+        onSortClick: function(e) {
+            var $sortable = $(e.target).closest('.sortable');
+            var sortBy = $sortable.attr('data-sort-by');
+            var order = $sortable.attr('data-order');
+            var sorted;
+
+            if(order === 'asc') {
+                $sortable.attr('data-order', 'desc');
+            } else {
+                $sortable.attr('data-order', 'asc');
+            }
+
+            sorted = this.items.sort(function(a, b) {
+                if (order === 'asc') {
+                    return a[sortBy] <= b[sortBy];
+                }
+
+                return a[sortBy] >= b[sortBy]; // DESC
+            });
+
+            this.items = sorted;
+            this.renderData({items: sorted});
         },
 
         onCreateItem: function (e, data) {
@@ -390,7 +414,8 @@
                 }
 
                 sorted = data.sort(function(a, b) {
-                    return a.job_name.toLowerCase() > b.job_name.toLowerCase();
+                    //return a.job_name.toLowerCase() > b.job_name.toLowerCase();
+                    return a.created_at <= b.created_at;
                 });
 
                 self.items = sorted;
@@ -840,16 +865,13 @@
 
         onSortClick: function(e) {
             var $sortable = $(e.target).closest('.sortable');
-            //var $icon = $sortable.find('.icon');
             var sortBy = $sortable.attr('data-sort-by');
             var order = $sortable.attr('data-order');
             var sorted;
 
             if(order === 'asc') {
                 $sortable.attr('data-order', 'desc');
-                //$icon.removeClass('icon-up').addClass('icon-down');
             } else {
-                //$icon.removeClass('icon-down').addClass('icon-up');
                 $sortable.attr('data-order', 'asc');
             }
 

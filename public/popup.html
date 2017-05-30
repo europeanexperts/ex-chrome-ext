@@ -64,6 +64,9 @@
             background-color: rgba(56, 168, 152, 1);
         }
 
+        .sortable {
+            cursor: pointer;
+        }
         .sortable[data-order="asc"]:after {
             content: " \2191";
         }
@@ -81,7 +84,10 @@
 <body>
 <div id="templates">
     <script type="text/template" id="job-list-template">
-        <% items.forEach(function(item) {%>
+        <% items.forEach(function(item) {
+            var createdAt = new Date(item.created_at);
+        %>
+
         <tr class="item" data-id="<%= item.id%>">
             <td>
                 <div class="chbWrap checkbox-wrap">
@@ -99,6 +105,7 @@
                 <div class="avatar"><%= item.short_name%></div>
             </td>
             <td class="jobLanguage cell-job-name"><%= item.job_name%></td>
+            <td class="cell-job-date"><%= createdAt.toLocaleDateString()%></td>
             <td class="jobRegion cell-region"><%= item.region%></td>
             <td class="jobProfilesCount cell-cell-profiles"><%= (item.profiles && item.profiles.length) || 0%></td>
             <td class="cell-settings">
@@ -310,6 +317,12 @@
                     <tr>
                         <th colspan="2"><button class="selectAllBtn btn green">Select all</button></th>
                         <th class="cell-job-name">Job Name</th>
+                        <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
+                            <span>Add date</span>
+                            <svg class="hide icon icon-up">
+                                <use class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../img/sprite.svg#icon-up"></use>
+                            </svg>
+                        </th>
                         <th class="cell-region">Region</th>
                         <th class="cell-profiles">Profiles</th>
                         <th class="cell-settings"></th>
