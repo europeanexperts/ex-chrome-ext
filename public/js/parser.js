@@ -100,6 +100,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var _title = (_titleArr.length) ? _titleArr[0] : '';
         var _languages;
         var _projects;
+        var _skills;
 
         // expand languages container
         $el.find('button[data-control-name="accomplishments_expand_languages"]').click();
@@ -133,6 +134,13 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             })
             .toArray();
 
+        $el.find('button[data-control-name="skill_details"]').click();
+        _skills = $el.find('.pv-skill-entity__skill-name')
+            .map(function () {
+                return $(this).html();
+            })
+            .toArray();
+
         return {
             name     : $el.find('.pv-top-card-section__name').html() || '',
             title    : _title || '',
@@ -140,7 +148,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             summary  : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
             picture  : $el.find('.pv-top-card-section__photo img').attr('src'),
             languages: _languages,
-            projects: _projects,
+            projects : _projects,
+            skills   : _skills,
             education: $el.find('.pv-education-entity')
                 .map(function () {
                     var $li = $(this);
@@ -156,11 +165,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                         start_date : $li.find('.pv-entity__dates time:first').html(),
                         end_date   : $li.find('.pv-entity__dates time:last').html()
                     }
-                })
-                .toArray(),
-            skills: $el.find('.pv-skill-entity__skill-name')
-                .map(function () {
-                    return $(this).html();
                 })
                 .toArray(),
 
@@ -190,7 +194,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     };
 })();
 
-/*SOCIAL_PARSER.onLoadProfile(function (err) {
+SOCIAL_PARSER.onLoadProfile(function (err) {
     var data;
 
     if (err) {
@@ -200,7 +204,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     data = SOCIAL_PARSER.parseProfile();
     console.log('>>> data', data);
     console.log('>>> data', JSON.stringify(data));
-});*/
+});
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
  var data = SOCIAL_PARSER.parseJobs();
