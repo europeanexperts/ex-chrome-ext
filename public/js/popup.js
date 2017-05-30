@@ -554,6 +554,8 @@
         },
 
         renderData: function (data) {
+            var importExisting = (typeof data.import_existing === 'boolean') ? data.import_existing : true;
+
             this.$el.attr('data-id', data.id);
 
             this.$inputJobName.val(data.job_name);
@@ -561,7 +563,7 @@
             this.$inputLanguage.val(data.language);
             this.$inputShortName.val(data.short_name);
             this.$inputUrl.val(data.url);
-            this.$inputImportExisting.prop('checked', data.import_existing);
+            this.$inputImportExisting.prop('checked', importExisting);
 
             this._preData = data;
         }
