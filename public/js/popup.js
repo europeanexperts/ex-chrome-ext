@@ -751,12 +751,19 @@
                                     }
 
                                     console.log('>>> res', res);
-
-                                    if (res.isNew) {
-                                        self.onParsedProfile(profileData, res.data);
+                                    if (!res.isNew) {
+                                        mapCb(null, res.data);
                                     }
 
-                                    mapCb(null, res.data);
+                                    self.onParsedProfile(profileData, res.data, function(err) {
+                                        if (err) {
+                                            console.error(err);
+                                            APP.error(err);
+                                        }
+
+                                        mapCb(null, res.data);
+                                    });
+
                                 });
 
                             }, function(err, parsedProfiles) {
@@ -971,7 +978,7 @@
             });
         },
 
-        onParsedProfile: function (profile, data) {
+        onParsedProfile: function (profile, data, callback) {
             var link = profile.link;
             var $li = this.$list.find('.item[data-id="' + link + '"]');
             var $action = $li.find('.profileAction');
@@ -1008,7 +1015,7 @@
                 job: function (cb) {
                     var _options = {
                         id      : self.jobId,
-                        profiles: self.items
+                        profiles: self.getItems()
                     };
 
                     EXT_API.saveJob(_options, function (err, res) {
@@ -1024,7 +1031,7 @@
                 var statusText;
 
                 if (err) {
-                    return APP.error(err);
+                    return callback(err);
                 }
 
                 if (profile.status === 1) {
@@ -1039,6 +1046,8 @@
 
                 $li.find('.profileStatus').html(statusText);
                 self.renderCounters();
+
+                callback(null, results);
             });
         },
 
