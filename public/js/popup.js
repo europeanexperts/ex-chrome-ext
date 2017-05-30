@@ -1759,6 +1759,12 @@
             } else {
                 APP.$settingsBtn.addClass('hide');
             }
+
+            if (!APP.history || APP.history.length <= 1) {
+                APP.$navBackBtn.addClass('hide');
+            } else {
+                APP.$navBackBtn.removeClass('hide');
+            }
         },
         navBack      : function () {
             var history = APP.history;
@@ -1847,17 +1853,16 @@
         init         : function () {
             APP.$extensionBody = $('.extensionBody');
             APP.$heading = APP.$extensionBody.find('.heading');
-            //APP.$logoutBtn = APP.$extensionBody.find('.logoutBtn');
             APP.$settingsBtn = APP.$extensionBody.find('.settingsBtn');
             APP.$logoutBtn = APP.$extensionBody.find('.logoutBtn');
-            APP.$extensionBody.find('.prevBtn').on('click', this.navBack);
+            APP.$navBackBtn = APP.$extensionBody.find('.prevBtn');
 
+            APP.$navBackBtn.on('click', this.navBack);
             APP.$settingsBtn.on('click', function () {
                 if (typeof APP.currentPage.showSettingsPage === 'function') {
                     APP.currentPage.showSettingsPage();
                 }
             });
-
             APP.$logoutBtn.on('click', function (e) {
                 console.log('>>> logout ...');
                 EXT_API.logout(function (err, res) {
