@@ -277,9 +277,21 @@
         onUpdateItem: function (e, data) {
             var $tr = this.$list.find('.item[data-id=' + data.id + ']');
 
-            $tr.find('.jobLanguage').html(data.job_name);
-            $tr.find('.jobRegion').html(data.region);
-            $tr.find('.avatar').html(data.short_name);
+            if (data.job_name) {
+                $tr.find('.jobLanguage').html(data.job_name);
+            }
+
+            if (data.region) {
+                $tr.find('.jobRegion').html(data.region);
+            }
+
+            if (data.short_name) {
+                $tr.find('.short_name').html(data.short_name);
+            }
+
+            if (Array.isArray(data.profiles)) {
+                $tr.find('.jobProfilesCount').html(data.profiles.length);
+            }
         },
 
         onItemClick: function (e) {
@@ -554,7 +566,7 @@
             _status = self.getParseStatus({jobId: options.id});
             this.jobId = options.id;
             this.parseStatus(_status.status || PARSE_STATUSES.CREATED);
-            this.setItems([]);
+            this.setItems([], {trigger: false});
 
             if (_status.status === PARSE_STATUSES.STARTED || _status.status === PARSE_STATUSES.PAUSED) {
                 this.$startBtn.find('span').html('Continue');
@@ -587,8 +599,12 @@
             });
         },
 
-        setItems: function(items) {
-            this._items = items; // TODO: merge the links
+        setItems: function(items, options) {
+            this._items = items;
+
+            if (!options || options.trigger !== false) {
+                APP.events.trigger('jobs:update', {id: this.jobId, profiles: items});
+            }
         },
 
         getItems: function() {
