@@ -70,6 +70,12 @@
         .sortable[data-order="desc"]:after {
             content: " \2193";
         }
+
+        .selectAllBtn {
+            padding: 1rem 1.5rem;
+            left: -1rem;
+            width: 110px;
+        }
     </style>
 </head>
 <body>
@@ -302,8 +308,7 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th class="cell-checkbox"></th>
-                        <th class="cell-avatar"></th>
+                        <th colspan="2"><button class="selectAllBtn btn green">Select all</button></th>
                         <th class="cell-job-name">Job Name</th>
                         <th class="cell-region">Region</th>
                         <th class="cell-profiles">Profiles</th>
@@ -422,7 +427,8 @@
                 <table class="table hide">
                     <thead>
                     <tr>
-                        <th colspan="3" class="cell-search">
+                        <th colspan="2"><button class="selectAllBtn btn green">Select all</button></th>
+                        <th colspan="1" class="cell-search">
                             <div class="search-field">
                                 <input class="searchField" type="search" placeholder="Search by name">
                                 <button class="searchBtn btn">

@@ -86,6 +86,20 @@
                 '<strong>Step</strong>',
                 '</p>'
             ].join('');
+        },
+        onSelectAllClick: function(e) {
+            var $btn = $(e.target);
+            var isSelected = $btn.attr('data-selected');
+
+            if (isSelected) {
+                this.$list.find('.checkbox').prop('checked', false);
+                $btn.html('Select all');
+                $btn.attr('data-selected', null);
+            } else {
+                this.$list.find('.checkbox').prop('checked', true);
+                $btn.html('Deselect all');
+                $btn.attr('data-selected', 'on');
+            }
         }
     };
 
@@ -217,13 +231,17 @@
             this.emptyListText = 'There are no saved jobs yet!';
 
             this.$list = this.$el.find('.jobList');
+            this.$selectAllBtn = this.$el.find('.selectAllBtn');
             this.$deleteSelectedBtn = this.$el.find('.deleteSelectedBtn');
+
 
             this.$el.find('.createJobBtn').on('click', function (e) {
                 e.preventDefault();
 
                 APP.showPage(APP.pages.job.name);
             });
+
+            this.$selectAllBtn.on('click', $.proxy(this.onSelectAllClick, this));
             this.$deleteSelectedBtn.on('click', $.proxy(this.onDeleteSelectedClick, this));
 
             this.$el.on('click', '.editJobBtn', $.proxy(this.onSettingsClick, this));
@@ -538,11 +556,13 @@
             this.$startBtn = this.$el.find('.startBtn');
             this.$pauseBtn = this.$el.find('.pauseBtn');
             this.$restartBtn = this.$el.find('.restartBtn');
+            this.$selectAllBtn = this.$el.find('.selectAllBtn');
             this.$exportSelectedBtn = this.$el.find('.exportSelectedBtn');
             this.$importSelectedBtn = this.$el.find('.importSelectedBtn');
             this.$deleteSelectedBtn = this.$el.find('.deleteSelectedBtn');
 
             this.$el.find('.searchBtn').on('click', $.proxy(this.search, this));
+            this.$selectAllBtn.on('click', $.proxy(this.onSelectAllClick, this));
             this.$searchField.on('change', $.proxy(this.search, this));
             this.$searchField.on('keyup', $.proxy(this.onSearch, this));
             this.$startBtn.on('click', $.proxy(this.onStartClick, this));
@@ -563,6 +583,10 @@
 
             ExtensionPage.prototype.show.call(this, options);
             this.$el.addClass('hide'); // hide until loading data
+
+            // clear the Select all button previous state:
+            this.$selectAllBtn.html('Select all');
+            this.$selectAllBtn.attr('data-selected', null);
 
             _status = self.getParseStatus({jobId: options.id});
             this.jobId = options.id;
