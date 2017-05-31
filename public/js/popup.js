@@ -1760,7 +1760,7 @@
                 APP.$settingsBtn.addClass('hide');
             }
 
-            if (!APP.history || APP.history.length <= 1) {
+            if (page.name === APP.pages.jobs.name) {
                 APP.$navBackBtn.addClass('hide');
             } else {
                 APP.$navBackBtn.removeClass('hide');
