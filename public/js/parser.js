@@ -226,8 +226,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         init: function() {
             console.log('>>> init profile hunter');
             this.render();
-
-            //this.$btn.on('click', $.proxy(this.onHunterClick, this));
         },
 
         getAuthToken: function() {
@@ -237,27 +235,23 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         sendProfile: function(options, callback) {
             var profile = options.profile;
             var authToken = this.getAuthToken();
+            var data = {
+                authToken: authToken,
+                profile  : profile
+            };
 
             if (!authToken) {
                 this.notification({message: '<b>Unauthorized!</b> You must to log in into Chrome Extension.'});
             }
 
-            $.ajax({
-                url        : 'http://euex-stage.fpdev.xyz/api/import/consultants',
-                method     : 'POST',
-                headers    : {
-                    'X-Authorization': authToken
-                },
-                crossDomain: true,
-                contentType: 'application/json',
-                accepts    : 'json',
-                data       : JSON.stringify(profile),
-                success    : function (res) {
-                    callback(null, res);
-                },
-                error      : function (err) {
-                    callback(err);
+            chrome.runtime.sendMessage({type: 'importProfile', data: data}, function(res) {
+                console.log('>>> response data', res);
+
+                if (res.error) {
+                    return callback(res.error);
                 }
+
+                callback(null, res.success);
             });
         },
 
@@ -305,7 +299,17 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         },
 
         errorHandler: function(xhr) {
-            this.notification({message: xhr.errors});
+            var message;
+
+            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                message = (xhr.responseJSON.errors);
+            } else if (xhr.responseText) {
+                message = xhr.responseText;
+            } else {
+                message = xhr;
+            }
+
+            this.notification({message: message});
         },
 
         renderNotifications: function() {
