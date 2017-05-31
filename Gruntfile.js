@@ -35,7 +35,6 @@ module.exports = function(grunt) {
                         'js/contentScript.js',
                         'js/templates.js',
                         'js/api.js',
-                        'js/helpers.js',
                         'js/popup.js',
                         'js/background.js'
                     ], dest: 'build/'}
