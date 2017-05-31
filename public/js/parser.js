@@ -2,7 +2,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
 (function () {
     'use strict';
-    var AUTH_TOKEN_KEY = 'euex-auth-token';
 
     var PATTERNS = {
         //PROFILE_URL: /^https:\/\/www\.linkedin\.com\/in\//
@@ -228,21 +227,11 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             this.render();
         },
 
-        getAuthToken: function() {
-            return localStorage.getItem(AUTH_TOKEN_KEY);
-        },
-
         sendProfile: function(options, callback) {
             var profile = options.profile;
-            var authToken = this.getAuthToken();
             var data = {
-                authToken: authToken,
                 profile  : profile
             };
-
-            if (!authToken) {
-                this.notification({message: '<b>Unauthorized!</b> You must to log in into Chrome Extension.'});
-            }
 
             chrome.runtime.sendMessage({type: 'importProfile', data: data}, function(res) {
                 console.log('>>> response data', res);
@@ -270,6 +259,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
                     self.notification({message: 'The profile was successfully parsed and was exported to server.', type: 'success'});
                     self.$btn.find('.btnText').html('Exported');
+                    $body.animate({scrollTop: 0});
                 });
             });
         },

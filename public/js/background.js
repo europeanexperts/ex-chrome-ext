@@ -3,9 +3,17 @@
 
     var IMPORT_URL = 'http://euex-stage.fpdev.xyz/api/import/consultants';
 
+    function getAuthToken() {
+        return localStorage.getItem('AUTH_TOKEN');
+    }
+
     function importProfileRequest(options, callback) {
-        var authToken = options.authToken;
+        var authToken = getAuthToken();
         var profile = options.profile;
+
+        if (!authToken) {
+            return callback('<b>Unauthorized!</b> You must to log in into Chrome Extension.');
+        }
 
         $.ajax({
             url        : IMPORT_URL,
