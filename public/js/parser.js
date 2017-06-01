@@ -3,11 +3,12 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 (function () {
     'use strict';
 
+    var REFRESH_PROFILE_ACTION = 'action=euex';
+    var REFRESH_PROFILE = 'REFRESH_PROFILE';
     var PATTERNS = {
         //PROFILE_URL: /^https:\/\/www\.linkedin\.com\/in\//
         PROFILE_URL: /^\/in\//
     };
-
     var SELECTORS = {
         TOTAL                 : '.search-results__total',
         SEARCH_RESULT         : '.results-list',
@@ -122,9 +123,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     SOCIAL_PARSER.onLoadProfile = function (callback) {
 
         $(document).ready(function () {
-            $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
+            callback();
+            /*$('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
                 return callback();
-            });
+            });*/
         });
     };
 
@@ -132,6 +134,13 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var $el = $('body');
 
         async.waterfall([
+
+            // animate:
+            function(cb) {
+                $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
+                    return cb();
+                });
+            },
 
             // general info:
             function (cb) {
@@ -354,6 +363,26 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return PATTERNS.PROFILE_URL.test(url);
     };
 
+    // refresh exported profile:
+    function startRefreshProfile() {
+        var path = window.location.pathname;
+
+        if (!PATTERNS.PROFILE_URL.test(path)) {
+            return console.warn('Invalid path for refresh profile', path);
+        }
+
+        SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+            if (err) {
+                return console.error(err);
+            }
+
+            console.log('>>> data', JSON.stringify(data));
+            chrome.runtime.sendMessage({type: REFRESH_PROFILE, data: data}, function(res) {
+                console.log('background response', res);
+            });
+        });
+    }
+
     // profile hunter:
     function ProfileHunter() {
         var instance = ProfileHunter.instance;
@@ -512,6 +541,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var _path;
         var hunter;
 
+        if (window.location.href.indexOf(REFRESH_PROFILE_ACTION) !== -1) {
+            startRefreshProfile();
+        }
+
         setInterval(function () {
             if (window.location.pathname !== _path) {
                 _path = window.location.pathname;
@@ -524,7 +557,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         }, 200);
     });
-
 })();
 
 /*SOCIAL_PARSER.onLoadProfile(function (err) {

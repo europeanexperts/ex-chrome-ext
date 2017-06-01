@@ -1,7 +1,11 @@
 (function () {
     'use strict';
 
+    var STAGE_DOMAIN = 'euex-stage.fpdev.xyz';
+    var LIVE_DOMAIN = 'join.europeanexperts.com';
+
     var IMPORT_URL = 'http://euex-stage.fpdev.xyz/api/import/consultants';
+    var REFRESH_PROFILE = 'REFRESH_PROFILE';
 
     function getAuthToken() {
         return localStorage.getItem('AUTH_TOKEN');
@@ -34,11 +38,30 @@
         });
     }
 
+    function refreshProfile(request) {
+        var data = $.extend({}, request);
+
+        chrome.tabs.query({}, function(tabs) {
+            tabs.forEach(function (tab) {
+                if (tab.url.indexOf(STAGE_DOMAIN) === -1 && tab.url.indexOf(LIVE_DOMAIN) === -1) {
+                    return;
+                }
+
+                chrome.tabs.sendMessage(tab.id, data, function (res) {
+                    console.log('>>> res from ' + tab.id, res);
+                });
+            });
+        });
+    }
+
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.type === 'importProfile') {
             importProfileRequest(request.data, function (err, res) {
                 sendResponse({error: err, success: res, req: request});
             });
+        } else if (request.type === REFRESH_PROFILE) {
+            refreshProfile(request);
+            sendResponse({data: 'OK', req: request});
         } else {
             sendResponse({data: 'default', req: request});
         }

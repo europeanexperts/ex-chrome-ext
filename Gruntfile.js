@@ -32,6 +32,7 @@ module.exports = function(grunt) {
                     {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
                     {expand: true, cwd: 'public/', src: [
                         'js/parser.js',
+                        'js/euexContentScript.js',
                         'js/contentScript.js',
                         'js/templates.js',
                         'js/api.js',
