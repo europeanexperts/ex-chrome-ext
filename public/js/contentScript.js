@@ -5,7 +5,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
     } else if (request.method === 'profile') {
         SOCIAL_PARSER.onLoadProfile(function () {
-            sendResponse({data: SOCIAL_PARSER.parseProfile(), method: "runtime", _pre: request});
+            SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+                sendResponse({data: data, method: "runtime", _pre: request});
+            });
         });
     } else if (request.method = 'loadURL') {
         SOCIAL_PARSER.loadURL(request.url);

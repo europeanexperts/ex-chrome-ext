@@ -35,9 +35,38 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     function parseEntityRange(str, options) {
         var delimiter = (options && options.delimiter) || ' – ';
 
-        return str.split(delimiter).map(function(item) {
+        return str.split(delimiter).map(function (item) {
             return item.trim();
         });
+    }
+
+    function afterTag(str, options) {
+        var tagName = (options && options.tagName) || '</span>';
+        var index = str.indexOf(tagName);
+        var result;
+
+        if (index !== -1) {
+            result = str.slice(index + tagName.length).trim(); // remove the span; ('</span>'.length === 7 !!!)
+        } else {
+            result = str.trim();
+        }
+
+        return result;
+    }
+
+    function parseProfileCourses(options) {
+        var $el = options.$el;
+        var _courses = $el.find('li')
+            .map(function () {
+                var $li = $(this);
+
+                return {
+                    name: afterTag($li.find('h4').html())
+                }
+            })
+            .toArray();
+
+        return _courses;
     }
 
     SOCIAL_PARSER.onLoadJobs = function (callback) {
@@ -93,7 +122,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     SOCIAL_PARSER.onLoadProfile = function (callback) {
 
         $(document).ready(function () {
-            $('body').animate({scrollTop: $('.profile-detail').height()}, 3000, function () {
+            $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
                 return callback();
             });
         });
@@ -106,10 +135,13 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var _languages;
         var _projects;
         var _skills;
+        var _certifications;
+        var _courses;
+        var _coursesCount = 0;
 
         // expand languages container
         $el.find('button[data-control-name="accomplishments_expand_languages"]').click();
-        _languages =  $el.find('.pv-accomplishments-section .languages li')
+        _languages = $el.find('.pv-accomplishments-section .languages li')
             .map(function () {
                 var $li = $(this);
                 var lang = $li.find('h4').html();
@@ -123,7 +155,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             .toArray();
 
         $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
-        _projects =  $el.find('.pv-accomplishments-section .projects li')
+        _projects = $el.find('.pv-accomplishments-section .projects li')
             .map(function () {
                 var $li = $(this);
                 var prTitle = $li.find('h4').html();
@@ -146,16 +178,81 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             })
             .toArray();
 
+        $el.find('button[data-control-name="accomplishments_expand_certifications"]').click();
+        _certifications = $el.find('.pv-accomplishments-section .certifications li')
+            .map(function () {
+                var $li = $(this);
+                var nameHTML;
+                var name;
+                var dateRangeHTML;
+                var dateRange;
+                var index;
+
+                nameHTML = $li.find('h4').html() || '';
+                index = nameHTML.indexOf('</span>');  // find the closing </span> tag:
+                if (index !== -1) {
+                    name = nameHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
+                } else {
+                    name = nameHTML.trim();
+                }
+
+                dateRangeHTML = $li.find('.pv-accomplishment-entity__date').html() || '';
+                index = dateRangeHTML.indexOf('</span>');
+                if (index !== -1) {
+                    dateRangeHTML = dateRangeHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
+                } else {
+                    dateRangeHTML = dateRangeHTML.trim();
+                }
+                dateRange = parseEntityRange(dateRangeHTML);
+
+                return {
+                    name      : name,
+                    start_date: dateRange[0],
+                    end_date  : dateRange[1]
+                }
+            })
+            .toArray();
+
+        $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
+        _coursesCount = $el.find('.pv-accomplishments-section .courses h3 span:last').html() || '0';
+        _coursesCount = parseInt(_coursesCount);
+        console.log('>>> _coursesCount', _coursesCount);
+
+        var i = 0;
+        while (i < _coursesCount) {
+            console.log('>>> click to show more ...');
+            $el.find('.pv-accomplishments-section .courses button.link').click();
+
+            if (_coursesCount === $el.find('.pv-accomplishments-section .courses button.link').length) {
+                i = _coursesCount;
+            } else {
+                i++;
+            }
+        }
+
+        _courses = $el.find('.pv-accomplishments-section .courses li')
+            .map(function () {
+                var $li = $(this);
+
+                return {
+                    name: afterTag($li.find('h4').html())
+                }
+            })
+            .toArray();
+
         return {
-            name     : $el.find('.pv-top-card-section__name').html() || '',
-            title    : _title || '',
-            country  : $el.find('.pv-top-card-section__location').html() || '',
-            summary  : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
-            picture  : $el.find('.pv-top-card-section__photo img').attr('src'),
-            languages: _languages,
-            projects : _projects,
-            skills   : _skills,
-            education: $el.find('.pv-education-entity')
+            name          : $el.find('.pv-top-card-section__name').html() || '',
+            title         : _title || '',
+            country       : $el.find('.pv-top-card-section__location').html() || '',
+            summary       : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
+            picture       : $el.find('.pv-top-card-section__photo img').attr('src'),
+
+            languages     : _languages,
+            projects      : _projects,
+            skills        : _skills,
+            certifications: _certifications,
+            courses       : _courses,
+            education     : $el.find('.pv-education-entity')
                 .map(function () {
                     var $li = $(this);
 
@@ -190,6 +287,218 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         };
     };
 
+    SOCIAL_PARSER.parseProfileAsync = function (callback) {
+        var $el = $('body');
+
+        async.waterfall([
+
+            // general info:
+            function (cb) {
+                var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
+                var parsed = {
+                    name   : $el.find('.pv-top-card-section__name').html() || '',
+                    title  : (_titleArr.length) ? _titleArr[0] : '',
+                    country: $el.find('.pv-top-card-section__location').html() || '',
+                    summary: $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
+                    picture: $el.find('.pv-top-card-section__photo img').attr('src')
+                };
+
+                cb(null, parsed);
+            },
+
+            // educations:
+            function(parsed, cb) {
+                var _educations = $el.find('.pv-education-entity')
+                    .map(function () {
+                        var $li = $(this);
+
+                        return {
+                            name       : $li.find('.pv-entity__school-name').html(),
+                            description: $li.find('.pv-entity__comma-item')
+                                .map(function () {
+                                    return $(this).html();
+                                })
+                                .toArray()
+                                .join(', '),
+                            start_date : $li.find('.pv-entity__dates time:first').html(),
+                            end_date   : $li.find('.pv-entity__dates time:last').html()
+                        }
+                    })
+                    .toArray();
+
+                parsed.education = _educations;
+                cb(null, parsed);
+            },
+
+            // companies:
+            function(parsed, cb) {
+                var _companies = $el.find('.pv-position-entity')
+                    .map(function () {
+                        var $li = $(this);
+
+                        return {
+                            title      : $li.find('h3').html(),
+                            company    : $li.find('.pv-entity__secondary-title').html(),
+                            // location   : '', // TODO
+                            start_date : $li.find('.pv-entity__date-range span:last').html().split(' – ')[0],
+                            end_date   : $li.find('.pv-entity__date-range span:last').html().split(' – ')[1],
+                            // description: '' // // TODO
+                        }
+                    })
+                    .toArray();
+
+                parsed.companies = _companies;
+                cb(null, parsed);
+            },
+
+            // languages:
+            function(parsed, cb) {
+                var _languages;
+
+                // expand languages container
+                $el.find('button[data-control-name="accomplishments_expand_languages"]').click();
+                _languages = $el.find('.pv-accomplishments-section .languages li')
+                    .map(function () {
+                        var $li = $(this);
+                        var lang = $li.find('h4').html();
+                        var level = $li.find('.pv-accomplishment-entity__proficiency').html() || '';
+
+                        return {
+                            language: parseVisuallyHidden(lang),
+                            level   : level.trim()
+                        };
+                    })
+                    .toArray();
+
+                parsed.languages = _languages;
+                cb(null, parsed);
+            },
+
+            // projects:
+            function(parsed, cb) {
+                var _projects;
+
+                $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
+                _projects = $el.find('.pv-accomplishments-section .projects li')
+                    .map(function () {
+                        var $li = $(this);
+                        var prTitle = $li.find('h4').html();
+                        var prDescription = $li.find('.pv-accomplishment-entity__description').html();
+                        var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+
+                        return {
+                            title      : parseVisuallyHidden(prTitle),
+                            description: parseVisuallyHidden(prDescription),
+                            start_date : dateRange[0],
+                            end_date   : dateRange[1]
+                        };
+                    })
+                    .toArray();
+
+                parsed.projects = _projects;
+                cb(null, parsed);
+            },
+
+            // skills:
+            function(parsed, cb) {
+                var _skills;
+
+                $el.find('button[data-control-name="skill_details"]').click();
+                _skills = $el.find('.pv-skill-entity__skill-name')
+                    .map(function () {
+                        return $(this).html();
+                    })
+                    .toArray();
+
+                parsed.skills = _skills;
+                cb(null, parsed);
+            },
+
+            // certifications:
+            function(parsed, cb) {
+                var _certifications;
+
+                $el.find('button[data-control-name="accomplishments_expand_certifications"]').click();
+                _certifications = $el.find('.pv-accomplishments-section .certifications li')
+                    .map(function () {
+                        var $li = $(this);
+                        var nameHTML;
+                        var name;
+                        var dateRangeHTML;
+                        var dateRange;
+                        var index;
+
+                        nameHTML = $li.find('h4').html() || '';
+                        index = nameHTML.indexOf('</span>');  // find the closing </span> tag:
+                        if (index !== -1) {
+                            name = nameHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
+                        } else {
+                            name = nameHTML.trim();
+                        }
+
+                        dateRangeHTML = $li.find('.pv-accomplishment-entity__date').html() || '';
+                        index = dateRangeHTML.indexOf('</span>');
+                        if (index !== -1) {
+                            dateRangeHTML = dateRangeHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
+                        } else {
+                            dateRangeHTML = dateRangeHTML.trim();
+                        }
+                        dateRange = parseEntityRange(dateRangeHTML);
+
+                        return {
+                            name      : name,
+                            start_date: dateRange[0],
+                            end_date  : dateRange[1]
+                        }
+                    })
+                    .toArray();
+
+                parsed.certifications = _certifications;
+                cb(null, parsed);
+            },
+
+            // courses:
+            function(parsed, cb) {
+                $el.animate({scrollTop: $el.height()}, 1000, function() {
+                    var $courses = $el.find('.pv-accomplishments-section .courses');
+                    var coursesCount = 0;
+                    var interval;
+                    var max = 50;
+                    var i = 0;
+
+                    $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
+
+                    coursesCount = $courses.find('h3 span:last').html() || '0';
+                    coursesCount = parseInt(coursesCount, 10);
+                    interval = setInterval(function() {
+                        var coursesLength = $courses.find('li').length;
+
+                        if (coursesLength === coursesCount || (max < i)) {
+                            if (max < i) {
+                                console.warn('Can not parse the courses. Parsed %s/%s', coursesLength, coursesCount);
+                            }
+
+                            clearInterval(interval);
+                            parsed.courses = parseProfileCourses({$el: $courses}) || [];
+
+                            return cb(null, parsed);
+                        }
+
+                        $courses.find('button.link').click();
+                        i++;
+                    }, 20);
+                });
+            }
+
+        ], function (err, parsed) {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, parsed);
+        });
+    };
+
     SOCIAL_PARSER.parserOnProfileLoaded = function (callback) {
         $(document).ready(callback);
     };
@@ -198,14 +507,14 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         window.location.href = url;
     };
 
-    SOCIAL_PARSER.testProfilePage = function() {
+    SOCIAL_PARSER.testProfilePage = function () {
         var url = window.location.href;
 
         return PATTERNS.PROFILE_URL.test(url);
     };
 
     // profile hunter:
-    function ProfileHunter () {
+    function ProfileHunter() {
         var instance = ProfileHunter.instance;
 
         if (instance !== undefined) {
@@ -222,18 +531,18 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     }
 
     ProfileHunter.prototype = {
-        init: function() {
+        init: function () {
             console.log('>>> init profile hunter');
             this.render();
         },
 
-        sendProfile: function(options, callback) {
+        sendProfile: function (options, callback) {
             var profile = options.profile;
             var data = {
-                profile  : profile
+                profile: profile
             };
 
-            chrome.runtime.sendMessage({type: 'importProfile', data: data}, function(res) {
+            chrome.runtime.sendMessage({type: 'importProfile', data: data}, function (res) {
                 console.log('>>> response data', res);
 
                 if (res.error) {
@@ -244,27 +553,34 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             });
         },
 
-        onHunterClick: function() {
+        onHunterClick: function () {
             var $body = $('body');
             var self = this;
 
             $body.animate({scrollTop: 0});
-            $body.animate({scrollTop: $('.profile-detail').height()}, 3000, function () {
-                var data = SOCIAL_PARSER.parseProfile();
-
-                self.sendProfile({profile: data}, function(err, res) {
+            $body.animate({scrollTop: $body.find('.profile-detail').height()}, 5000, function () {
+                SOCIAL_PARSER.parseProfileAsync(function(err, data) {
                     if (err) {
                         return self.errorHandler(err);
                     }
 
-                    self.notification({message: 'The profile was successfully parsed and was exported to server.', type: 'success'});
-                    self.$btn.find('.btnText').html('Exported');
-                    $body.animate({scrollTop: 0});
+                    self.sendProfile({profile: data}, function (err, res) {
+                        if (err) {
+                            return self.errorHandler(err);
+                        }
+
+                        self.notification({
+                            message: 'The profile was successfully parsed and was exported to server.',
+                            type   : 'success'
+                        });
+                        self.$btn.find('.btnText').html('Exported');
+                        $body.animate({scrollTop: 0});
+                    });
                 });
             });
         },
 
-        notification: function(options) {
+        notification: function (options) {
             var message = options.message || 'Something went wrong!';
             var type = options.type || 'error';
             var color = (type === 'success') ? '#0084bf' : 'red';
@@ -274,21 +590,21 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             $p.css({
                 'text-align': 'center',
-                color: color
+                color       : color
             });
 
             $wrapper.css({
-                    'border-bottom': '5px solid ' + color,
-                    display: 'block'
-                })
+                'border-bottom': '5px solid ' + color,
+                display        : 'block'
+            })
                 .html($p);
 
-            setTimeout(function() {
+            setTimeout(function () {
                 $wrapper.css({display: 'none'});
             }, timeout);
         },
 
-        errorHandler: function(xhr) {
+        errorHandler: function (xhr) {
             var message;
 
             if (xhr.responseJSON && xhr.responseJSON.errors) {
@@ -302,23 +618,23 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             this.notification({message: message});
         },
 
-        renderNotifications: function() {
+        renderNotifications: function () {
             this.$notificationsWrapper = $('<div id="euexNotificationWrapper"></div>');
             this.$notificationsWrapper.css({
-                position       : 'fixed',
-                top            : 0,
-                width          : '100%',
-                background     : '#fff',
+                position  : 'fixed',
+                top       : 0,
+                width     : '100%',
+                background: '#fff',
                 //'border-bottom': '5px solid red',
-                padding        : '30px',
-                'z-index'      : 100,
-                'display'      : 'none'
+                padding   : '30px',
+                'z-index' : 100,
+                'display' : 'none'
             });
 
             $('body').append(this.$notificationsWrapper);
         },
 
-        renderButton: function() {
+        renderButton: function () {
             var $actions = $('.pv-top-card-section__actions');
             var $span;
 
@@ -345,7 +661,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             }
         },
 
-        render: function() {
+        render: function () {
             this.renderButton();
             this.renderNotifications();
         }
@@ -355,7 +671,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var _path;
         var hunter;
 
-        setInterval(function() {
+        setInterval(function () {
             if (window.location.pathname !== _path) {
                 _path = window.location.pathname;
                 console.log('>>> changed path', _path);
@@ -371,15 +687,18 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 })();
 
 /*SOCIAL_PARSER.onLoadProfile(function (err) {
-    var data;
-
     if (err) {
         return console.error(err);
     }
 
-    data = SOCIAL_PARSER.parseProfile();
-    console.log('>>> data', data);
-    console.log('>>> data', JSON.stringify(data));
+    SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+        if (err) {
+            return console.error(err);
+        }
+
+        console.log('>>> data', data);
+        console.log('>>> data', JSON.stringify(data));
+    });
 });*/
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
