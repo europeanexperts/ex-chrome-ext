@@ -516,8 +516,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             }
 
             this.$btn = $([
-                '<button class="primary top-card-action" style="background: #FF5722;">',
-                '<span class="btnText hunterBtn">Hunter</span>',
+                '<button class="primary top-card-action" style="background: #F1C40F;">',
+                '<span class="btnText hunterBtn">Go Experts</span>',
                 '</button>'
             ].join(' '));
             this.$btn.on('click', $.proxy(this.onHunterClick, this));     // on click
