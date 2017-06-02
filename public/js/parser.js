@@ -3,6 +3,9 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 (function () {
     'use strict';
 
+    var HUNTER_API_KEY = 'ce1972d359b9d29b810dfb23181f5cd726b0d399';
+    var HUNTER_API_HOST = 'https://api.hunter.io/v2';
+
     var REFRESH_PROFILE_ACTION = 'action=euex';
     var REFRESH_PROFILE = 'REFRESH_PROFILE';
     var PATTERNS = {
@@ -70,6 +73,97 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return _courses;
     }
 
+    function getIdFromCompanyPath(str) {
+        var _match = str.match(/company(-beta)?\/([0-9]*)/);
+
+        return (_match && _match[2]) || '';
+    }
+
+    function getFindEmailURL(options) {
+        var url = HUNTER_API_HOST + '/email-finder?api_key=' + HUNTER_API_KEY;
+        var params = {
+            domain   : 'domain',
+            companyId: 'linkedin_id',
+            firstName: 'first_name',
+            lastName : 'last_name'
+        };
+
+        Object.keys(params).forEach(function (attr) {
+            var param = options[attr];
+
+            if (param) {
+                url += '&' + params[attr] + '=' + encodeURIComponent(param);
+            }
+        });
+
+        return url;
+    }
+    
+    function findEmail(options, callback) {
+        var url = getFindEmailURL(options);
+
+        $.ajax({
+            url     : url,
+            headers : {
+                'Email-Hunter-Origin': 'chrome_extension'
+            },
+            type    : 'GET',
+            dataType: 'json',
+            success : function (res) {
+                callback(null, res);
+            },
+            error   : function (err) {
+                callback(err);
+            }
+        });
+    }
+
+    function replaceAll(str, replaceObj) {
+        var keys = Object.keys(replaceObj);
+
+        keys.forEach(function (key) {
+            var regExp = new RegExp(key, 'g');
+
+            str.replace(regExp, replaceObj[key]);
+        });
+
+        return str;
+    }
+
+    function cleanName(name) {
+        return name.split(/\s+/).length > 2 ? replaceAll(name, {
+            ",? Jr.?": "",
+            ",? Sr.?": "",
+            ",? MBA" : "",
+            ",? CPA" : "",
+            ",? PhD" : "",
+            ",? MD"  : "",
+            ",? MHA" : "",
+            ",? CGA" : "",
+            ",? ACCA": "",
+            ",? PMP" : "",
+            ",? MSc" : ""
+        }) : name;
+    }
+
+    function getNameObj(rows) {
+        var objs = [];
+        var profile;
+
+        rows.forEach(function (obj) {
+            if (obj.firstName && obj.lastName) {
+                objs.push(obj);
+            }
+        });
+
+        profile = (objs && objs[1]) || {};
+
+        return {
+            first_name: profile.firstName,
+            last_name : profile.lastName
+        }
+    }
+
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
             var positions = $('.results-list li')
@@ -125,39 +219,56 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         $(document).ready(function () {
             callback();
             /*$('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
-                return callback();
-            });*/
+             return callback();
+             });*/
         });
     };
 
     SOCIAL_PARSER.parseProfileAsync = function (callback) {
         var $el = $('body');
+        var codeJSON;
 
         async.waterfall([
 
             // animate:
-            function(cb) {
+            function (cb) {
                 $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
                     return cb();
                 });
+            },
+
+            // codeJSON:
+            function (cb) {
+                var code = $el.find("code:contains('countryCode')").html();
+
+                try {
+                    codeJSON = JSON.parse(code);
+                } catch (e) {
+                    console.warn(e);
+                    codeJSON = {};
+                }
+
+                cb();
             },
 
             // general info:
             function (cb) {
                 var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
                 var parsed = {
-                    name   : $el.find('.pv-top-card-section__name').html() || '',
-                    title  : (_titleArr.length) ? _titleArr[0] : '',
-                    country: $el.find('.pv-top-card-section__location').html() || '',
-                    summary: $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
-                    picture: $el.find('.pv-top-card-section__photo img').attr('src')
+                    link        : window.location.pathname,
+                    linkedin_url: window.location.origin + window.location.pathname, // without hash
+                    name        : $el.find('.pv-top-card-section__name').html() || '',
+                    title       : (_titleArr.length) ? _titleArr[0] : '',
+                    country     : $el.find('.pv-top-card-section__location').html() || '',
+                    summary     : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
+                    picture     : $el.find('.pv-top-card-section__photo img').attr('src')
                 };
 
                 cb(null, parsed);
             },
 
             // educations:
-            function(parsed, cb) {
+            function (parsed, cb) {
                 var _educations = $el.find('.pv-education-entity')
                     .map(function () {
                         var $li = $(this);
@@ -181,17 +292,17 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // companies:
-            function(parsed, cb) {
+            function (parsed, cb) {
                 var _companies = $el.find('.pv-position-entity')
                     .map(function () {
                         var $li = $(this);
 
                         return {
-                            title      : $li.find('h3').html(),
-                            company    : $li.find('.pv-entity__secondary-title').html(),
+                            title     : $li.find('h3').html(),
+                            company   : $li.find('.pv-entity__secondary-title').html(),
                             // location   : '', // TODO
-                            start_date : $li.find('.pv-entity__date-range span:last').html().split(' – ')[0],
-                            end_date   : $li.find('.pv-entity__date-range span:last').html().split(' – ')[1],
+                            start_date: $li.find('.pv-entity__date-range span:last').html().split(' – ')[0],
+                            end_date  : $li.find('.pv-entity__date-range span:last').html().split(' – ')[1],
                             // description: '' // // TODO
                         }
                     })
@@ -201,8 +312,35 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 cb(null, parsed);
             },
 
+            // email:
+            function (parsed, cb) {
+                var lastCompanyPath = $el.find('.experience-section .pv-position-entity>a').first().attr('href');
+                var nameObj = getNameObj(codeJSON.included || []);
+                var _options = {
+                    firstName: nameObj.first_name,
+                    lastName : nameObj.last_name,
+                    domain   : parsed.domain,
+                    companyId: getIdFromCompanyPath(lastCompanyPath)
+                };
+
+                findEmail(_options, function(err, res) {
+                    var data;
+
+                    if (err) {
+                        return console.error(err);
+                    }
+
+                    data = (res && res.data) || {};
+                    if (data.email) {
+                        parsed.email = data.email;
+                    }
+
+                    cb(null, parsed);
+                });
+            },
+
             // languages:
-            function(parsed, cb) {
+            function (parsed, cb) {
                 var _languages;
 
                 // expand languages container
@@ -225,7 +363,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // projects:
-            function(parsed, cb) {
+            function (parsed, cb) {
                 var _projects;
 
                 $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
@@ -250,7 +388,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // skills:
-            function(parsed, cb) {
+            function (parsed, cb) {
                 var _skills;
 
                 $el.find('button[data-control-name="skill_details"]').click();
@@ -265,7 +403,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // certifications:
-            function(parsed, cb) {
+            function (parsed, cb) {
                 var _certifications;
 
                 $el.find('button[data-control-name="accomplishments_expand_certifications"]').click();
@@ -308,8 +446,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // courses:
-            function(parsed, cb) {
-                $el.animate({scrollTop: $el.height()}, 1000, function() {
+            function (parsed, cb) {
+                $el.animate({scrollTop: $el.height()}, 1000, function () {
                     var $courses = $el.find('.pv-accomplishments-section .courses');
                     var coursesCount = 0;
                     var interval;
@@ -320,7 +458,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
                     coursesCount = $courses.find('h3 span:last').html() || '0';
                     coursesCount = parseInt(coursesCount, 10);
-                    interval = setInterval(function() {
+                    interval = setInterval(function () {
                         var coursesLength = $courses.find('li').length;
 
                         if (coursesLength === coursesCount || (max < i)) {
@@ -371,13 +509,13 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             return console.warn('Invalid path for refresh profile', path);
         }
 
-        SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+        SOCIAL_PARSER.parseProfileAsync(function (err, data) {
             if (err) {
                 return console.error(err);
             }
 
             console.log('>>> data', JSON.stringify(data));
-            chrome.runtime.sendMessage({type: REFRESH_PROFILE, data: data}, function(res) {
+            chrome.runtime.sendMessage({type: REFRESH_PROFILE, data: data}, function (res) {
                 console.log('background response', res);
             });
         });
@@ -429,7 +567,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             $body.animate({scrollTop: 0});
             $body.animate({scrollTop: $body.find('.profile-detail').height()}, 5000, function () {
-                SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+                SOCIAL_PARSER.parseProfileAsync(function (err, data) {
                     if (err) {
                         return self.errorHandler(err);
                     }
