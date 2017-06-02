@@ -1461,7 +1461,7 @@
 
         renderJob: function (job) {
             var date = new Date(job.updated_at);
-            var totalCount = job.totalCount || '-';
+            var totalCount = job.total_count || '-';
 
             this.$header.find('.jobProfileRegion').html(job.region || '');
             this.$header.find('.jobProfileDate').html(date.toLocaleDateString());
