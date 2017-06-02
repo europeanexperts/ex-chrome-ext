@@ -597,8 +597,9 @@
             this.$restartBtn.on('click', $.proxy(this.onRestartClick, this));
 
             this.$el.on('click', '.sortable', $.proxy(this.onSortClick, this));
+            this.$el.on('click', '.exportBtn', $.proxy(this.onExportClick, this));
             this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
-            this.$el.on('click', '.deleteBtn', $.proxy(this.onDeleteClick, this));
+
             this.$exportSelectedBtn.on('click', $.proxy(this.onExportSelectedClick, this));
             this.$importSelectedBtn.on('click', $.proxy(this.onImportSelectedClick, this));
             this.$deleteSelectedBtn.on('click', $.proxy(this.onDeleteSelectedClick, this));
@@ -653,10 +654,12 @@
         },
 
         setItems: function(items, options) {
-            this._items = items;
+            var mappedItems = EXT_API.mapLocalProfiles(items);
+
+            this._items = mappedItems;
 
             if (!options || options.trigger !== false) {
-                APP.events.trigger('jobs:update', {id: this.jobId, profiles: items});
+                APP.events.trigger('jobs:update', {id: this.jobId, profiles: mappedItems});
             }
         },
 
@@ -1171,13 +1174,13 @@
 
         importProfiles: function (links) {
             var jobJSON = this.job;
+            var $list = this.$list;
 
             async.eachLimit(links, 10, function (link, cb) {
                 var profileJSON = EXT_API.getProfileLocal({link: link});
                 var data;
 
                 delete profileJSON.jobs; // TODO: remove
-                profileJSON.linkedin_url = link;
                 profileJSON.import_existing = jobJSON.import_existing || false;
                 data = {
                     profile: profileJSON
@@ -1188,6 +1191,8 @@
                         return cb(err);
                     }
 
+                    $list.find('.item[data-id="' + link + '"]').addClass('exported');
+                    EXT_API.setProfileExported({link: link});
                     cb(null, res);
                 });
 

@@ -313,6 +313,24 @@
 
             return profileJSON;
         },
+        setProfileExported: function(options) {
+            var link = options.link;
+            var profileJSON = this.getProfileLocal({link: link});
+
+            profileJSON.is_exported = true;
+            localStorage.setItem('profile_' + link, JSON.stringify(profileJSON));
+        },
+        mapLocalProfiles: function(profiles) {
+            var self = this;
+
+            return profiles.map(function(profile) {
+                var profileLocal = self.getProfileLocal({link: profile.link});
+
+                profile.is_exported = (profileLocal && profileLocal.is_exported) || false;
+
+                return profile;
+            });
+        },
 
         // import:
         importProfile: function(options, callback) {

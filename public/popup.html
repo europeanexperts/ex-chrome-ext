@@ -89,6 +89,10 @@
             left: -1rem;
             width: 110px;
         }
+
+        .table .item.exported td{
+            background: #f1c40f;
+        }
     </style>
 </head>
 <body>
@@ -146,7 +150,7 @@
             }
         %>
 
-        <tr class="item" data-id="<%= item.link%>" data-cid="<%= item.cid%>">'
+        <tr class="item <%=(item.is_exported) ? 'exported' : '' %>" data-id="<%= item.link%>" data-cid="<%= item.cid%>">'
 
             <!-- checkbox -->
             <td class="cell-checkbox">

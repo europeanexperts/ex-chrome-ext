@@ -30,6 +30,9 @@
             accepts    : 'json',
             data       : JSON.stringify(profile),
             success    : function (res) {
+                profile.is_exported = true;
+                localStorage.setItem('profile_' + profile.link, JSON.stringify(profile));
+
                 callback(null, res);
             },
             error      : function (err) {
@@ -38,15 +41,19 @@
         });
     }
 
-    function refreshProfile(request) {
-        var data = $.extend({}, request);
+    function refreshProfile(profile) {
+        profile.is_exported = true;
+        localStorage.setItem('profile_' + profile.link, JSON.stringify(profile));
 
         chrome.tabs.query({}, function(tabs) {
             tabs.forEach(function (tab) {
+                var data;
+
                 if (tab.url.indexOf(STAGE_DOMAIN) === -1 && tab.url.indexOf(LIVE_DOMAIN) === -1) {
                     return;
                 }
 
+                data = $.extend({}, profile);
                 chrome.tabs.sendMessage(tab.id, data, function (res) {
                     console.log('>>> res from ' + tab.id, res);
                 });
