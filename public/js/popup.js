@@ -6,6 +6,7 @@
 
 (function () {
 
+    var LINKEDIN_HOST = 'https://www.linkedin.com';
     var EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var PASSWORD_MIN_LENGTH = 6;
     var PARSE_STATUSES = {
@@ -683,15 +684,20 @@
             this._setStatus(value);
         },
 
-        appendProfiles: function(normalized) {
-            var newProfiles = this.filterNewItems(normalized);
+        appendProfiles: function(normalized, options) {
+            var newProfiles;
+            var totalCount;
+
+            options = options || {};
+            newProfiles = this.filterNewItems(normalized);
+            totalCount = options.totalCount;
 
             if (!newProfiles.length) {
                 return false;
             }
 
-            this.storeProfileList(newProfiles);
-            this.renderItems({items: newProfiles, append: true});
+            this.storeProfileList(newProfiles, {totalCount: totalCount});
+            this.renderItems({items: newProfiles, append: true, totalCount: totalCount});
             this.$table.removeClass('hide');
         },
 
@@ -792,7 +798,7 @@
                             });
 
                             normalized = self.normalizeProfiles(profileList);
-                            self.appendProfiles(normalized);
+                            self.appendProfiles(normalized, {totalCount: _total});
 
                             async.mapSeries(normalized, function(profileData, mapCb) {
                                 if (!isRun()) {
@@ -1006,7 +1012,7 @@
 
         parseProfile: function (options, callback) {
             var profileLink = options.link;
-            // var storedProfile;
+            var storedProfile;
             var url;
 
             if (typeof profileLink !== 'string') {
@@ -1017,16 +1023,12 @@
                 message: 'Parse <b>' + options.name + '</b> ...'
             });
 
-            /*storedProfile = EXT_API.getProfileLocal({
-                jobId: this.jobId,
-                link : profileLink
-            });
-
-            if (storedProfile && storedProfile.name) {
+            storedProfile = EXT_API.getProfileLocal({link : profileLink});
+            /*if (storedProfile && storedProfile.name) {
                 return callback(null, {data: storedProfile, isNew: false});
             }*/
 
-            url = 'https://www.linkedin.com' + profileLink;
+            url = LINKEDIN_HOST + profileLink;
             console.log('>>> parseProfile', options);
 
             chrome.tabs.query({active: true}, function (tabs) {
@@ -1041,8 +1043,10 @@
                     APP.events.off(evt);
                     chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
                         response = response || {};
-
+                        response.data = response.data || {};
+                        response.data.is_exported = (storedProfile && storedProfile.is_exported) || false;
                         response.isNew = true;
+
                         console.log("response: " + JSON.stringify(response));
 
                         /*
@@ -1274,15 +1278,18 @@
             });
         },
 
-        storeProfileList: function (newProfiles) {
+        storeProfileList: function (newProfiles, options) {
             var _options;
+
+            options = options || {};
 
             this.setItems(this.getItems().concat(newProfiles));
             this.job.profiles = this.getItems();
 
             _options = {
-                id      : this.job.id,
-                profiles: this.job.profiles
+                id        : this.job.id,
+                profiles  : this.job.profiles,
+                total_count: options.totalCount // or undefined
             };
 
             EXT_API.saveJob(_options, function (err, res) {
@@ -1391,6 +1398,11 @@
 
         renderItems: function (options) {
             var profiles = options.items;
+            var totalCount = options.totalCount;
+            var counterOptions = {
+                totalCount: totalCount
+            };
+
             var template;
             var templateOptions;
             var html;
@@ -1399,7 +1411,7 @@
             if (!thisItems || !thisItems.length) {
                 html = '<tr class="noItems"><td colspan="8">There are no data</td></td></tr>';
                 this.$list.html(html);
-                this.renderCounters();
+                this.renderCounters(counterOptions);
 
                 return;
             } else {
@@ -1422,15 +1434,19 @@
                 this.$list.html(html);
             }
 
-            this.renderCounters();
+            this.renderCounters(counterOptions);
         },
 
-        renderCounters: function () {
+        renderCounters: function (options) {
             var counts = {
                 "-1": 0, // unsuccessful,
                 "0" : 0, // pending,
                 "1" : 0  // successful
             };
+
+            if (options && options.totalCount !== undefined) {
+                this.$header.find('.countTotal').html(options.totalCount);
+            }
 
             this.getItems().forEach(function (profile) {
                 var _status = profile.status || 0;
@@ -1444,12 +1460,13 @@
         },
 
         renderJob: function (job) {
-            var _date = new Date(job.updated_at);
+            var date = new Date(job.updated_at);
+            var totalCount = job.totalCount || '-';
 
             this.$header.find('.jobProfileRegion').html(job.region || '');
-            this.$header.find('.jobProfileDate').html(_date.toLocaleDateString());
+            this.$header.find('.jobProfileDate').html(date.toLocaleDateString());
 
-            this.renderCounters();
+            this.renderCounters({totalCount: totalCount});
         }
     });
 
