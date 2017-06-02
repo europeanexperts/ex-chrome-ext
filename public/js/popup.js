@@ -1158,7 +1158,7 @@
         },
 
         onPauseClick: function () {
-            this.$startBtn.removeClass('hide').find('span').html('start');
+            this.$startBtn.removeClass('hide').find('span').html('Continue');
             this.$pauseBtn.addClass('hide');
             //this.$restartBtn.removeClass('hide'); // hide class will be removed on parse callback
 
