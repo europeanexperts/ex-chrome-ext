@@ -18,6 +18,26 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         SEARCH_RESULT_PROFILES: '.results-list li'
     };
 
+    var PARSE_STATUSES = {
+        CREATED  : 'created',
+        STARTED  : 'started',
+        PAUSED   : 'paused',
+        RESTARTED: 'restarted',
+        STOPPED  : 'stopped'
+    };
+
+    var _status = null;
+
+    function ParseStatusError() {
+        this.name = 'ParseStatusError';
+        this.message = 'The parse status === "' + _status + '".';
+        this.parseStatus = _status;
+    }
+
+    function checkParseStatus() {
+        return _status === PARSE_STATUSES.STARTED  || _status === PARSE_STATUSES.RESTARTED;
+    }
+
     function parseVisuallyHidden(str) {
         var rows;
 
@@ -230,6 +250,15 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         async.waterfall([
 
+            // check parse status:
+            function(cb) {
+                if (!checkParseStatus()) {
+                    return cb(new ParseStatusError());
+                }
+
+                cb();
+            },
+
             // animate:
             function (cb) {
                 $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
@@ -322,6 +351,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     domain   : parsed.domain,
                     companyId: getIdFromCompanyPath(lastCompanyPath)
                 };
+
+                if (!checkParseStatus()) {
+                    return cb(new ParseStatusError());
+                }
 
                 findEmail(_options, function(err, res) {
                     var data;
@@ -499,6 +532,14 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var url = window.location.href;
 
         return PATTERNS.PROFILE_URL.test(url);
+    };
+
+    SOCIAL_PARSER.onChangeParseStatus = function(options) {
+        var status = options.status;
+
+        console.info('onChangeParseStatus', status);
+
+        _status = status;
     };
 
     // refresh exported profile:

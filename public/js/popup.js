@@ -17,6 +17,13 @@
         STOPPED  : 'stopped'
     };
 
+    var RUNTIME_METHODS = {
+        PARSE_JOBS         : 'jobs',
+        PARSE_PROFILE      : 'profile',
+        LOAD_URL           : 'loadURL',
+        CHANGE_PARSE_STATUS: 'changeParseStatus'
+    };
+
     function inherit(Child, Parent, proto) {
         proto = proto || {};
         Child.prototype = $.extend({}, Parent.prototype, proto);
@@ -654,6 +661,16 @@
             });
         },
 
+        hide: function() {
+            var currentStatus = this.parseStatus();
+
+            if (currentStatus === PARSE_STATUSES.STARTED || currentStatus === PARSE_STATUSES.RESTARTED) {
+                this.onPauseClick();
+            }
+
+            ExtensionPage.prototype.hide.call(this);
+        },
+
         setItems: function(items, options) {
             var mappedItems = EXT_API.mapLocalProfiles(items);
 
@@ -676,12 +693,27 @@
             this._status = value;
         },
 
+        onChangeParseStatus: function(_status) {
+            chrome.tabs.query({active: true}, function (tabs) {
+                var tabId = tabs[0].id;
+                var data = {
+                    method: RUNTIME_METHODS.CHANGE_PARSE_STATUS,
+                    status: _status
+                };
+
+                chrome.tabs.sendMessage(tabId, data, function(res) {
+                    console.log(res);
+                });
+            });
+        },
+
         parseStatus: function(value) {
             if (value === undefined) {
                 return this._getStatus();
             }
 
             this._setStatus(value);
+            this.onChangeParseStatus(value);
         },
 
         appendProfiles: function(normalized, options) {
@@ -764,12 +796,12 @@
                 }, function iterate(cb) {
                     var nextUrl = url + '&page=' + self.parsePageIndex;
 
-                    chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: nextUrl});
+                    chrome.tabs.sendMessage(tabId, {method: RUNTIME_METHODS.LOAD_URL, url: nextUrl});
 
                     APP.events.on(evt, function (e, tab, info) {
                         APP.events.off(evt);
 
-                        chrome.tabs.sendMessage(tab.id, {method: 'jobs'}, function (response) {
+                        chrome.tabs.sendMessage(tab.id, {method: RUNTIME_METHODS.PARSE_JOBS}, function (response) {
                             var profileList;
                             var _total;
                             var normalized;
@@ -809,6 +841,12 @@
 
                                 self.parseProfile(profileData, function(err, res) {
                                     if (err) {
+                                        if (err.name === 'ParseStatusError') {
+                                            console.warn(err.message);
+                                            return mapCb(null, null);
+
+                                        }
+
                                         return mapCb(err);
                                     }
 
@@ -1012,6 +1050,7 @@
 
         parseProfile: function (options, callback) {
             var profileLink = options.link;
+            var self = this;
             var storedProfile;
             var url;
 
@@ -1041,7 +1080,12 @@
                     }
 
                     APP.events.off(evt);
-                    chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
+                    chrome.tabs.sendMessage(tab.id, {method: RUNTIME_METHODS.CHANGE_PARSE_STATUS, status: self.parseStatus()});
+                    chrome.tabs.sendMessage(tab.id, {method: RUNTIME_METHODS.PARSE_PROFILE}, function (response) {
+                        if (response.err) {
+                            return callback(response.err);
+                        }
+
                         response = response || {};
                         response.data = response.data || {};
                         response.data.is_exported = (storedProfile && storedProfile.is_exported) || false;
@@ -1056,7 +1100,7 @@
                     });
                 });
 
-                chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: url}, function (response) {
+                chrome.tabs.sendMessage(tabId, {method: RUNTIME_METHODS.LOAD_URL, url: url}, function (response) {
                     console.log("redirect response: " + response);
                 });
             });
@@ -1509,7 +1553,7 @@
                     });
                 });
 
-                chrome.tabs.sendMessage(tabId, {method: 'loadURL', url: url}, function (response) {
+                chrome.tabs.sendMessage(tabId, {method: RUNTIME_METHODS.LOAD_URL, url: url}, function (response) {
                     console.log("redirect response: " + response);
                 });
             });
@@ -1864,7 +1908,7 @@
                 _notificationOptions.message = e;
             }
 
-            if (status === 401 || status || 403) {
+            if (status === 401 || status === 403) {
                 APP.notification(_notificationOptions, function() {
                     APP.unauthorize();
                 });

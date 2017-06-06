@@ -6,14 +6,17 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     } else if (request.method === 'profile') {
         SOCIAL_PARSER.onLoadProfile(function () {
             SOCIAL_PARSER.parseProfileAsync(function(err, data) {
-                sendResponse({data: data, method: "runtime", _pre: request});
+                sendResponse({err: err, data: data, _pre: request});
             });
         });
-    } else if (request.method = 'loadURL') {
+    } else if (request.method === 'loadURL') {
         SOCIAL_PARSER.loadURL(request.url);
-        sendResponse({data: 'OK', method: "runtime", _pre: request});
+        sendResponse({data: 'OK', _pre: request});
+    } else if (request.method === 'changeParseStatus') {
+        SOCIAL_PARSER.onChangeParseStatus({status: request.status});
+        sendResponse({data: 'OK', _pre: request});
     } else {
-        sendResponse({data: 'DEFAULT', method: "runtime",_pre: request});
+        sendResponse({data: 'DEFAULT', _pre: request});
     }
 
     return true;
