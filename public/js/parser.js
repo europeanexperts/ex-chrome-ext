@@ -286,6 +286,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             // general info:
             function (cb) {
                 var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
+                var $avatar = $el.find('.pv-top-card-section__photo img');
                 var parsed = {
                     link        : window.location.pathname,
                     linkedin_url: window.location.origin + window.location.pathname, // without hash
@@ -293,7 +294,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     title       : (_titleArr.length) ? _titleArr[0] : '',
                     country     : $el.find('.pv-top-card-section__location').html() || '',
                     summary     : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
-                    picture     : $el.find('.pv-top-card-section__photo img').attr('src')
+                    picture     : ($avatar.hasClass('ghost-person') ) ? '' : $avatar.attr('src')
                 };
 
                 cb(null, parsed);
