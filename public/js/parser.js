@@ -561,12 +561,15 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             return console.warn('Invalid path for refresh profile', path);
         }
 
+        SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STARTED});
         SOCIAL_PARSER.parseProfileAsync(function (err, data) {
             if (err) {
                 return console.error(err);
             }
 
             console.log('>>> data', JSON.stringify(data));
+
+            SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
             chrome.runtime.sendMessage({type: REFRESH_PROFILE, data: data}, function (res) {
                 console.log('background response', res);
             });
