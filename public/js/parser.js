@@ -94,7 +94,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     }
 
     function getIdFromCompanyPath(str) {
-        var _match = str.match(/company(-beta)?\/([0-9]*)/);
+        var _match;
+
+        str = str || '';
+        _match = str.match(/company(-beta)?\/([0-9]*)/);
 
         return (_match && _match[2]) || '';
     }
@@ -345,15 +348,23 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             function (parsed, cb) {
                 var lastCompanyPath = $el.find('.experience-section .pv-position-entity>a').first().attr('href');
                 var nameObj = getNameObj(codeJSON.included || []);
+                var companyId = getIdFromCompanyPath(lastCompanyPath);
                 var _options = {
                     firstName: nameObj.first_name,
                     lastName : nameObj.last_name,
                     domain   : parsed.domain,
-                    companyId: getIdFromCompanyPath(lastCompanyPath)
+                    companyId: companyId
                 };
 
                 if (!checkParseStatus()) {
                     return cb(new ParseStatusError());
+                }
+
+                if (!companyId && !parsed.domain) {
+                    console.warn('The email can not be parsed');
+                    parsed.email = '';
+
+                    return cb(null, parsed);
                 }
 
                 findEmail(_options, function(err, res) {
@@ -606,12 +617,16 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             var $body = $('body');
             var self = this;
 
+            SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STARTED});
+
             $body.animate({scrollTop: 0});
             $body.animate({scrollTop: $body.find('.profile-detail').height()}, 5000, function () {
                 SOCIAL_PARSER.parseProfileAsync(function (err, data) {
                     if (err) {
                         return self.errorHandler(err);
                     }
+
+                    SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
 
                     self.sendProfile({profile: data}, function (err, res) {
                         if (err) {
