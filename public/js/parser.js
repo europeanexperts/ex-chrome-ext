@@ -187,6 +187,26 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         }
     }
 
+    function stringToNumber() {
+        var len = this.length || 0;
+        var str = this;
+
+        var i = 0;
+        var numStr = '';
+        var numRegExp = /[0-9]/;
+
+        while (i < len)  {
+            if (numRegExp.test(str[i])) {
+                numStr += str[i];
+            }
+            i++;
+        }
+
+        return parseInt(numStr, 10);
+    }
+
+    // String.prototype.toNumber = stringToNumber;
+
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
             var positions = $('.results-list li')
@@ -213,12 +233,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var $el = $('body');
 
         var _total = $el.find(SELECTORS.TOTAL).html() || '';
+        var _profiles;
 
-        _total = _total.replace(/[a-zA-Z\s.]/g, '');
-        _total = _total.replace(/,/g, '');
-        _total = _total.replace(/\./g, '');
-
-        var _profiles = $el.find(SELECTORS.SEARCH_RESULT_PROFILES).map(function () {
+        _total = stringToNumber.call(_total);
+        _profiles = $el.find(SELECTORS.SEARCH_RESULT_PROFILES).map(function () {
             var $li = $(this);
             var $info = $li.find('.search-result__info');
 
