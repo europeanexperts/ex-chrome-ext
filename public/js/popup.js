@@ -264,11 +264,24 @@
         },
 
         show: function (options) {
+            var self = this;
+
             ExtensionPage.prototype.show.call(this, options);
 
             if (!this.items || options.reset === true) {
-                this.fetchList();
+                this.fetchList(function(err, data) {
+                    if (err) {
+                        return APP.error(err);
+                    }
+
+                    self.items = data;
+                    self.renderData();
+                });
             }
+        },
+
+        showItemById: function(id) {
+            this.$list.find('.item[data-id="' + id + '"]').click();
         },
 
         getSelectedIds: function () {
@@ -409,25 +422,21 @@
             });
         },
 
-        fetchList: function () {
-            var self = this;
-
+        fetchList: function (callback) {
             console.log('>>> fetch job list...');
 
             EXT_API.fetchJobList({}, function (err, data) {
                 var sorted;
 
                 if (err) {
-                    return APP.error(err);
+                    return callback(err);
                 }
 
                 sorted = data.sort(function(a, b) {
-                    //return a.job_name.toLowerCase() > b.job_name.toLowerCase();
                     return a.created_at <= b.created_at;
                 });
 
-                self.items = sorted;
-                self.renderData();
+                callback(null, sorted);
             });
         },
 
@@ -554,8 +563,12 @@
                         APP.showPage(APP.pages.jobs.name);
                         APP.events.trigger('jobs:update', res);
                     } else {
-                        APP.showPage(APP.pages.jobs.name, {reset: true});
-                        // APP.events.trigger('jobs:create', res);
+                        // APP.showPage(APP.pages.jobs.name, {reset: true});
+                        APP.events.trigger('jobs:create', res);
+                        APP.showPage(APP.pages.jobProfiles.name, {
+                            id   : res.id,
+                            title: res.language
+                        });
                     }
                 });
             });
