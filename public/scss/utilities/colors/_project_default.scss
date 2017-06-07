@@ -20,6 +20,7 @@ $colors-state : (
   'brown'      : #c9caa8,
   'light-blue' : #f4f7f9,
   'gray'       : #aaa,
+  'dark-gray'  : #292929,
 );
 
 $form-colors : (
@@ -56,4 +57,5 @@ $base-text   : color('default', 'dark-gray');
 $base-link   : color('default', 'blue');
 $base-border : color('default', 'light-gray');
 $base-color  : color('state', 'yellow');
+$base-hover  : color('state', 'dark-gray');
 // -----------------------

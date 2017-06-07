@@ -34,13 +34,13 @@ th {
 
     .cell-date {
       a {
-        color: $btn-green;
+        color: $base-color;
 
         &:hover {
-          color: $btn-green-hover;
+          color: $base-hover ;
 
           .icon-up {
-            color: $btn-green-hover;
+            color: $base-hover;
           }
         }
       }
@@ -153,7 +153,7 @@ th {
       width: 9rem;
 
       a {
-        color: $btn-green;
+        color: $base-color;
         font-family: $second-font-name;
         font-weight: 700;
         text-transform: uppercase;
@@ -165,11 +165,11 @@ th {
 
 
         &:hover {
-          color: $btn-green-hover;
+          color: $base-hover;
 
           .icon-export,
           .icon-import {
-            color: $btn-green-hover;
+            color: $base-hover;
           }
         }
       }

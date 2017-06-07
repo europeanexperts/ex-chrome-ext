@@ -406,19 +406,15 @@ blockquote {
     line-height: 1.4583; } }
 
 html {
-  position: relative;
-  min-height: 100%;
-  background: #434343; }
+  position: relative; }
   html body {
     height: 100%;
     min-height: .1rem; }
 
 .wrapper {
-  width: 100%;
-  background: #434343; }
+  width: 100%; }
   .wrapper .extension-body {
     width: 76.8rem;
-    height: 66rem;
     margin: 0 auto;
     border-radius: .6rem;
     background: #fff; }
@@ -532,13 +528,12 @@ a, svg {
   position: relative;
   display: inline-block;
   margin: 0;
-  padding: 1rem 3rem;
-  border: 0 none;
+  padding: .8rem 3rem;
   border-radius: 1.4rem;
   outline: none 0;
   background-color: transparent;
   font-family: Arial;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -563,7 +558,14 @@ a, svg {
       background-color: #2a8578; }
   .btn.big {
     padding: 1.5rem 3.6rem;
-    border-radius: 2rem; }
+    border-radius: 5.5rem; }
+  .btn.yellow {
+    border: 2px solid #f1c40f;
+    background: transparent;
+    color: #f1c40f; }
+    .btn.yellow:hover {
+      background: #f1c40f;
+      color: #fff; }
   .btn.inactive {
     background-color: #b7dcd5;
     pointer-events: none; }
@@ -608,11 +610,11 @@ th {
     font-size: 1.2rem;
     font-weight: 700; }
   .table thead .cell-date a {
-    color: #38a898; }
+    color: #f1c40f; }
     .table thead .cell-date a:hover {
-      color: #2a8578; }
+      color: #292929; }
       .table thead .cell-date a:hover .icon-up {
-        color: #2a8578; }
+        color: #292929; }
   .table thead .cell-date svg {
     vertical-align: baseline; }
   .table tbody tr:nth-child(2n + 1) td {
@@ -672,7 +674,7 @@ th {
   .table .cell-action {
     width: 9rem; }
     .table .cell-action a {
-      color: #38a898;
+      color: #f1c40f;
       font-family: Arial;
       font-weight: 700;
       text-transform: uppercase; }
@@ -680,10 +682,10 @@ th {
         margin-left: .3rem;
         text-decoration: underline; }
       .table .cell-action a:hover {
-        color: #2a8578; }
+        color: #292929; }
         .table .cell-action a:hover .icon-export,
         .table .cell-action a:hover .icon-import {
-          color: #2a8578; }
+          color: #292929; }
   .table .cell-search {
     padding-left: 0; }
   .table.import .cell-job,
@@ -808,7 +810,7 @@ th {
     border-right: 1px solid #e4e4e4;
     cursor: pointer; }
     .main-header .btn-prev:hover .icon-arrow-left {
-      color: #c29d0b; }
+      color: #292929; }
   .main-header .settings-btn {
     display: flex;
     align-items: center;
@@ -819,16 +821,16 @@ th {
     cursor: pointer; }
     .main-header .log-out-btn span {
       margin-right: 1rem;
-      color: #38a898;
+      color: #f1c40f;
       font-family: Arial;
       font-size: 1.4rem;
       font-weight: 700;
       line-height: 2.2rem;
       transition: all 350ms ease-in-out 0s; }
     .main-header .log-out-btn:hover span {
-      color: #2a8578; }
+      color: #292929; }
     .main-header .log-out-btn:hover .icon-log-out {
-      color: #2a8578; }
+      color: #292929; }
 
 .log-in .main-header {
   margin: 0 1.5rem; }
@@ -841,11 +843,14 @@ th {
   .main-content .forgot-password {
     display: block;
     margin-bottom: 3rem;
-    color: #38a898;
+    color: #f1c40f;
     font-family: Arial;
     font-size: 1.1rem;
     font-weight: 700;
-    text-transform: uppercase; }
+    text-transform: uppercase;
+    transition: all 350ms ease-in-out 0s; }
+    .main-content .forgot-password:hover {
+      color: #292929; }
   .main-content .top-panel {
     padding-bottom: 2rem; }
     .main-content .top-panel .hint {
@@ -909,6 +914,30 @@ th {
     .counter .count-item .caption {
       color: #898989;
       font-size: 1.2rem; }
+
+.page {
+  display: none; }
+  .page.active {
+    display: block; }
+
+#messageWrapper {
+  position: absolute;
+  width: 100%;
+  border: none;
+  background-color: #fff; }
+
+#messageText {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 1rem;
+  color: #fff;
+  font-weight: bold;
+  z-index: 10; }
+  #messageText.error {
+    background-color: #e97660; }
+  #messageText.success {
+    background-color: #38a898; }
 
 .main-footer {
   padding: 1.4rem 1.5rem;

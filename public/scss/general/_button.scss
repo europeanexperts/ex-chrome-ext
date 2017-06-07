@@ -10,13 +10,12 @@ a, svg {
   position: relative;
   display: inline-block;
   margin: 0;
-  padding: 1rem 3rem;
-  border: 0 none;
+  padding: .8rem 3rem;
   border-radius: 1.4rem;
   outline: none 0;
   background-color: transparent;
   font-family: $second-font-name;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -54,7 +53,18 @@ a, svg {
 
   &.big {
     padding: 1.5rem 3.6rem;
-    border-radius: 2rem;
+    border-radius: 5.5rem;
+  }
+
+  &.yellow {
+    border: 2px solid $btn-yellow;
+    background: transparent;
+    color: $btn-yellow;
+
+    &:hover {
+      background: $btn-yellow;
+      color: $white;
+    }
   }
 
   &.inactive {
