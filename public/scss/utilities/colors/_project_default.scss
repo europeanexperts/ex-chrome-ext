@@ -13,6 +13,7 @@ $colors-default : (
 $colors-state : (
   'red'        : #e97660,
   'dark-red'   : #e25034,
+  'yellow'     : #f1c40f,
   'green'      : #38a898,
   'dark-green' : #2a8578,
   'light-green': #b7dcd5,
@@ -54,4 +55,5 @@ $base-bg     : $white;
 $base-text   : color('default', 'dark-gray');
 $base-link   : color('default', 'blue');
 $base-border : color('default', 'light-gray');
+$base-color  : color('state', 'yellow');
 // -----------------------

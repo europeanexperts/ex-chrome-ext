@@ -15,7 +15,7 @@ $input-border    : rgba($black, .1);
 $input-bg        : color('form', 'light-gray');
 $input-text      : color('form', 'dark-gray');
 $unchecked-bg    : color('form', 'gray');
-$checked-bg      : color('state', 'green');
+$checked-bg      : $base-color;
 
 // Buttons ---------------
 $btn-text        : $white;
@@ -33,14 +33,14 @@ $avatar-bg : color('state', 'brown');
 // -----------------------
 
 // Icons -----------------
-$icon-arrow-left : color('state', 'green');
+$icon-arrow-left : $base-color;
 $icon-check      : $white;
 $icon-delete     : color('state', 'red');
-$icon-export     : color('state', 'green');
-$icon-import     : color('state', 'green');
-$icon-log-out    : color('state', 'green');
+$icon-export     : $base-color;
+$icon-import     : $base-color;
+$icon-log-out    : $base-color;
 $icon-search     : $black;
 $icon-settings   : color('state', 'gray');
 $icon-start      : $white;
 $icon-pause      : $white;
-$icon-up         : color('state', 'green');
+$icon-up         : $base-color;

@@ -29,7 +29,7 @@
 
       &:hover {
         .icon-arrow-left {
-          color: $btn-green-hover;
+          color: darken($base-color, 10%);
       }
     }
   }
