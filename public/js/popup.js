@@ -738,6 +738,7 @@
             totalCount = options.totalCount;
 
             if (!newProfiles.length) {
+                this.renderCounters({totalCount: totalCount});
                 return false;
             }
 
