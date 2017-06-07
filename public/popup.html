@@ -11,89 +11,6 @@
     <script src="/js/libs/respond/dest/respond.min.js"></script>
     <!--[endif]-->
 
-    <style>
-        /* being fix
-            Login window is displayed incorrectly
-            http://45.32.154.169:8080/issue/LP-57
-        */
-        html {
-
-             min-height: auto;
-        }
-        /* end fix */
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .loader {
-            margin-bottom: 10px;
-            height: 24px;
-        }
-
-        /* .progressWrapper {
-             border: 1px solid #cfd6d9;
-         }*/
-        .loaderProgress {
-            background: rgba(56, 168, 152, 0.48);
-            height: 24px;
-        }
-
-        .loaderMessage {
-            font-size: 14px;
-            position: relative;
-            height: 0;
-            top: -22px;
-            left: 6px;
-        }
-        #messageWrapper {
-            width: 100%;
-            position: absolute;
-            border: none;
-            background-color: #fff;
-        }
-
-        #messageText {
-            margin: 0;
-            padding: 10px;
-            position: relative;
-            width: 100%;
-            z-index: 10;
-            font-weight: bold;
-            color: white;
-        }
-
-        #messageText.error {
-            background-color: #e97660;
-        }
-        #messageText.success {
-            background-color: rgba(56, 168, 152, 1);
-        }
-
-        .sortable {
-            cursor: pointer;
-        }
-        .sortable[data-order="asc"]:after {
-            content: " \2191";
-        }
-        .sortable[data-order="desc"]:after {
-            content: " \2193";
-        }
-
-        .selectAllBtn {
-            padding: 1rem 1.5rem;
-            left: -1rem;
-            width: 110px;
-        }
-
-        .table .item.exported td{
-            background: #f1c40f;
-        }
-    </style>
 </head>
 <body>
 
@@ -143,8 +60,8 @@
                         <input type="password" id="password" name="password">
                     </div>
                     <a href="#" class="link forgot-password">Forgot Password?</a>
-                    <!--<input class="btn green big" type="submit" value="Log In">-->
-                    <button class="btn green big">Log In</button>
+                    <!--<input class="btn yellow big" type="submit" value="Log In">-->
+                    <button class="btn yellow big">Log In</button>
                 </form>
             </div>
 
@@ -155,7 +72,7 @@
                         <label for="restoreEmail">Email</label>
                         <input type="email" id="restoreEmail" name="email">
                     </div>
-                    <input class="btn green big" type="submit" value="Restore">
+                    <input class="btn yellow big" type="submit" value="Restore">
                 </form>
             </div>
 
@@ -175,7 +92,7 @@
                <!-- <footer class="main-footer">
                     <div class="btn-group">
                         <div class="left-side">
-                            <button class="btn green">Next step</button>
+                            <button class="btn yellow">Next step</button>
                         </div>
                     </div>
                 </footer>-->

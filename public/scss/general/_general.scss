@@ -4,8 +4,7 @@
 
 html {
   position: relative;
-  min-height: 100%;
-  background: #434343; // TODO test
+  //min-height: auto;
 
   body {
     height: 100%;
@@ -16,11 +15,10 @@ html {
 // General classes for project
 .wrapper {
   width: 100%;
-  background: #434343; // TODO test
 
   .extension-body {
     width: 76.8rem;
-    height: 66rem;
+    //height: 66rem;
     margin: 0 auto;
     border-radius: .6rem;
     background: $base-bg;

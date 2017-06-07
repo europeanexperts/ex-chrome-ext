@@ -7,11 +7,16 @@
   .forgot-password {
     display: block;
     margin-bottom: 3rem;
-    color: $btn-green;
+    color: $base-color;
     font-family: $second-font-name;
     font-size: 1.1rem;
     font-weight: 700;
     text-transform: uppercase;
+    transition: all 350ms ease-in-out 0s;
+
+    &:hover {
+      color: $base-hover;
+    }
   }
 
   .top-panel {
@@ -114,5 +119,38 @@
       color: $light-text;
       font-size: 1.2rem;
     }
+  }
+}
+
+.page {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+#messageWrapper {
+  position: absolute;
+  width: 100%;
+  border: none;
+  background-color: $white;
+}
+
+#messageText {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 1rem;
+  color: $white;
+  font-weight: bold;
+  z-index: 10;
+
+  &.error {
+    background-color: $error-color;
+  }
+
+  &.success {
+    background-color: $success-color;
   }
 }
