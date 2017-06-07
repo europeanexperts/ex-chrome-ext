@@ -481,6 +481,13 @@
             } else {
                 APP.$extensionBody.removeClass('log-in');
             }
+
+            // show / hide Nav back button:
+            if (page.name === APP.pages.forgotPassword.name) {
+                APP.$navBackBtn.removeClass('hide');
+            } else {
+                APP.$navBackBtn.addClass('hide');
+            }
         },
         navBack      : function () {
             var history = APP.history;
