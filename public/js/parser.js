@@ -647,7 +647,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     return callback(res.error);
                 }
 
-                callback(null, res.success);
+                callback(null, res);
             });
         },
 
@@ -667,12 +667,15 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
 
                     self.sendProfile({profile: data}, function (err, res) {
+                        var successMessage;
+
                         if (err) {
                             return self.errorHandler(err);
                         }
 
+                        successMessage = (res && res.success && res.success.message) || 'The profile was successfully parsed and was exported to server.';
                         self.notification({
-                            message: 'The profile was successfully parsed and was exported to server.',
+                            message: successMessage,
                             type   : 'success'
                         });
                         self.$btn.find('.btnText').html('Exported');
