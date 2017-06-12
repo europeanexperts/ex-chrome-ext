@@ -3,7 +3,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 (function () {
     'use strict';
 
-    var HUNTER_API_KEY = 'ce1972d359b9d29b810dfb23181f5cd726b0d399';
+    //var HUNTER_API_KEY = 'ce1972d359b9d29b810dfb23181f5cd726b0d399';
+    var HUNTER_API_KEY = '52c698fd10eebf0576effcd0b93abb554adfce8a';
     var HUNTER_API_HOST = 'https://api.hunter.io/v2';
 
     var REFRESH_PROFILE_ACTION = 'action=euex';
