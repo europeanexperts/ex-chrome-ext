@@ -121,7 +121,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         return url;
     }
-    
+
+    function parseHunterApiError(xhr) {
+        var res;
+        var err;
+
+        console.error(xhr);
+        res = xhr.responseJSON || {};
+        if ( !res || !res.errors || !res.errors.length) {
+            return res;
+        }
+
+        err = res.errors[0];
+
+        return err.details || 'api error';
+    }
+
     function findEmail(options, callback) {
         var url = getFindEmailURL(options);
 
@@ -135,8 +150,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             success : function (res) {
                 callback(null, res);
             },
-            error   : function (err) {
-                callback(err);
+            error   : function (res) {
+                callback(parseHunterApiError(res));
             }
         });
     }
@@ -390,7 +405,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     var data;
 
                     if (err) {
-                        return console.error(err);
+                        return cb(err);
                     }
 
                     data = (res && res.data) || {};

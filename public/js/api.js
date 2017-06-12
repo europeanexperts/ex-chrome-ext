@@ -2,7 +2,9 @@
 
 (function () {
 
-    var BASE_URL = 'http://euex-stage.fpdev.xyz';
+    // var BASE_URL = 'http://euex-stage.fpdev.xyz';
+    var BASE_URL = 'https://join.europeanexperts.com';
+
     var AUTH_URL = BASE_URL + '/api/sessions';
     var RESTORE_URL = BASE_URL + '/api/password_resets';
     var IMPORT_URL = BASE_URL + '/api/import/consultants';

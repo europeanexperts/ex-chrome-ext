@@ -4,7 +4,9 @@
     var STAGE_DOMAIN = 'euex-stage.fpdev.xyz';
     var LIVE_DOMAIN = 'join.europeanexperts.com';
 
-    var IMPORT_URL = 'http://euex-stage.fpdev.xyz/api/import/consultants';
+    //var IMPORT_URL = 'http://euex-stage.fpdev.xyz/api/import/consultants';
+    var IMPORT_URL = 'https://join.europeanexperts.com/api/import/consultants';
+
     var REFRESH_PROFILE = 'REFRESH_PROFILE';
 
     function getAuthToken() {

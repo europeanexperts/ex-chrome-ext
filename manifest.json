@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "EuEx",
-  "description": "Parse LinkedIn data",
+  "description": "EuEx LinkedIn Parser",
   "version": "0.0.1",
   "browser_action": {
     "default_icon": "icon.png",
@@ -22,7 +22,7 @@
     },
     {
       "matches": [
-        "http://euex-stage.fpdev.xyz/*"
+        "https://join.europeanexperts.com/*"
       ],
       "js": [
         "js/euexContentScript.js"
@@ -42,6 +42,6 @@
     "tabs",
     "storage",
     "cookies",
-    "http://euex-stage.fpdev.xyz/*"
+    "https://join.europeanexperts.com/*"
   ]
 }
