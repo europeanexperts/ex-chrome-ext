@@ -4,12 +4,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     'use strict';
 
     var CONFIG = GET_APP_CONFIG();
-
-    var HUNTER_API_KEY = '52c698fd10eebf0576effcd0b93abb554adfce8a';
-    var HUNTER_API_HOST = CONFIG.HUNTER_API_HOST;
-
     var REFRESH_PROFILE_ACTION = 'action=euex';
-    var REFRESH_PROFILE = 'REFRESH_PROFILE';
     var PATTERNS = {
         PROFILE_URL: /^\/in\//
     };
@@ -103,57 +98,13 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return (_match && _match[2]) || '';
     }
 
-    function getFindEmailURL(options) {
-        var url = HUNTER_API_HOST + '/email-finder?api_key=' + HUNTER_API_KEY;
-        var params = {
-            domain   : 'domain',
-            companyId: 'linkedin_id',
-            firstName: 'first_name',
-            lastName : 'last_name'
-        };
-
-        Object.keys(params).forEach(function (attr) {
-            var param = options[attr];
-
-            if (param) {
-                url += '&' + params[attr] + '=' + encodeURIComponent(param);
-            }
-        });
-
-        return url;
-    }
-
-    function parseHunterApiError(xhr) {
-        var res;
-        var err;
-
-        console.error(xhr);
-        res = xhr.responseJSON || {};
-        if ( !res || !res.errors || !res.errors.length) {
-            return res;
-        }
-
-        err = res.errors[0];
-
-        return err.details || 'api error';
-    }
-
     function findEmail(options, callback) {
-        var url = getFindEmailURL(options);
-
-        $.ajax({
-            url     : url,
-            headers : {
-                'Email-Hunter-Origin': 'chrome_extension'
-            },
-            type    : 'GET',
-            dataType: 'json',
-            success : function (res) {
-                callback(null, res);
-            },
-            error   : function (res) {
-                callback(parseHunterApiError(res));
+        chrome.runtime.sendMessage({type: CONFIG.FIND_EMAIL_MESSAGE, data: options}, function(err, res) {
+            if (err) {
+                return callback(err);
             }
+
+            callback(null, res);
         });
     }
 
@@ -605,7 +556,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             console.log('>>> data', JSON.stringify(data));
 
             SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
-            chrome.runtime.sendMessage({type: REFRESH_PROFILE, data: data}, function (res) {
+            chrome.runtime.sendMessage({type: CONFIG.REFRESH_PROFILE_MESSAGE, data: data}, function (res) {
                 console.log('background response', res);
             });
         });

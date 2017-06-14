@@ -3,10 +3,89 @@
 
     var CONFIG = GET_APP_CONFIG();
     var IMPORT_URL = CONFIG.BASE_URL + '/api/import/consultants';
-    var REFRESH_PROFILE = 'REFRESH_PROFILE';
+
+    var HUNTER_API_KEY = '52c698fd10eebf0576effcd0b93abb554adfce8a';
+    var HUNTER_API_HOST = CONFIG.HUNTER_API_HOST;
 
     function getAuthToken() {
         return localStorage.getItem('AUTH_TOKEN');
+    }
+
+    function getHunterApiKey() {
+        var str = localStorage.getItem('AUTH_PROFILE');
+        var data;
+
+        try {
+            data = JSON.parse(str);
+        } catch (e) {
+            console.warn(e);
+        }
+
+        data = data || {};
+
+        return data.hunter_api_key;
+    }
+
+    function getFindEmailURL(options) {
+        var url = HUNTER_API_HOST + '/email-finder?api_key=' + options.apiKey;
+        var params = {
+            domain   : 'domain',
+            companyId: 'linkedin_id',
+            firstName: 'first_name',
+            lastName : 'last_name'
+        };
+
+        Object.keys(params).forEach(function (attr) {
+            var param = options[attr];
+
+            if (param) {
+                url += '&' + params[attr] + '=' + encodeURIComponent(param);
+            }
+        });
+
+        return url;
+    }
+
+    function parseHunterApiError(xhr) {
+        var res;
+        var err;
+
+        console.error(xhr);
+        res = xhr.responseJSON || {};
+        if ( !res || !res.errors || !res.errors.length) {
+            return res;
+        }
+
+        err = res.errors[0];
+
+        return err.details || 'api error';
+    }
+
+    function findHunterEmail(options, callback) {
+        var apiKey = getHunterApiKey();
+        var url;
+
+        if (!apiKey) {
+            return callback('The Hunter API Key was not found');
+        }
+
+        options.apiKey = apiKey;
+        url = getFindEmailURL(options);
+
+        $.ajax({
+            url     : url,
+            headers : {
+                'Email-Hunter-Origin': 'chrome_extension'
+            },
+            type    : 'GET',
+            dataType: 'json',
+            success : function (res) {
+                callback(null, res);
+            },
+            error   : function (res) {
+                callback(parseHunterApiError(res));
+            }
+        });
     }
 
     function importProfileRequest(options, callback) {
@@ -64,9 +143,14 @@
             importProfileRequest(request.data, function (err, res) {
                 sendResponse({error: err, success: res, req: request});
             });
-        } else if (request.type === REFRESH_PROFILE) {
+
+        } else if (request.type === CONFIG.REFRESH_PROFILE_MESSAGE) {
             refreshProfile(request);
             sendResponse({data: 'OK', req: request});
+
+        } else if (request.type === CONFIG.FIND_EMAIL_MESSAGE) {
+            findHunterEmail(request.data, sendResponse);
+
         } else {
             sendResponse({data: 'default', req: request});
         }

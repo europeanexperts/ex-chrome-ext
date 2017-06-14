@@ -180,7 +180,13 @@
                     return APP.notification({message: 'Unauthorized'});
                 }
 
-                localStorage.setItem('AUTH_PROFILE', JSON.stringify({name: authOptions.name, email: authOptions.email, role: authOptions.role}));
+                localStorage.setItem('AUTH_PROFILE', JSON.stringify({
+                    name          : authOptions.name,
+                    email         : authOptions.email,
+                    role          : authOptions.role,
+                    hunter_api_key: authOptions.hunter_api_key
+                }));
+
                 APP.authorize(authOptions);
             });
         }
