@@ -748,7 +748,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     });
 })();
 
-SOCIAL_PARSER.onLoadProfile(function (err) {
+/*SOCIAL_PARSER.onLoadProfile(function (err) {
     if (err) {
         return console.error(err);
     }
@@ -764,7 +764,7 @@ SOCIAL_PARSER.onLoadProfile(function (err) {
         console.log('>>> data', data);
         console.log('>>> data', JSON.stringify(data));
     });
-});
+});*/
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
  var data = SOCIAL_PARSER.parseJobs();
