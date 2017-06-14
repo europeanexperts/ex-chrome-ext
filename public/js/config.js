@@ -21,8 +21,10 @@
         try  {
             data = JSON.parse(confStr);
         } catch(e) {
-            data = {};
+            console.warn(e);
         }
+
+        data = data || {};
 
         return data.app_env || APP_ENV;
     }
