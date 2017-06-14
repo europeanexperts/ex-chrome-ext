@@ -318,6 +318,9 @@
             var order = $sortable.attr('data-order');
             var sorted;
 
+            e.preventDefault();
+            e.stopPropagation();
+
             if(order === 'asc') {
                 $sortable.attr('data-order', 'desc');
             } else {
@@ -945,6 +948,9 @@
             var sortBy = $sortable.attr('data-sort-by');
             var order = $sortable.attr('data-order');
             var sorted;
+
+            e.preventDefault();
+            e.stopPropagation();
 
             if(order === 'asc') {
                 $sortable.attr('data-order', 'desc');
