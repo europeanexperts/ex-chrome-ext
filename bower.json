@@ -19,6 +19,7 @@
     "html5shiv": "^3.7.3"
   },
   "dependencies": {
-    "async": "2.4.0"
+    "async": "^2.4.0",
+    "lodash": "^4.17.4"
   }
 }
