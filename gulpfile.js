@@ -72,6 +72,6 @@ gulp.task('watcher', function () {
   gulp.watch(paths.jsWatch, ['js']);
 });
 
-gulp.task('build', ['css:minify', 'js:minify'], function () {
+gulp.task('build', ['css:minify'], function () {
   console.log('Build success');
 });
