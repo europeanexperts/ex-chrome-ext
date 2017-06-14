@@ -247,23 +247,25 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="2">
+                        <th colspan="2" class="cell-checkbox">
                             <input type="checkbox" class="checkbox selectAllChb" id="selectAllJobs" name="select_all_jobs">
                             <label for="selectAllJobs" class="checkbox-label">
-                            <span class="check">
-                                <svg class="icon icon-check">
-                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
-                                </svg>
-                            </span>
+                                <span class="check">
+                                    <svg class="icon icon-check">
+                                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                    </svg>
+                                </span>
                                 <span class="chbText">Select all</span>
                             </label>
                         </th>
                         <th class="cell-job-name">Job Name</th>
                         <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
-                            <span>Add date</span>
-                            <svg class="hide icon icon-up">
-                                <use class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../img/sprite.svg#icon-up"></use>
-                            </svg>
+                            <a href="">
+                                <span>Add date</span>
+                                <svg class="icon icon-up">
+                                    <use class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../img/sprite.svg#icon-up"></use>
+                                </svg>
+                            </a>
                         </th>
                         <th class="cell-region">Region</th>
                         <th class="cell-profiles">Profiles</th>
@@ -390,7 +392,7 @@
                 <table class="table hide">
                     <thead>
                     <tr>
-                        <th colspan="2">
+                        <th colspan="2" class="cell-checkbox">
                             <input type="checkbox" class="checkbox selectAllChb" id="selectAllJobProfiles" name="select_all_job_profiles">
                             <label for="selectAllJobProfiles" class="checkbox-label">
                             <span class="check">
@@ -401,7 +403,7 @@
                                 <span class="chbText">Select all</span>
                             </label>
                         </th>
-                        <th colspan="1" class="cell-search">
+                        <th class="cell-search">
                             <div class="search-field">
                                 <input class="searchField" type="search" placeholder="Search by name">
                                 <button class="searchBtn btn">
@@ -413,9 +415,9 @@
                         </th>
                         <th class="cell-job">Job</th>
                         <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
-                            <a href="#">
+                            <a href="">
                                 <span>Add date</span>
-                                <svg class="hide icon icon-up">
+                                <svg class="icon icon-up">
                                     <use class="icon-svg" xlink:href="../img/sprite.svg#icon-up"></use>
                                 </svg>
                             </a>
