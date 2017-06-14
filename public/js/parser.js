@@ -102,12 +102,14 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     }
 
     function findEmail(options, callback) {
-        chrome.runtime.sendMessage({type: CONFIG.FIND_EMAIL_MESSAGE, data: options}, function(err, res) {
-            if (err) {
-                return callback(err);
+        chrome.runtime.sendMessage({type: CONFIG.FIND_EMAIL_MESSAGE, data: options}, function(result) {
+            result = result || {};
+
+            if (result.error) {
+                return callback(result.error);
             }
 
-            callback(null, res);
+            callback(null, result.success);
         });
     }
 

@@ -147,7 +147,9 @@
             sendResponse({data: 'OK', req: request});
 
         } else if (request.type === CONFIG.FIND_EMAIL_MESSAGE) {
-            findHunterEmail(request.data, sendResponse);
+            findHunterEmail(request.data, function(err, res) {
+                sendResponse({error: err, success: res});
+            });
 
         } else {
             sendResponse({data: 'default', req: request});
