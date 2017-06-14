@@ -13,7 +13,7 @@ module.exports = function(grunt) {
                     // includes files within path
                     //{expand: true, cwd: 'public/', src: ['js/libs/**', 'js/popup.js'], dest: 'build/'},
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
-                    {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
+                    {expand: true, cwd: 'public/', src: ['popup.html', 'options.html'], dest: 'build/'},
                     {expand: true, cwd: 'public/', src: ['js/**', 'css/**', 'fonts/**', 'img/**'], dest: 'build/'}
 
                     // includes files within path and its sub-directories
@@ -29,15 +29,17 @@ module.exports = function(grunt) {
             dev: {
                 files: [
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
-                    {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
+                    {expand: true, cwd: 'public/', src: ['popup.html', 'options.html'], dest: 'build/'},
                     {expand: true, cwd: 'public/', src: [
                         'js/parser.js',
                         'js/euexContentScript.js',
                         'js/contentScript.js',
+                        'js/config.js',
                         'js/templates.js',
                         'js/api.js',
                         'js/popup.js',
-                        'js/background.js'
+                        'js/background.js',
+                        'js/options.js'
                     ], dest: 'build/'}
                 ]
             }

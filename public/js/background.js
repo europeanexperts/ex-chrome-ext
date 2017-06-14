@@ -1,12 +1,8 @@
 (function () {
     'use strict';
 
-    var STAGE_DOMAIN = 'euex-stage.fpdev.xyz';
-    var LIVE_DOMAIN = 'join.europeanexperts.com';
-
-    var IMPORT_URL = 'http://euex-stage.fpdev.xyz/api/import/consultants';
-    //var IMPORT_URL = 'https://join.europeanexperts.com/api/import/consultants';
-
+    var CONFIG = GET_APP_CONFIG();
+    var IMPORT_URL = CONFIG.BASE_URL + '/api/import/consultants';
     var REFRESH_PROFILE = 'REFRESH_PROFILE';
 
     function getAuthToken() {
@@ -51,7 +47,7 @@
             tabs.forEach(function (tab) {
                 var data;
 
-                if (tab.url.indexOf(STAGE_DOMAIN) === -1 && tab.url.indexOf(LIVE_DOMAIN) === -1) {
+                if (tab.url.indexOf(CONFIG.BASE_URL) !== 0) { // The url must begin with BASE_URL
                     return;
                 }
 

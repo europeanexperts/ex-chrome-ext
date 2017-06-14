@@ -3,13 +3,14 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 (function () {
     'use strict';
 
+    var CONFIG = GET_APP_CONFIG();
+
     var HUNTER_API_KEY = '52c698fd10eebf0576effcd0b93abb554adfce8a';
-    var HUNTER_API_HOST = 'https://api.hunter.io/v2';
+    var HUNTER_API_HOST = CONFIG.HUNTER_API_HOST;
 
     var REFRESH_PROFILE_ACTION = 'action=euex';
     var REFRESH_PROFILE = 'REFRESH_PROFILE';
     var PATTERNS = {
-        //PROFILE_URL: /^https:\/\/www\.linkedin\.com\/in\//
         PROFILE_URL: /^\/in\//
     };
     var SELECTORS = {

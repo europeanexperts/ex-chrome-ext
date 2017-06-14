@@ -20,8 +20,10 @@
         "js/contentScript.js"
       ]
     },
+
     {
       "matches": [
+        "http://euex-stage.fpdev.xyz/*",
         "https://join.europeanexperts.com/*"
       ],
       "js": [
@@ -37,11 +39,16 @@
     ],
     "persistent": false
   },
+  "options_ui": {
+    "chrome_style": false,
+    "page": "options.html"
+  },
   "permissions": [
     "activeTab",
     "tabs",
     "storage",
     "cookies",
+    "http://euex-stage.fpdev.xyz/*",
     "https://join.europeanexperts.com/*"
   ]
 }
