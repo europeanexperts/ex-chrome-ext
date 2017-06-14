@@ -35,6 +35,7 @@
   "background": {
     "scripts": [
       "js/libs/jquery/dist/jquery.min.js",
+      "js/config.js",
       "js/background.js"
     ],
     "persistent": false

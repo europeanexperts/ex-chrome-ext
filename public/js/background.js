@@ -3,8 +3,6 @@
 
     var CONFIG = GET_APP_CONFIG();
     var IMPORT_URL = CONFIG.BASE_URL + '/api/import/consultants';
-
-    var HUNTER_API_KEY = '52c698fd10eebf0576effcd0b93abb554adfce8a';
     var HUNTER_API_HOST = CONFIG.HUNTER_API_HOST;
 
     function getAuthToken() {
@@ -139,7 +137,7 @@
     }
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.type === 'importProfile') {
+        if (request.type === CONFIG.IMPORT_PROFILE_MESSAGE) {
             importProfileRequest(request.data, function (err, res) {
                 sendResponse({error: err, success: res, req: request});
             });

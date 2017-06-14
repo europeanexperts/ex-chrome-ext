@@ -3,7 +3,12 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 (function () {
     'use strict';
 
-    var CONFIG = GET_APP_CONFIG();
+    var CONFIG = {
+        REFRESH_PROFILE_MESSAGE: 'REFRESH_PROFILE',
+        FIND_EMAIL_MESSAGE     : 'FIND_EMAIL',
+        IMPORT_PROFILE_MESSAGE : 'IMPORT_PROFILE'
+    };
+
     var REFRESH_PROFILE_ACTION = 'action=euex';
     var PATTERNS = {
         PROFILE_URL: /^\/in\//
@@ -13,7 +18,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         SEARCH_RESULT         : '.results-list',
         SEARCH_RESULT_PROFILES: '.results-list li'
     };
-
     var PARSE_STATUSES = {
         CREATED  : 'created',
         STARTED  : 'started',
@@ -21,7 +25,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         RESTARTED: 'restarted',
         STOPPED  : 'stopped'
     };
-
     var _status = null;
 
     function ParseStatusError() {
@@ -171,8 +174,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         return parseInt(numStr, 10);
     }
-
-    // String.prototype.toNumber = stringToNumber;
 
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
@@ -591,7 +592,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 profile: profile
             };
 
-            chrome.runtime.sendMessage({type: 'importProfile', data: data}, function (res) {
+            chrome.runtime.sendMessage({type: CONFIG.IMPORT_PROFILE_MESSAGE, data: data}, function (res) {
                 console.log('>>> response data', res);
 
                 if (res.error) {
