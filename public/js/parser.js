@@ -3,14 +3,14 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 (function () {
     'use strict';
 
-    //var HUNTER_API_KEY = 'ce1972d359b9d29b810dfb23181f5cd726b0d399';
-    var HUNTER_API_KEY = '52c698fd10eebf0576effcd0b93abb554adfce8a';
-    var HUNTER_API_HOST = 'https://api.hunter.io/v2';
+    var CONFIG = {
+        REFRESH_PROFILE_MESSAGE: 'REFRESH_PROFILE',
+        FIND_EMAIL_MESSAGE     : 'FIND_EMAIL',
+        IMPORT_PROFILE_MESSAGE : 'IMPORT_PROFILE'
+    };
 
     var REFRESH_PROFILE_ACTION = 'action=euex';
-    var REFRESH_PROFILE = 'REFRESH_PROFILE';
     var PATTERNS = {
-        //PROFILE_URL: /^https:\/\/www\.linkedin\.com\/in\//
         PROFILE_URL: /^\/in\//
     };
     var SELECTORS = {
@@ -18,7 +18,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         SEARCH_RESULT         : '.results-list',
         SEARCH_RESULT_PROFILES: '.results-list li'
     };
-
     var PARSE_STATUSES = {
         CREATED  : 'created',
         STARTED  : 'started',
@@ -26,7 +25,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         RESTARTED: 'restarted',
         STOPPED  : 'stopped'
     };
-
     var _status = null;
 
     function ParseStatusError() {
@@ -103,57 +101,15 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return (_match && _match[2]) || '';
     }
 
-    function getFindEmailURL(options) {
-        var url = HUNTER_API_HOST + '/email-finder?api_key=' + HUNTER_API_KEY;
-        var params = {
-            domain   : 'domain',
-            companyId: 'linkedin_id',
-            firstName: 'first_name',
-            lastName : 'last_name'
-        };
-
-        Object.keys(params).forEach(function (attr) {
-            var param = options[attr];
-
-            if (param) {
-                url += '&' + params[attr] + '=' + encodeURIComponent(param);
-            }
-        });
-
-        return url;
-    }
-
-    function parseHunterApiError(xhr) {
-        var res;
-        var err;
-
-        console.error(xhr);
-        res = xhr.responseJSON || {};
-        if ( !res || !res.errors || !res.errors.length) {
-            return res;
-        }
-
-        err = res.errors[0];
-
-        return err.details || 'api error';
-    }
-
     function findEmail(options, callback) {
-        var url = getFindEmailURL(options);
+        chrome.runtime.sendMessage({type: CONFIG.FIND_EMAIL_MESSAGE, data: options}, function(result) {
+            result = result || {};
 
-        $.ajax({
-            url     : url,
-            headers : {
-                'Email-Hunter-Origin': 'chrome_extension'
-            },
-            type    : 'GET',
-            dataType: 'json',
-            success : function (res) {
-                callback(null, res);
-            },
-            error   : function (res) {
-                callback(parseHunterApiError(res));
+            if (result.error) {
+                return callback(result.error);
             }
+
+            callback(null, result.success);
         });
     }
 
@@ -220,8 +176,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         return parseInt(numStr, 10);
     }
-
-    // String.prototype.toNumber = stringToNumber;
 
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
@@ -605,7 +559,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             console.log('>>> data', JSON.stringify(data));
 
             SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
-            chrome.runtime.sendMessage({type: REFRESH_PROFILE, data: data}, function (res) {
+            chrome.runtime.sendMessage({type: CONFIG.REFRESH_PROFILE_MESSAGE, data: data}, function (res) {
                 console.log('background response', res);
             });
         });
@@ -640,7 +594,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 profile: profile
             };
 
-            chrome.runtime.sendMessage({type: 'importProfile', data: data}, function (res) {
+            chrome.runtime.sendMessage({type: CONFIG.IMPORT_PROFILE_MESSAGE, data: data}, function (res) {
                 console.log('>>> response data', res);
 
                 if (res.error) {
@@ -794,12 +748,15 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     });
 })();
 
-/*SOCIAL_PARSER.onLoadProfile(function (err) {
+SOCIAL_PARSER.onLoadProfile(function (err) {
     if (err) {
         return console.error(err);
     }
 
-    SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+    SOCIAL_PARSER.onChangeParseStatus({status: 'started'});
+    SOCIAL_PARSER.parseProfileAsync(function (err, data) {
+        SOCIAL_PARSER.onChangeParseStatus({status: 'stopped'});
+
         if (err) {
             return console.error(err);
         }
@@ -807,7 +764,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         console.log('>>> data', data);
         console.log('>>> data', JSON.stringify(data));
     });
-});*/
+});
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
  var data = SOCIAL_PARSER.parseJobs();

@@ -34,6 +34,7 @@ module.exports = function(grunt) {
                         'js/parser.js',
                         'js/euexContentScript.js',
                         'js/contentScript.js',
+                        'js/config.js',
                         'js/api.js',
                         'js/popup.js',
                         'js/background.js'
