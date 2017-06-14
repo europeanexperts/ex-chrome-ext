@@ -247,7 +247,17 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="2"><button class="selectAllBtn btn yellow">Select all</button></th>
+                        <th colspan="2">
+                            <input type="checkbox" class="checkbox selectAllChb" id="selectAllJobs" name="select_all_jobs">
+                            <label for="selectAllJobs" class="checkbox-label">
+                            <span class="check">
+                                <svg class="icon icon-check">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                </svg>
+                            </span>
+                                <span class="chbText">Select all</span>
+                            </label>
+                        </th>
                         <th class="cell-job-name">Job Name</th>
                         <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
                             <span>Add date</span>
@@ -376,7 +386,17 @@
                 <table class="table hide">
                     <thead>
                     <tr>
-                        <th colspan="2"><button class="selectAllBtn btn yellow">Select all</button></th>
+                        <th colspan="2">
+                            <input type="checkbox" class="checkbox selectAllChb" id="selectAllJobProfiles" name="select_all_job_profiles">
+                            <label for="selectAllJobProfiles" class="checkbox-label">
+                            <span class="check">
+                                <svg class="icon icon-check">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                </svg>
+                            </span>
+                                <span class="chbText">Select all</span>
+                            </label>
+                        </th>
                         <th colspan="1" class="cell-search">
                             <div class="search-field">
                                 <input class="searchField" type="search" placeholder="Search by name">
