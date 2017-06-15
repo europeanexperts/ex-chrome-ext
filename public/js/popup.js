@@ -556,7 +556,7 @@
                 language       : this.$inputLanguage.val(),
                 short_name     : this.$inputShortName.val(),
                 url            : this.$inputUrl.val(),
-                import_existing: this.$inputImportExisting.prop('checked')
+                import_existing: !this.$inputImportExisting.prop('checked')
             };
         },
 
@@ -602,7 +602,7 @@
         },
 
         renderData: function (data) {
-            var importExisting = (typeof data.import_existing === 'boolean') ? data.import_existing : true;
+            var importExisting = (typeof data.import_existing === 'boolean') ? !data.import_existing : true;
 
             this.$el.attr('data-id', data.id);
 
