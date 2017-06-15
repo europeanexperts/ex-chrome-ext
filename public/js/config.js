@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var APP_ENV = 'dev';
+    var APP_ENV = 'live';
     var SHARED_CONF = {
         HUNTER_API_HOST        : 'https://api.hunter.io/v2',
         REFRESH_PROFILE_MESSAGE: 'REFRESH_PROFILE',
