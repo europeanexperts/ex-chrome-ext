@@ -1259,7 +1259,7 @@
             this.setItems([]);
             this.renderItems({items: []});
 
-            this.parsePageIndex = 0;
+            this.parsePageIndex = 1;
             this.onStartClick();
         },
 
