@@ -119,6 +119,15 @@
         }
     };
 
+    function getProfileShortName(name) {
+        return name.split(' ')
+            .map(function (str) {
+                return str[0] || ''
+            })
+            .slice(0, 3)
+            .join('');
+    }
+
     var LoginPage = ExtensionPage.extend({
         init     : function (options) {
             ExtensionPage.prototype.init.call(this, options);
@@ -2044,4 +2053,17 @@
 
     APP.run();
 
+    chrome.tabs.query({active: true}, function (tabs) {
+        var tabId = tabs[0].id;
+
+        chrome.tabs.onUpdated.addListener(function (_tabId, info, updTab) {
+            var evt;
+
+            if (tabId === _tabId && info.status === "complete") {
+                evt = 'complete:' + tabId;
+
+                APP.events.trigger(evt, [updTab, info]);
+            }
+        });
+    });
 })();
