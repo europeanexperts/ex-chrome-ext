@@ -1,4 +1,16 @@
 module.exports = function(grunt) {
+    function getBuildName() {
+        var now = new Date();
+        var dateStr = grunt.template.date(now, 'ddmmyy');
+        var version = grunt.option('ver') || '1.0';
+        var name;
+
+        name = ['build_simple', 'v2.'+version, dateStr + '.zip'].join('_');
+        console.log('>>> name', name);
+
+        return name;
+    }
+
     grunt.initConfig({
         watch: {
             scripts: {
@@ -41,6 +53,16 @@ module.exports = function(grunt) {
                     ], dest: 'build/'}
                 ]
             }
+        },
+        compress: {
+            main: {
+                options: {
+                    archive: 'builds/' + getBuildName()
+                },
+                files: [
+                    {src: ['build/**'], dest: 'builds/simple/'}
+                ]
+            }
         }
     });
 
@@ -48,9 +70,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-clear');
+    grunt.loadNpmTasks('grunt-template');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
     // register grunt tasks:
-    grunt.registerTask('build', ['copy:main']);
+    grunt.registerTask('build', ['copy:main', 'compress']);
     grunt.registerTask('build-dev', ['copy:dev']);
     grunt.registerTask('default', ['build']);
 };
