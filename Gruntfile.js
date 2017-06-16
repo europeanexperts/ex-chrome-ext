@@ -3,9 +3,10 @@ module.exports = function(grunt) {
         var now = new Date();
         var dateStr = grunt.template.date(now, 'ddmmyy');
         var version = grunt.option('ver') || '1.0';
+        var sha = (grunt.option('sha')) ? 'SHA' + grunt.option('sha') : '';
         var name;
 
-        name = ['build_simple', 'v2.'+version, dateStr + '.zip'].join('_');
+        name = ['build_simple', 'v2.'+version, dateStr, sha + '.zip'].join('_');
         console.log('>>> name', name);
 
         return name;
