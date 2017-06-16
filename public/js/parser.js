@@ -649,7 +649,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             var message = options.message || 'Something went wrong!';
             var type = options.type || 'error';
             var color = (type === 'success') ? '#0084bf' : 'red';
-            var timeout = options.timeout || 3000;
+            var timeout = options.timeout || 6000;
             var $wrapper = this.$notificationsWrapper;
             var $p = $('<p>' + message + '</p>');
 
