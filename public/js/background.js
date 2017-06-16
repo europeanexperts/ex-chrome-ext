@@ -72,9 +72,9 @@
 
         $.ajax({
             url     : url,
-            headers : {
+            /*headers : {
                 'Email-Hunter-Origin': 'chrome_extension'
-            },
+            },*/
             type    : 'GET',
             dataType: 'json',
             success : function (res) {
