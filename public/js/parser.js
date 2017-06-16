@@ -56,10 +56,16 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     }
 
     function parseEntityRange(str, options) {
-        var delimiter = (options && options.delimiter) || ' – ';
+        str = str || '';
 
-        return str.split(delimiter).map(function (item) {
+        var defaults = ['', ''];
+        var delimiter = (options && options.delimiter) || ' – ';
+        var values = str.split(delimiter).map(function (item) {
             return item.trim();
+        });
+
+        return defaults.map(function (item, index) {
+            return values[index] || defaults[index];
         });
     }
 
