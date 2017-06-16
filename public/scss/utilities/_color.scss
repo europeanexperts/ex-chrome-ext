@@ -3,7 +3,7 @@
 // General ---------------
 $light-text    : color('default', 'gray');
 $error-color   : color('state', 'red');
-$success-color : color('state', 'green');
+$success-color : $base-color;
 // -----------------------
 
 // Scroll ----------------
@@ -31,8 +31,9 @@ $btn-gradient    : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.
 // -----------------------
 
 // Tables ----------------
-$table-bg  : color('state', 'light-blue');
-$avatar-bg : color('state', 'brown');
+$table-bg          : color('state', 'light-blue');
+$avatar-bg         : color('state', 'brown');
+$exported-field-bg : color('state', 'light-yellow');
 // -----------------------
 
 // Icons -----------------

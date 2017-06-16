@@ -236,4 +236,8 @@ th {
       max-width: 28.3rem;
     }
   }
+
+  .item.exported td{
+    background: $exported-field-bg;
+  }
 }
