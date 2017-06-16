@@ -98,6 +98,25 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return _courses;
     }
 
+    function parseProfileExperience(options) {
+        var $el = options.$el;
+        var _companies = $el.find('li')
+            .map(function () {
+                var $li = $(this);
+                var dateHTML = $li.find('.pv-entity__date-range span:last').html() || '';
+
+                return {
+                    title     : $li.find('h3').html(),
+                    company   : $li.find('.pv-entity__secondary-title').html(),
+                    start_date: dateHTML.split(' – ')[0],
+                    end_date  : dateHTML.split(' – ')[1]
+                }
+            })
+            .toArray();
+
+        return _companies;
+    }
+
     function getIdFromCompanyPath(str) {
         var _match;
 
@@ -320,23 +339,30 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // companies:
             function (parsed, cb) {
-                var _companies = $el.find('.pv-position-entity')
-                    .map(function () {
-                        var $li = $(this);
+                $el.animate({scrollTop: $el.height()}, 1000, function () {
+                    var $items = $el.find('.experience-section');
+                    var interval;
+                    var max = 50;
+                    var i = 0;
 
-                        return {
-                            title     : $li.find('h3').html(),
-                            company   : $li.find('.pv-entity__secondary-title').html(),
-                            // location   : '', // TODO
-                            start_date: $li.find('.pv-entity__date-range span:last').html().split(' – ')[0],
-                            end_date  : $li.find('.pv-entity__date-range span:last').html().split(' – ')[1],
-                            // description: '' // // TODO
+                    $el.find('button.link').click();
+
+                    interval = setInterval(function () {
+                        if ($items.find('button.link').attr('aria-expanded') === "true" || (max < i)) {
+                            if (max < i) {
+                                console.warn('Can not parse the companies.');
+                            }
+
+                            clearInterval(interval);
+                            parsed.companies = parseProfileExperience({$el: $items}) || [];
+
+                            return cb(null, parsed);
                         }
-                    })
-                    .toArray();
 
-                parsed.companies = _companies;
-                cb(null, parsed);
+                        $items.find('button.link').click();
+                        i++;
+                    }, 20);
+                });
             },
 
             // email:
