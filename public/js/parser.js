@@ -104,12 +104,14 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             .map(function () {
                 var $li = $(this);
                 var dateHTML = $li.find('.pv-entity__date-range span:last').html() || '';
+                var description = $li.find('.pv-entity__description').html() || '';
 
                 return {
-                    title     : $li.find('h3').html(),
-                    company   : $li.find('.pv-entity__secondary-title').html(),
-                    start_date: dateHTML.split(' – ')[0],
-                    end_date  : dateHTML.split(' – ')[1]
+                    title      : $li.find('h3').html(),
+                    company    : $li.find('.pv-entity__secondary-title').html(),
+                    start_date : dateHTML.split(' – ')[0],
+                    end_date   : dateHTML.split(' – ')[1],
+                    description: description.trim()
                 }
             })
             .toArray();
@@ -201,6 +203,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         return parseInt(numStr, 10);
     }
+
+    SOCIAL_PARSER.PARSE_STATUSES = PARSE_STATUSES;
 
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
@@ -785,9 +789,9 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return console.error(err);
     }
 
-    SOCIAL_PARSER.onChangeParseStatus({status: 'started'});
-    SOCIAL_PARSER.parseProfileAsync(function (err, data) {
-        SOCIAL_PARSER.onChangeParseStatus({status: 'stopped'});
+    SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STARTED});
+    SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+        SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STOPPED});
 
         if (err) {
             return console.error(err);
