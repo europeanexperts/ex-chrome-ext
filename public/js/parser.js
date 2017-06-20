@@ -83,6 +83,56 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return result;
     }
 
+    function parseSectionCount(options) {
+        var $el = options.$el;
+        var count = $el.find('h3 span:last').html() || '0';
+
+        return  parseInt(count, 10);
+    }
+
+    function prepareSection(options, callback) {
+        var $el = options.$el;
+        var sectionName = options.sectionName;
+        var sectionSelector = options.sectionSelector;
+        var buttonSelector = options.buttonSelector || 'button.link';
+        var totalCount = options.totalCount;
+        var timeout = options.timeout || 50;
+
+        $el.animate({scrollTop: $el.height()}, 1000, function () {
+            var $items = $el.find(sectionSelector);
+            var interval;
+            var max = 50;
+            var i = 0;
+
+            var check = function() {
+                if (totalCount) {
+                    return ($el.find(sectionSelector).length === totalCount || (max < i));
+                }
+
+                return ($items.find('button.link').attr('aria-expanded') === "true" || (max < i));
+            };
+
+            if (totalCount === 0 || $el.find(buttonSelector).length === 0) {
+                return callback(); // there is nothing to show more
+            }
+
+            $el.find('button.link').click();
+            interval = setInterval(function () {
+                if (check()) {
+                    if (max < i) {
+                        console.warn('Can not parse the %s.', sectionName);
+                    }
+
+                    clearInterval(interval);
+                    return callback();
+                }
+
+                $el.find(buttonSelector).click();
+                i++;
+            }, timeout);
+        });
+    }
+
     function parseProfileCourses(options) {
         var $el = options.$el;
         var _courses = $el.find('li')
@@ -117,6 +167,45 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             .toArray();
 
         return _companies;
+    }
+
+    function parseCertifications(options) {
+        var $el = options.$el;
+        var _certifications = $el.find('.pv-accomplishments-section .certifications li')
+            .map(function () {
+                var $li = $(this);
+                var nameHTML;
+                var name;
+                var dateRangeHTML;
+                var dateRange;
+                var index;
+
+                nameHTML = $li.find('h4').html() || '';
+                index = nameHTML.indexOf('</span>');  // find the closing </span> tag:
+                if (index !== -1) {
+                    name = nameHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
+                } else {
+                    name = nameHTML.trim();
+                }
+
+                dateRangeHTML = $li.find('.pv-accomplishment-entity__date').html() || '';
+                index = dateRangeHTML.indexOf('</span>');
+                if (index !== -1) {
+                    dateRangeHTML = dateRangeHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
+                } else {
+                    dateRangeHTML = dateRangeHTML.trim();
+                }
+                dateRange = parseEntityRange(dateRangeHTML);
+
+                return {
+                    name      : name,
+                    start_date: dateRange[0],
+                    end_date  : dateRange[1]
+                }
+            })
+            .toArray();
+
+        return _certifications;
     }
 
     function getIdFromCompanyPath(str) {
@@ -343,29 +432,16 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // companies:
             function (parsed, cb) {
-                $el.animate({scrollTop: $el.height()}, 1000, function () {
-                    var $items = $el.find('.experience-section');
-                    var interval;
-                    var max = 50;
-                    var i = 0;
+                var _options = {
+                    $el            : $el,
+                    sectionName    : 'companies',
+                    sectionSelector: '.experience-section'
+                };
 
-                    $el.find('button.link').click();
+                prepareSection(_options, function() {
+                    parsed.companies = parseProfileExperience({$el: $el.find(_options.sectionSelector)}) || [];
 
-                    interval = setInterval(function () {
-                        if ($items.find('button.link').attr('aria-expanded') === "true" || (max < i)) {
-                            if (max < i) {
-                                console.warn('Can not parse the companies.');
-                            }
-
-                            clearInterval(interval);
-                            parsed.companies = parseProfileExperience({$el: $items}) || [];
-
-                            return cb(null, parsed);
-                        }
-
-                        $items.find('button.link').click();
-                        i++;
-                    }, 20);
+                    cb(null, parsed);
                 });
             },
 
@@ -473,45 +549,21 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // certifications:
             function (parsed, cb) {
-                var _certifications;
+                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .certifications')});
+                var _options= {
+                    $el            : $el,
+                    sectionName    : 'certifications',
+                    sectionSelector: '.pv-accomplishments-section .certifications li',
+                    buttonSelector: '.pv-accomplishments-section .certifications button.link',
+                    totalCount     : _totalCount
+                };
 
                 $el.find('button[data-control-name="accomplishments_expand_certifications"]').click();
-                _certifications = $el.find('.pv-accomplishments-section .certifications li')
-                    .map(function () {
-                        var $li = $(this);
-                        var nameHTML;
-                        var name;
-                        var dateRangeHTML;
-                        var dateRange;
-                        var index;
+                prepareSection(_options, function() {
+                    parsed.certifications = parseCertifications({$el: $el});
 
-                        nameHTML = $li.find('h4').html() || '';
-                        index = nameHTML.indexOf('</span>');  // find the closing </span> tag:
-                        if (index !== -1) {
-                            name = nameHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
-                        } else {
-                            name = nameHTML.trim();
-                        }
-
-                        dateRangeHTML = $li.find('.pv-accomplishment-entity__date').html() || '';
-                        index = dateRangeHTML.indexOf('</span>');
-                        if (index !== -1) {
-                            dateRangeHTML = dateRangeHTML.slice(index + 7).trim(); // remove the span; ('</span>'.length === 7 !!!)
-                        } else {
-                            dateRangeHTML = dateRangeHTML.trim();
-                        }
-                        dateRange = parseEntityRange(dateRangeHTML);
-
-                        return {
-                            name      : name,
-                            start_date: dateRange[0],
-                            end_date  : dateRange[1]
-                        }
-                    })
-                    .toArray();
-
-                parsed.certifications = _certifications;
-                cb(null, parsed);
+                    cb(null, parsed);
+                });
             },
 
             // courses:
@@ -524,9 +576,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     var i = 0;
 
                     $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
-
-                    coursesCount = $courses.find('h3 span:last').html() || '0';
-                    coursesCount = parseInt(coursesCount, 10);
+                    coursesCount = parseSectionCount({$el : $courses});
                     interval = setInterval(function () {
                         var coursesLength = $courses.find('li').length;
 
