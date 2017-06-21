@@ -97,19 +97,19 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var buttonSelector = options.buttonSelector || 'button.link';
         var totalCount = options.totalCount;
         var timeout = options.timeout || 50;
+        var maxIterations = options.maxIterations || 200;
 
         $el.animate({scrollTop: $el.height()}, 1000, function () {
             var $items = $el.find(sectionSelector);
             var interval;
-            var max = 50;
             var i = 0;
 
             var check = function() {
                 if (totalCount) {
-                    return ($el.find(sectionSelector).length === totalCount || (max < i));
+                    return ($el.find(sectionSelector).length === totalCount || (maxIterations < i));
                 }
 
-                return ($items.find('button.link').attr('aria-expanded') === "true" || (max < i));
+                return ($items.find('button.link').attr('aria-expanded') === "true" || (maxIterations < i));
             };
 
             if (totalCount === 0 || $el.find(buttonSelector).length === 0) {
@@ -119,7 +119,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             $el.find('button.link').click();
             interval = setInterval(function () {
                 if (check()) {
-                    if (max < i) {
+                    if (maxIterations < i) {
                         console.warn('Can not parse the %s.', sectionName);
                     }
 
@@ -435,7 +435,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 var _options = {
                     $el            : $el,
                     sectionName    : 'companies',
-                    sectionSelector: '.experience-section'
+                    sectionSelector: '.experience-section',
+                    timeout        : 100
                 };
 
                 prepareSection(_options, function() {
@@ -568,32 +569,21 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // courses:
             function (parsed, cb) {
-                $el.animate({scrollTop: $el.height()}, 1000, function () {
+                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .courses')});
+                var _options = {
+                    $el            : $el,
+                    sectionName    : 'courses',
+                    sectionSelector: '.pv-accomplishments-section .courses li',
+                    totalCount     : _totalCount
+                };
+
+                $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
+                prepareSection(_options, function() {
                     var $courses = $el.find('.pv-accomplishments-section .courses');
-                    var coursesCount = 0;
-                    var interval;
-                    var max = 50;
-                    var i = 0;
 
-                    $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
-                    coursesCount = parseSectionCount({$el : $courses});
-                    interval = setInterval(function () {
-                        var coursesLength = $courses.find('li').length;
+                    parsed.courses = parseProfileCourses({$el: $courses}) || [];
 
-                        if (coursesLength === coursesCount || (max < i)) {
-                            if (max < i) {
-                                console.warn('Can not parse the courses. Parsed %s/%s', coursesLength, coursesCount);
-                            }
-
-                            clearInterval(interval);
-                            parsed.courses = parseProfileCourses({$el: $courses}) || [];
-
-                            return cb(null, parsed);
-                        }
-
-                        $courses.find('button.link').click();
-                        i++;
-                    }, 20);
+                    cb(null, parsed);
                 });
             }
 
@@ -835,22 +825,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 })();
 
 /*SOCIAL_PARSER.onLoadProfile(function (err) {
-    if (err) {
-        return console.error(err);
-    }
+ if (err) {
+ return console.error(err);
+ }
 
-    SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STARTED});
-    SOCIAL_PARSER.parseProfileAsync(function(err, data) {
-        SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STOPPED});
+ SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STARTED});
+ SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+ SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STOPPED});
 
-        if (err) {
-            return console.error(err);
-        }
+ if (err) {
+ return console.error(err);
+ }
 
-        console.log('>>> data', data);
-        console.log('>>> data', JSON.stringify(data));
-    });
-});*/
+ console.log('>>> data', data);
+ console.log('>>> data', JSON.stringify(data));
+ });
+ });*/
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
  var data = SOCIAL_PARSER.parseJobs();
