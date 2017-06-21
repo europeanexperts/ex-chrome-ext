@@ -97,19 +97,19 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var buttonSelector = options.buttonSelector || 'button.link';
         var totalCount = options.totalCount;
         var timeout = options.timeout || 50;
+        var maxIterations = options.maxIterations || 200;
 
         $el.animate({scrollTop: $el.height()}, 1000, function () {
             var $items = $el.find(sectionSelector);
             var interval;
-            var max = 50;
             var i = 0;
 
             var check = function() {
                 if (totalCount) {
-                    return ($el.find(sectionSelector).length === totalCount || (max < i));
+                    return ($el.find(sectionSelector).length === totalCount || (maxIterations < i));
                 }
 
-                return ($items.find('button.link').attr('aria-expanded') === "true" || (max < i));
+                return ($items.find('button.link').attr('aria-expanded') === "true" || (maxIterations < i));
             };
 
             if (totalCount === 0 || $el.find(buttonSelector).length === 0) {
@@ -119,7 +119,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             $el.find('button.link').click();
             interval = setInterval(function () {
                 if (check()) {
-                    if (max < i) {
+                    if (maxIterations < i) {
                         console.warn('Can not parse the %s.', sectionName);
                     }
 
@@ -834,7 +834,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     });
 })();
 
-/*SOCIAL_PARSER.onLoadProfile(function (err) {
+SOCIAL_PARSER.onLoadProfile(function (err) {
     if (err) {
         return console.error(err);
     }
@@ -850,7 +850,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         console.log('>>> data', data);
         console.log('>>> data', JSON.stringify(data));
     });
-});*/
+});
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
  var data = SOCIAL_PARSER.parseJobs();
