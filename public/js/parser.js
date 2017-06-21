@@ -825,22 +825,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 })();
 
 /*SOCIAL_PARSER.onLoadProfile(function (err) {
-    if (err) {
-        return console.error(err);
-    }
+ if (err) {
+ return console.error(err);
+ }
 
-    SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STARTED});
-    SOCIAL_PARSER.parseProfileAsync(function(err, data) {
-        SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STOPPED});
+ SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STARTED});
+ SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+ SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STOPPED});
 
-        if (err) {
-            return console.error(err);
-        }
+ if (err) {
+ return console.error(err);
+ }
 
-        console.log('>>> data', data);
-        console.log('>>> data', JSON.stringify(data));
-    });
-});*/
+ console.log('>>> data', data);
+ console.log('>>> data', JSON.stringify(data));
+ });
+ });*/
 
 /*SOCIAL_PARSER.onLoadJobs(function() {
  var data = SOCIAL_PARSER.parseJobs();
