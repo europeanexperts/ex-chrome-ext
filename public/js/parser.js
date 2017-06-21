@@ -435,7 +435,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 var _options = {
                     $el            : $el,
                     sectionName    : 'companies',
-                    sectionSelector: '.experience-section'
+                    sectionSelector: '.experience-section',
+                    timeout        : 100
                 };
 
                 prepareSection(_options, function() {
@@ -568,32 +569,21 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // courses:
             function (parsed, cb) {
-                $el.animate({scrollTop: $el.height()}, 1000, function () {
+                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .courses')});
+                var _options = {
+                    $el            : $el,
+                    sectionName    : 'courses',
+                    sectionSelector: '.pv-accomplishments-section .courses li',
+                    totalCount     : _totalCount
+                };
+
+                $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
+                prepareSection(_options, function() {
                     var $courses = $el.find('.pv-accomplishments-section .courses');
-                    var coursesCount = 0;
-                    var interval;
-                    var max = 50;
-                    var i = 0;
 
-                    $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
-                    coursesCount = parseSectionCount({$el : $courses});
-                    interval = setInterval(function () {
-                        var coursesLength = $courses.find('li').length;
+                    parsed.courses = parseProfileCourses({$el: $courses}) || [];
 
-                        if (coursesLength === coursesCount || (max < i)) {
-                            if (max < i) {
-                                console.warn('Can not parse the courses. Parsed %s/%s', coursesLength, coursesCount);
-                            }
-
-                            clearInterval(interval);
-                            parsed.courses = parseProfileCourses({$el: $courses}) || [];
-
-                            return cb(null, parsed);
-                        }
-
-                        $courses.find('button.link').click();
-                        i++;
-                    }, 20);
+                    cb(null, parsed);
                 });
             }
 
