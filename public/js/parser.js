@@ -150,7 +150,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
     function parseProfileExperience(options) {
         var $el = options.$el;
-        var _companies = $el.find('li')
+        var _companies = $el.find('li.pv-position-entity')
             .map(function () {
                 var $li = $(this);
                 var dateHTML = $li.find('.pv-entity__date-range span:last').html() || '';
