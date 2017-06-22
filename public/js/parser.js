@@ -280,7 +280,24 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         }) : name;
     }
 
-    function getNameObj(rows) {
+    function getNameObj(fullName) {
+        var arr;
+        var firstName;
+        var lastName;
+
+        fullName = fullName || $('.pv-top-card-section__name').html() || '';
+
+        arr = fullName.split(' ');
+        firstName = arr.shift();
+        lastName = arr.join(' ');
+
+        return {
+            first_name: firstName,
+            last_name : lastName
+        };
+    }
+
+    function getNameObjFromCode(rows) {
         var objs = [];
         var profile;
 
@@ -472,7 +489,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             // email:
             function (parsed, cb) {
                 var lastCompanyPath = $el.find('.experience-section .pv-position-entity>a').first().attr('href');
-                var nameObj = getNameObj(codeJSON.included || []);
+                var nameObj = getNameObj();
                 var companyId = getIdFromCompanyPath(lastCompanyPath);
                 var _options = {
                     firstName: nameObj.first_name,
