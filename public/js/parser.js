@@ -537,7 +537,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             function (parsed, cb) {
                 var _skills;
 
-                $el.find('button[data-control-name="skill_details"]').click();
+                $el.find('button[data-control-name="skill_details"][aria-expanded="false"]').click();
                 _skills = $el.find('.pv-skill-entity__skill-name')
                     .map(function () {
                         return $(this).html();
