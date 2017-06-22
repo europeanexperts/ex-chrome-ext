@@ -136,6 +136,42 @@
         });
     }
 
+    function getLinkedInProfile(options, callback) {
+        options = options || {};
+
+        var link = options.link;
+        var value;
+        var profileJSON;
+
+        if (!link) {
+            return callback('Invalid param options.link');
+        }
+
+        value = localStorage.getItem('profile_' + link);
+        if (!value) {
+            callback(null, null);
+        }
+
+        try {
+            profileJSON = JSON.parse(value);
+        } catch(err) {
+            console.warn(err);
+            profileJSON = null;
+        }
+
+        callback(null, profileJSON);
+    }
+
+    function saveLinkedInProfile(options, callback) {
+        var link = options.link;
+        var profile = options.profile;
+
+        // profile.is_exported = true;
+        localStorage.setItem('profile_' + link, JSON.stringify(profile));
+
+        callback(null, 'success');
+    }
+
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.type === CONFIG.IMPORT_PROFILE_MESSAGE) {
             importProfileRequest(request.data, function (err, res) {
@@ -147,10 +183,17 @@
             sendResponse({data: 'OK', req: request});
 
         } else if (request.type === CONFIG.FIND_EMAIL_MESSAGE) {
-            findHunterEmail(request.data, function(err, res) {
+            findHunterEmail(request.data, function (err, res) {
                 sendResponse({error: err, success: res});
             });
-
+        } else if (request.type === CONFIG.SAVE_PROFILE_MESSAGE) {
+            saveLinkedInProfile(request.data, function(err, result) {
+                sendResponse({error: err, success: result});
+            })
+        } else if (request.type === CONFIG.GET_PROFILE_MESSAGE) {
+            getLinkedInProfile(request.data, function(err, profile) {
+                sendResponse({error: err, profile: profile});
+            });
         } else {
             sendResponse({data: 'default', req: request});
         }

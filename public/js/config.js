@@ -6,7 +6,9 @@
         HUNTER_API_HOST        : 'https://api.hunter.io/v2',
         REFRESH_PROFILE_MESSAGE: 'REFRESH_PROFILE',
         FIND_EMAIL_MESSAGE     : 'FIND_EMAIL',
-        IMPORT_PROFILE_MESSAGE : 'IMPORT_PROFILE'
+        IMPORT_PROFILE_MESSAGE : 'IMPORT_PROFILE',
+        GET_PROFILE_MESSAGE    : 'GET_PROFILE',
+        SAVE_PROFILE_MESSAGE   : 'SAVE_PROFILE'
     };
 
     var CONF_DEV = $.extend({}, SHARED_CONF, {
