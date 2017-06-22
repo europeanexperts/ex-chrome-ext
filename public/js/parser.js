@@ -6,7 +6,9 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     var CONFIG = {
         REFRESH_PROFILE_MESSAGE: 'REFRESH_PROFILE',
         FIND_EMAIL_MESSAGE     : 'FIND_EMAIL',
-        IMPORT_PROFILE_MESSAGE : 'IMPORT_PROFILE'
+        IMPORT_PROFILE_MESSAGE : 'IMPORT_PROFILE',
+        GET_PROFILE_MESSAGE    : 'GET_PROFILE',
+        SAVE_PROFILE_MESSAGE   : 'SAVE_PROFILE'
     };
 
     var REFRESH_PROFILE_ACTION = 'action=euex';
@@ -646,7 +648,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         var instance = ProfileHunter.instance;
 
         if (instance !== undefined) {
-            instance.renderButton();
+            this.checkExportedProfile(function(err, isExported) {
+                instance.isExportedProfile = isExported;
+                instance.renderButton();
+            });
 
             return instance;
         }
@@ -661,7 +666,12 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     ProfileHunter.prototype = {
         init: function () {
             console.log('>>> init profile hunter');
-            this.render();
+            var self = this;
+
+            this.checkExportedProfile(function(err, isExported) {
+                self.isExportedProfile = isExported;
+                self.render();
+            });
         },
 
         sendProfile: function (options, callback) {
@@ -708,7 +718,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                             message: successMessage,
                             type   : 'success'
                         });
-                        self.$btn.find('.btnText').html('Exported');
+                        self.setButtonText(self.calcButtonText({isExported: true}));
                         $body.animate({scrollTop: 0});
                     });
                 });
@@ -753,6 +763,39 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             this.notification({message: message});
         },
 
+        calcButtonText: function(options) {
+            if (options.isExported) {
+                return 'Exported';
+            }
+
+            return 'Go Experts';
+        },
+
+        setButtonText: function(text) {
+            this.$btn.find('.btnText').html(text);
+        },
+
+        checkExportedProfile: function(callback) {
+            var data = {
+                link: window.location.pathname
+            };
+
+            chrome.runtime.sendMessage({type: CONFIG.GET_PROFILE_MESSAGE, data: data}, function (res) {
+                res = res || {};
+
+                var isExported;
+
+                if (res.profile && res.profile.is_exported) {
+                    isExported = true;
+                } else {
+                    console.warn(res.error);
+                    isExported = false;
+                }
+
+                callback(null, isExported);
+            });
+        },
+
         renderNotifications: function () {
             this.$notificationsWrapper = $('<div id="euexNotificationWrapper"></div>');
             this.$notificationsWrapper.css({
@@ -772,17 +815,20 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         renderButton: function () {
             var $actions = $('.pv-top-card-section__actions');
             var $span;
+            var btnText = this.calcButtonText({isExported: this.isExportedProfile});
 
-            if ($actions.find('.hunterBtn').length) {
-                this.$btn = $actions.find('.hunterBtn');
+            if ($actions.find('.hunterBtnWrp').length) {
+                this.$btn = $actions.find('.hunterBtnWrp');
+                this.$btn.off('click');
                 this.$btn.on('click', $.proxy(this.onHunterClick, this)); // on click
+                this.setButtonText(btnText);
 
                 return;
             }
 
             this.$btn = $([
-                '<button class="primary top-card-action" style="background: #F1C40F;">',
-                '<span class="btnText hunterBtn">Go Experts</span>',
+                '<button class="primary top-card-action hunterBtnWrp" style="background: #F1C40F;">',
+                '<span class="btnText hunterBtn">' + btnText + '</span>',
                 '</button>'
             ].join(' '));
             this.$btn.on('click', $.proxy(this.onHunterClick, this));     // on click
@@ -811,8 +857,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         }
 
         setInterval(function () {
-            if (window.location.pathname !== _path) {
-                _path = window.location.pathname;
+            var pathname = window.location.pathname;
+
+            if (pathname !== _path) {
+                _path = pathname;
                 console.log('>>> changed path', _path);
 
                 if (PATTERNS.PROFILE_URL.test(_path)) {
