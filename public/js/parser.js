@@ -208,6 +208,27 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return _certifications;
     }
 
+    function parseProjects(options) {
+        var $el = options.$el;
+        var _projects = $el.find('.pv-accomplishments-section .projects li')
+            .map(function () {
+                var $li = $(this);
+                var prTitle = $li.find('h4').html();
+                var prDescription = $li.find('.pv-accomplishment-entity__description').html();
+                var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+
+                return {
+                    title      : parseVisuallyHidden(prTitle),
+                    description: parseVisuallyHidden(prDescription),
+                    start_date : dateRange[0],
+                    end_date   : dateRange[1]
+                };
+            })
+            .toArray();
+
+        return _projects;
+    }
+
     function getIdFromCompanyPath(str) {
         var _match;
 
@@ -509,28 +530,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // projects:
-            function (parsed, cb) {
-                var _projects;
+            function(parsed, cb) {
+                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .projects ')});
+                var _options= {
+                    $el            : $el,
+                    sectionName    : 'projects',
+                    sectionSelector: '.pv-accomplishments-section .projects li',
+                    buttonSelector: '.pv-accomplishments-section .projects button.link',
+                    totalCount     : _totalCount
+                };
 
                 $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
-                _projects = $el.find('.pv-accomplishments-section .projects li')
-                    .map(function () {
-                        var $li = $(this);
-                        var prTitle = $li.find('h4').html();
-                        var prDescription = $li.find('.pv-accomplishment-entity__description').html();
-                        var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+                prepareSection(_options, function() {
+                    parsed.projects = parseProjects({$el: $el});
 
-                        return {
-                            title      : parseVisuallyHidden(prTitle),
-                            description: parseVisuallyHidden(prDescription),
-                            start_date : dateRange[0],
-                            end_date   : dateRange[1]
-                        };
-                    })
-                    .toArray();
-
-                parsed.projects = _projects;
-                cb(null, parsed);
+                    cb(null, parsed);
+                });
             },
 
             // skills:
