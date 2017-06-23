@@ -413,15 +413,16 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 var _educations = $el.find('.pv-education-entity')
                     .map(function () {
                         var $li = $(this);
+                        var name = $li.find('.pv-entity__school-name').html();
+                        var specializations = $li.find('.pv-entity__comma-item')
+                            .map(function () {
+                                return $(this).html();
+                            })
+                            .toArray();
 
                         return {
-                            name       : $li.find('.pv-entity__school-name').html(),
-                            description: $li.find('.pv-entity__comma-item')
-                                .map(function () {
-                                    return $(this).html();
-                                })
-                                .toArray()
-                                .join(', '),
+                            name       : name + ', ' + specializations.join(', '),
+                            description: $li.find('.pv-entity__description').html() || '',
                             start_date : $li.find('.pv-entity__dates time:first').html(),
                             end_date   : $li.find('.pv-entity__dates time:last').html()
                         }
