@@ -451,15 +451,16 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 var _educations = $el.find('.pv-education-entity')
                     .map(function () {
                         var $li = $(this);
+                        var specializations = $li.find('.pv-entity__comma-item')
+                            .map(function () {
+                                return $(this).html();
+                            })
+                            .toArray();
 
                         return {
                             name       : $li.find('.pv-entity__school-name').html(),
-                            description: $li.find('.pv-entity__comma-item')
-                                .map(function () {
-                                    return $(this).html();
-                                })
-                                .toArray()
-                                .join(', '),
+                            program    : specializations.join(', '),
+                            description: $li.find('.pv-entity__description').html() || '',
                             start_date : $li.find('.pv-entity__dates time:first').html(),
                             end_date   : $li.find('.pv-entity__dates time:last').html()
                         }
@@ -859,7 +860,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             }
 
             this.$btn = $([
-                '<button class="primary top-card-action hunterBtnWrp" style="background: #F1C40F;">',
+                '<button class="primary top-card-action hunterBtnWrp" style="background: #F1C40F;margin-left: 12px;">',
                 '<span class="btnText hunterBtn">' + btnText + '</span>',
                 '</button>'
             ].join(' '));
