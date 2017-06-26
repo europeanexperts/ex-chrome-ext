@@ -151,8 +151,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     }
 
     function parseProfileExperience(options) {
-        var $el = options.$el;
-        var _companies = $el.find('li.pv-position-entity')
+        var _companies = $('section.experience-section ul.pv-profile-section__section-info > li')
             .map(function () {
                 var $li = $(this);
                 var dateHTML = $li.find('.pv-entity__date-range span:last').html() || '';
