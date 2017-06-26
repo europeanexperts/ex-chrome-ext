@@ -394,7 +394,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
     SOCIAL_PARSER.parseProfileAsync = function (callback) {
         var $el = $('body');
-        var codeJSON;
 
         async.waterfall([
 
@@ -412,20 +411,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
                     return cb();
                 });
-            },
-
-            // codeJSON:
-            function (cb) {
-                var code = $el.find("code:contains('countryCode')").html();
-
-                try {
-                    codeJSON = JSON.parse(code);
-                } catch (e) {
-                    console.warn(e);
-                    codeJSON = {};
-                }
-
-                cb();
             },
 
             // general info:
