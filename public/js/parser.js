@@ -230,6 +230,24 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return _projects;
     }
 
+    function parseProfileSummary(options) {
+        var $el = options.$el;
+        var $profileSummary = $el.find('.pv-top-card-section__summary');
+        var $showMoreBtn = $profileSummary.find('button');
+
+        if (!$showMoreBtn || !$showMoreBtn.length) {
+            return $profileSummary.text();
+        }
+
+        if ($profileSummary.find('.truncate-multiline--truncation-target').length) {
+            $showMoreBtn.click();
+        }
+
+        return $profileSummary.clone()
+            .find('button').remove().end()
+            .text();
+    }
+
     function getIdFromCompanyPath(str) {
         var _match;
 
@@ -416,7 +434,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             // general info:
             function (cb) {
                 var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
-                var _summary = $el.find('.pv-top-card-section__summary').text() || '';
+                var _summary = parseProfileSummary({$el: $el}) || '';
                 var $avatar = $el.find('.pv-top-card-section__photo img');
                 var parsed = {
                     link        : window.location.pathname,
