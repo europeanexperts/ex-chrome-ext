@@ -151,8 +151,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     }
 
     function parseProfileExperience(options) {
-        var $el = options.$el;
-        var _companies = $el.find('li')
+        var _companies = $('section.experience-section ul.pv-profile-section__section-info > li')
             .map(function () {
                 var $li = $(this);
                 var dateHTML = $li.find('.pv-entity__date-range span:last').html() || '';
@@ -210,6 +209,45 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return _certifications;
     }
 
+    function parseProjects(options) {
+        var $el = options.$el;
+        var _projects = $el.find('.pv-accomplishments-section .projects li')
+            .map(function () {
+                var $li = $(this);
+                var prTitle = $li.find('h4').html();
+                var prDescription = $li.find('.pv-accomplishment-entity__description').html();
+                var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+
+                return {
+                    title      : parseVisuallyHidden(prTitle),
+                    description: parseVisuallyHidden(prDescription),
+                    start_date : dateRange[0],
+                    end_date   : dateRange[1]
+                };
+            })
+            .toArray();
+
+        return _projects;
+    }
+
+    function parseProfileSummary(options) {
+        var $el = options.$el;
+        var $profileSummary = $el.find('.pv-top-card-section__summary');
+        var $showMoreBtn = $profileSummary.find('button');
+
+        if (!$showMoreBtn || !$showMoreBtn.length) {
+            return $profileSummary.text();
+        }
+
+        if ($profileSummary.find('.truncate-multiline--truncation-target').length) {
+            $showMoreBtn.click();
+        }
+
+        return $profileSummary.clone()
+            .find('button').remove().end()
+            .text();
+    }
+
     function getIdFromCompanyPath(str) {
         var _match;
 
@@ -259,7 +297,24 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         }) : name;
     }
 
-    function getNameObj(rows) {
+    function getNameObj(fullName) {
+        var arr;
+        var firstName;
+        var lastName;
+
+        fullName = fullName || $('.pv-top-card-section__name').html() || '';
+
+        arr = fullName.split(' ');
+        firstName = arr.shift();
+        lastName = arr.join(' ');
+
+        return {
+            first_name: firstName,
+            last_name : lastName
+        };
+    }
+
+    function getNameObjFromCode(rows) {
         var objs = [];
         var profile;
 
@@ -357,7 +412,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
     SOCIAL_PARSER.parseProfileAsync = function (callback) {
         var $el = $('body');
-        var codeJSON;
 
         async.waterfall([
 
@@ -377,23 +431,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 });
             },
 
-            // codeJSON:
-            function (cb) {
-                var code = $el.find("code:contains('countryCode')").html();
-
-                try {
-                    codeJSON = JSON.parse(code);
-                } catch (e) {
-                    console.warn(e);
-                    codeJSON = {};
-                }
-
-                cb();
-            },
-
             // general info:
             function (cb) {
                 var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
+                var _summary = parseProfileSummary({$el: $el}) || '';
                 var $avatar = $el.find('.pv-top-card-section__photo img');
                 var parsed = {
                     link        : window.location.pathname,
@@ -401,7 +442,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     name        : $el.find('.pv-top-card-section__name').html() || '',
                     title       : (_titleArr.length) ? _titleArr[0] : '',
                     country     : $el.find('.pv-top-card-section__location').html() || '',
-                    summary     : $el.find('.pv-top-card-section__summary .truncate-multiline--last-line-wrapper span').html() || '',
+                    summary     : _summary.trim(),
                     picture     : ($avatar.hasClass('ghost-person') ) ? '' : $avatar.attr('src')
                 };
 
@@ -452,7 +493,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             // email:
             function (parsed, cb) {
                 var lastCompanyPath = $el.find('.experience-section .pv-position-entity>a').first().attr('href');
-                var nameObj = getNameObj(codeJSON.included || []);
+                var nameObj = getNameObj();
                 var companyId = getIdFromCompanyPath(lastCompanyPath);
                 var _options = {
                     firstName: nameObj.first_name,
@@ -512,35 +553,29 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             },
 
             // projects:
-            function (parsed, cb) {
-                var _projects;
+            function(parsed, cb) {
+                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .projects ')});
+                var _options= {
+                    $el            : $el,
+                    sectionName    : 'projects',
+                    sectionSelector: '.pv-accomplishments-section .projects li',
+                    buttonSelector: '.pv-accomplishments-section .projects button.link',
+                    totalCount     : _totalCount
+                };
 
                 $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
-                _projects = $el.find('.pv-accomplishments-section .projects li')
-                    .map(function () {
-                        var $li = $(this);
-                        var prTitle = $li.find('h4').html();
-                        var prDescription = $li.find('.pv-accomplishment-entity__description').html();
-                        var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+                prepareSection(_options, function() {
+                    parsed.projects = parseProjects({$el: $el});
 
-                        return {
-                            title      : parseVisuallyHidden(prTitle),
-                            description: parseVisuallyHidden(prDescription),
-                            start_date : dateRange[0],
-                            end_date   : dateRange[1]
-                        };
-                    })
-                    .toArray();
-
-                parsed.projects = _projects;
-                cb(null, parsed);
+                    cb(null, parsed);
+                });
             },
 
             // skills:
             function (parsed, cb) {
                 var _skills;
 
-                $el.find('button[data-control-name="skill_details"]').click();
+                $el.find('button[data-control-name="skill_details"][aria-expanded="false"]').click();
                 _skills = $el.find('.pv-skill-entity__skill-name')
                     .map(function () {
                         return $(this).html();
