@@ -216,7 +216,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 var $li = $(this);
                 var prTitle = $li.find('h4').html();
                 var prDescription = $li.find('.pv-accomplishment-entity__description').html();
-                var dateRange = parseEntityRange($el.find('.pv-accomplishment-entity__date').html());
+                var dateRange = parseEntityRange($li.find('.pv-accomplishment-entity__date').html());
 
                 return {
                     title      : parseVisuallyHidden(prTitle),
