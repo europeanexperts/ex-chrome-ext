@@ -334,16 +334,9 @@
                 $sortable.attr('data-order', 'asc');
             }
 
-            sorted = this.items.sort(function(a, b) {
-                if (order === 'asc') {
-                    return a[sortBy] <= b[sortBy];
-                }
-
-                return a[sortBy] >= b[sortBy]; // DESC
-            });
-
+            sorted = _.orderBy(this.items, sortBy, order);
             this.items = sorted;
-            this.renderData({items: sorted});
+            this.renderData();
         },
 
         onCreateItem: function (e, data) {
@@ -962,14 +955,7 @@
                 $sortable.attr('data-order', 'asc');
             }
 
-            sorted = this.getItems().sort(function(a, b) {
-                if (order === 'asc') {
-                    return a[sortBy] <= b[sortBy];
-                }
-
-                return a[sortBy] >= b[sortBy]; // DESC
-            });
-
+            sorted = _.orderBy(this.getItems(), sortBy, order);
             this.setItems(sorted);
             this.renderItems({items: sorted});
         },
