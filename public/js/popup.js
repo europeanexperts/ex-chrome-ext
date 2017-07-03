@@ -27,7 +27,6 @@
 
     ExtensionPage.prototype = {
         init               : function (options) {
-            console.log('init', options.name);
             this.$el = $('.page[data-name="' + options.name + '"]');
             this.title = this.$el.attr('data-title');
         },
@@ -205,8 +204,7 @@
                     return APP.error(err);
                 }
 
-                console.log('>>> success', res);
-                alert('success');
+                alert('Success!');
             });
         }
     });
@@ -273,7 +271,7 @@
             options = options || {};
             page = APP.pages[name];
 
-            console.log('APP.showPage name=%s, opts=%s', name, JSON.stringify(options));
+            // console.log('APP.showPage name=%s, opts=%s', name, JSON.stringify(options));
 
             if (APP.currentPage) {
                 APP.currentPage.hide();
@@ -384,7 +382,7 @@
             }, timeout);
         },
         error        : function (e) {
-            console.log('>>> APP.error', e);
+            console.error('>>> APP.error', e);
 
             var status;
             var _notificationOptions = {
@@ -423,7 +421,6 @@
                 }
             });
             APP.$logoutBtn.on('click', function (e) {
-                console.log('>>> logout ...');
                 EXT_API.logout(function (err, res) {
                     if (err) {
                         return APP.error(err);
