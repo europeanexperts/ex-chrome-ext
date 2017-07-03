@@ -40,10 +40,6 @@
     ],
     "persistent": false
   },
-  "options_ui": {
-    "chrome_style": false,
-    "page": "options.html"
-  },
   "permissions": [
     "activeTab",
     "tabs",
