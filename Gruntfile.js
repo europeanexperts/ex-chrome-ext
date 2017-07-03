@@ -49,7 +49,7 @@ module.exports = function(grunt) {
                     archive: 'builds/' + getBuildName()
                 },
                 files: [
-                    {src: ['build/**'], dest: 'builds/'}
+                    {src: ['build/**'], dest: ''}
                 ]
             }
         }
