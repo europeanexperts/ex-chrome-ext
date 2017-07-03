@@ -701,7 +701,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
     ProfileHunter.prototype = {
         init: function () {
-            console.log('>>> init profile hunter');
             var self = this;
 
             this.checkExportedProfile(function(err, isExported) {
@@ -897,7 +896,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             if (pathname !== _path) {
                 _path = pathname;
-                console.log('>>> changed path', _path);
+                // console.log('>>> changed path', _path);
 
                 if (PATTERNS.PROFILE_URL.test(_path)) {
                     hunter = new ProfileHunter();
