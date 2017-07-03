@@ -42,7 +42,6 @@
 
     ExtensionPage.prototype = {
         init               : function (options) {
-            console.log('init', options.name);
             this.$el = $('.page[data-name="' + options.name + '"]');
             this.title = this.$el.attr('data-title');
         },
@@ -241,8 +240,7 @@
                     return APP.error(err);
                 }
 
-                console.log('>>> success', res);
-                alert('success');
+                alert('Success!');
             });
         }
     });
@@ -429,7 +427,6 @@
                 return APP.notification({message: 'Select jobs You want to delete'});
             }
 
-            console.log('>>> delete', ids);
             EXT_API.deleteJobs(ids, function (err, res) {
                 if (err) {
                     return APP.error(err);
@@ -441,8 +438,6 @@
         },
 
         fetchList: function (callback) {
-            console.log('>>> fetch job list...');
-
             EXT_API.fetchJobList({}, function (err, data) {
                 var sorted;
                 var jobs;
@@ -1037,58 +1032,15 @@
                     }
                 });
 
-                self.parsePageIndex = 1; // the items are changed the parse need to start from page=1
+                self.parsePageIndex = 1;              // the items are changed the parse need to start from page=1
                 self.clearProfileStatus();
 
                 if (!profiles.length) {
-                    self.renderItems({items: []}); // Show 'There are no data' message and update the counters;
+                    self.renderItems({items: []});    // Show 'There are no data' message and update the counters;
                 } else {
-                    self.renderCounters();         // Update the counters only;
+                    self.renderCounters();            // Update the counters only;
                 }
             });
-        },
-
-        __parseProfile: function (options, callback) {
-            console.log('>>> parseProfile', options);
-
-            var url = 'https://www.linkedin.com/in/' + 'tetiana-bysaha-637a427b';
-            var _options = {
-                //tabId: this.profileTabId || null,
-                // url  : 'https://www.linkedin.com/in/' + options.link
-                url: url
-            };
-
-            var self = this;
-
-            chrome.tabs.create({url: url, active: false}, function (tab) {
-                chrome.tabs.onUpdated.addListener(function (tabId, info, updTab) {
-                    if (updTab.url === url && tabId === tab.id && (info.status === "complete")) {
-                        console.log('... complete');
-                        //onCompleteTab(tabId, info);
-
-                        chrome.tabs.sendMessage(tab.id, {method: "profile"}, function (response) {
-                            console.log("response: " + JSON.stringify(response));
-
-                            //chrome.tabs.remove(tabId, function() {
-                            callback(null, options); // TODO: !!!
-                            //});
-                        });
-                    }
-                });
-            });
-
-            /*APP_HELPERS.prepareParseProfile(_options, function(err, res) {
-             if (err) {
-             return callback(err);
-             }
-
-             console.log('>>> res', res);
-             //self.profileTabId = res.tabId;
-
-             setTimeout(function () {
-             callback(null, options); // TODO: !!!
-             }, 200);
-             });*/
         },
 
         parseProfile: function (options, callback) {
@@ -1106,12 +1058,7 @@
             });
 
             storedProfile = EXT_API.getProfileLocal({link : profileLink});
-            /*if (storedProfile && storedProfile.name) {
-             return callback(null, {data: storedProfile, isNew: false});
-             }*/
-
             url = LINKEDIN_HOST + profileLink;
-            console.log('>>> parseProfile', options);
 
             chrome.tabs.query({active: true}, function (tabs) {
                 var tabId = tabs[0].id;
@@ -1655,8 +1602,6 @@
 
             ExtensionPage.prototype.show.call(this, options);
 
-            console.log('>>> ImportJobListPage.show', options);
-
             this.profile = options.profile || null;
             this.items = [];
             this.fetchJobs(function (err, data) {
@@ -1665,8 +1610,6 @@
                 }
 
                 self.items = data;
-                console.log('>>> data', data);
-
                 self.renderList();
             });
         },
@@ -1784,13 +1727,6 @@
 
             options = options || {};
             items = options.items || this.items;
-
-            /*if (!items || !items.length) {
-             this.$list.html('<tr><td colspan="7">' + this.emptyListText + '</td></tr>');
-
-             return;
-             }*/
-
             template = APP_TEMPLATES.getTemplate('import-job-list');
             listHtml = template({items: items});
 
@@ -1799,51 +1735,6 @@
             } else {
                 this.$list.html(listHtml);
             }
-        }
-    });
-
-    var MyProfilePage = ExtensionPage.extend({
-        init: function(options) {
-            ExtensionPage.prototype.init.call(this, options);
-
-            this.$name = this.$el.find('#my_name');
-            this.$email = this.$el.find('#my_email');
-        },
-
-        show: function(options) {
-            ExtensionPage.prototype.show.call(this, options);
-
-            this.profileJSON = this.getProfile();
-            if (!this.profileJSON || !this.profileJSON.email) {
-                return APP.error({status: 401, responseText: 'Unauthorized'});
-            }
-
-            this.render();
-        },
-
-        getProfile: function() {
-            var value = localStorage.getItem('AUTH_PROFILE');
-            var profileJSON;
-
-            if (!value) {
-                return {};
-            }
-
-            try {
-                profileJSON = JSON.parse(value);
-            } catch(err) {
-                console.error(err);
-                profileJSON = {};
-            }
-
-            return profileJSON;
-        },
-
-        render: function() {
-            var profileJSON = this.profileJSON;
-
-            this.$name.val(profileJSON.name);
-            this.$email.val(profileJSON.email);
         }
     });
 
@@ -1864,7 +1755,7 @@
             options = options || {};
             page = APP.pages[name];
 
-            console.log('APP.showPage name=%s, opts=%s', name, JSON.stringify(options));
+            // console.log('APP.showPage name=%s, opts=%s', name, JSON.stringify(options));
 
             if (APP.currentPage) {
                 APP.currentPage.hide();
@@ -1988,7 +1879,7 @@
             }, timeout);
         },
         error        : function (e) {
-            console.log('>>> APP.error', e);
+            console.error('>>> APP.error', e);
 
             var status;
             var _notificationOptions = {
@@ -2027,7 +1918,6 @@
                 }
             });
             APP.$logoutBtn.on('click', function (e) {
-                console.log('>>> logout ...');
                 EXT_API.logout(function (err, res) {
                     if (err) {
                         return APP.error(err);
@@ -2039,19 +1929,6 @@
 
         }
     };
-
-    APP.init();
-
-    APP.addPage(LoginPage, {name: 'login'});
-    APP.addPage(ForgotPasswordPage, {name: 'forgotPassword'});
-    APP.addPage(JobsPage, {name: 'jobs'});
-    APP.addPage(JobItemPage, {name: 'job'});
-    APP.addPage(JobProfileListPage, {name: 'jobProfiles'});
-    APP.addPage(ImportProfilePage, {name: 'importProfile'});
-    APP.addPage(ImportJobListPage, {name: 'importJobListPage'});
-    // APP.addPage(MyProfilePage, {name: 'myProfile'});
-
-    APP.run();
 
     chrome.tabs.query({active: true}, function (tabs) {
         var tabId = tabs[0].id;
@@ -2066,4 +1943,17 @@
             }
         });
     });
+
+    APP.init();
+
+    APP.addPage(LoginPage, {name: 'login'});
+    APP.addPage(ForgotPasswordPage, {name: 'forgotPassword'});
+    APP.addPage(JobsPage, {name: 'jobs'});
+    APP.addPage(JobItemPage, {name: 'job'});
+    APP.addPage(JobProfileListPage, {name: 'jobProfiles'});
+    APP.addPage(ImportProfilePage, {name: 'importProfile'});
+    APP.addPage(ImportJobListPage, {name: 'importJobListPage'});
+
+    APP.run();
+
 })();
