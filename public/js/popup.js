@@ -1601,12 +1601,27 @@
         },
 
         fetchJobs: function (callback) {
-            EXT_API.fetchJobList({}, function (err, jobs) {
+            EXT_API.fetchJobList({}, function (err, data) {
+                var sorted;
+                var jobs;
+
                 if (err) {
                     return callback(err);
                 }
 
-                callback(null, jobs);
+                if (Array.isArray(data)) {
+                    jobs = data;
+                } else if (data && Array.isArray(data.jobs)) {
+                    jobs = data.jobs;
+                } else {
+                    jobs = [];
+                }
+
+                sorted = jobs.sort(function(a, b) {
+                    return a.created_at <= b.created_at;
+                });
+
+                callback(null, sorted);
             });
         },
 
@@ -1646,9 +1661,9 @@
             var profile;
             var self = this;
 
-            async.mapSeries(this.getItems(), function iterator(job, cb) {
+            async.mapSeries(this.items, function iterator(job, cb) {
                 var jobProfile = self.normalizeProfile(self.profile, {status: 1}); // TODO: status ???
-                var jobProfiles = job.profiles;
+                var jobProfiles = job.profiles || [];
                 var profile;
 
                 if (ids.indexOf(job.id) === -1) {
