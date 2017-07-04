@@ -582,7 +582,7 @@
                         APP.events.trigger('jobs:create', res);
                         APP.showPage(APP.pages.jobProfiles.name, {
                             id   : res.id,
-                            title: res.language
+                            title: res.job_name
                         });
                     }
                 });
