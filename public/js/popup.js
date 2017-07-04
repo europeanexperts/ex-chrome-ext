@@ -549,9 +549,15 @@
         },
 
         validate: function (data) {
-            if (!data.job_name && !data.region && !data.language && !data.url) {
+            if (!data.job_name && !data.region && !data.language) {
                 return {
                     error: 'At least one field must be non empty!'
+                }
+            }
+
+            if (!data.url) {
+                return {
+                    error: 'The URL field can not be empty!'
                 }
             }
 
