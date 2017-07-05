@@ -1560,7 +1560,6 @@
                 profile = res.data;
                 profile.shortName = profile.shortName || getProfileShortName(profile.name);
                 profile.url = url;
-                profile.linkedin_url = url.slice(24, -1);
 
                 self.profileJSON = profile;
                 self.renderProfile();
