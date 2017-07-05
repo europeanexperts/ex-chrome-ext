@@ -1680,7 +1680,7 @@
                     import_existing: job.import_existing
                 }, self.profile);
 
-                EXT_API.storeProfileLocal({jobId: job.id, profile: jobProfile, link: jobProfile.link}, function(err, res) {
+                EXT_API.storeProfileLocal({jobId: job.id, profile: profile, link: jobProfile.link}, function(err, res) {
                     console.log('>>> stored locally', jobProfile.link);
                 });
 
