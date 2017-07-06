@@ -407,7 +407,7 @@
                     return APP.error(err);
                 }
 
-                APP.notification({message: 'success delete', type: 'success'});
+                APP.notification({message: 'Success delete', type: 'success'});
                 self.removeItems(ids);
             });
         },
@@ -426,7 +426,7 @@
                 }
 
                 self.removeItems(ids);
-                APP.notification({message: 'success removed', type: 'success'});
+                APP.notification({message: 'Success removed', type: 'success'});
             });
         },
 
