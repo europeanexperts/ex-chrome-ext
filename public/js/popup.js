@@ -114,7 +114,7 @@
             }
 
             if (data.password.length < PASSWORD_MIN_LENGTH) {
-                errors.password = 'To short password';
+                errors.password = 'Too short password';
             }
 
             return (Object.keys(errors).length) ? errors : null;
