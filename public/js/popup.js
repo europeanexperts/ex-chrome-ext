@@ -1660,6 +1660,10 @@
             var profile;
             var self = this;
 
+            if (!ids || !ids.length) {
+                return APP.notification({message: 'Select jobs to import profile'});
+            }
+
             async.mapSeries(this.items, function iterator(job, cb) {
                 var jobProfile = self.normalizeProfile(self.profile, {status: 1}); // TODO: status ???
                 var jobProfiles = job.profiles || [];
