@@ -712,6 +712,12 @@ th {
     transition: color 350ms ease-in-out; }
   .table .sortable[data-order="asc"] .icon-up {
     transform: rotate(180deg); }
+  .table .job-profile-list-items .item td {
+    background: #f2e4ab; }
+  .table .job-profile-list-items .item.pending td {
+    background: #ffffff; }
+  .table .job-profile-list-items .item.exported td {
+    background: #38a898; }
   .table.import .cell-job,
   .table.import .cell-region {
     width: 20rem;
@@ -725,8 +731,6 @@ th {
   .table.import .cell-job-name {
     width: 28.3rem;
     max-width: 28.3rem; }
-  .table .item.exported td {
-    background: #f2e4ab; }
 
 .icon {
   position: relative;
