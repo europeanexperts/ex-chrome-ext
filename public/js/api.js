@@ -314,6 +314,12 @@
 
             return profileJSON;
         },
+        getProfileExported: function(options) {
+            var link = options.link;
+            var profile = EXT_API.getProfileLocal({link: link}) || {};
+
+            return profile.is_exported || false;
+        },
         setProfileExported: function(options) {
             var link = options.link;
             var profileJSON = this.getProfileLocal({link: link});

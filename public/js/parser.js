@@ -248,6 +248,23 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             .text();
     }
 
+    function parseLocation(locationStr) {
+        var arr = locationStr.split(',');
+        var result = {
+            country : '',
+            location: ''
+        };
+
+        if (arr.length < 2) { // empty or one element. Can't different the city, region, country ...
+            return result;
+        }
+
+        result.location = arr[0].trim();
+        result.country = arr[arr.length - 1].trim();
+
+        return result;
+    }
+
     function getIdFromCompanyPath(str) {
         var _match;
 

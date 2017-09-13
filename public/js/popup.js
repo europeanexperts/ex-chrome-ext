@@ -674,7 +674,7 @@
                 }
 
                 job = results.job;
-                profiles = results.profiles;
+                profiles = self.mapIsExported(results.profiles);
 
                 self.job = job;
                 self.renderJob(job);
@@ -857,7 +857,7 @@
                                 status : self.parsePageIndex / count
                             });
 
-                            normalized = self.normalizeProfiles(profileList);
+                            normalized = self.mapIsExported(self.normalizeProfiles(profileList));
                             self.appendProfiles(normalized, {totalCount: _total});
 
                             async.mapSeries(normalized, function(profileData, mapCb) {
@@ -1058,6 +1058,8 @@
                     APP.events.off(evt);
                     chrome.tabs.sendMessage(tab.id, {method: RUNTIME_METHODS.CHANGE_PARSE_STATUS, status: self.parseStatus()});
                     chrome.tabs.sendMessage(tab.id, {method: RUNTIME_METHODS.PARSE_PROFILE}, function (response) {
+                        response = response || {};
+
                         if (response.err) {
                             return callback(response.err);
                         }
@@ -1139,6 +1141,7 @@
                 }
 
                 if (profile.status === 1) {
+                    $li.removeClass('pending');
                     statusText = 'Successful';
                     $action.find('[data-action="export"]').removeClass('hide');
                     $action.find('[data-action="import"]').addClass('hide');
@@ -1200,9 +1203,19 @@
             var jobJSON = this.job;
             var $list = this.$list;
 
-            async.eachLimit(links, 10, function (link, cb) {
+            async.eachSeries(links, function (link, cb) {
                 var profileJSON = EXT_API.getProfileLocal({link: link});
                 var data;
+
+                if (!profileJSON || !Object.keys(profileJSON).length) { // !Object.keys(profileJSON).length - is not empty object
+                    async.setImmediate(function() {
+                        console.warn('The profile "%s" was not found in local storage! Please parse the profile again.', link);
+
+                        cb();
+                    });
+
+                    return;
+                }
 
                 delete profileJSON.jobs; // TODO: remove
                 profileJSON.import_existing = jobJSON.import_existing || false;
@@ -1390,6 +1403,16 @@
 
                 }
             }, callback);
+        },
+
+        mapIsExported: function(profiles) {
+            profiles.forEach(function (profile) {
+                var link = profile.link;
+
+                profile.is_exported = EXT_API.getProfileExported({link: link});
+            });
+
+            return profiles;
         },
 
         normalizeProfiles: function (profiles) {
@@ -1640,12 +1663,13 @@
 
             profile = profile || this.profile;
             result = {
-                name      : profile.name,
-                job       : profile.title,
-                link      : profile.linkedin_url,
-                shortName : getProfileShortName(profile.name),
-                created_at: profile.created_at || now,
-                updated_at: profile.updated_at || now
+                name        : profile.name,
+                job         : profile.title,
+                link        : profile.link,
+                linkedin_url: profile.linkedin_url,
+                shortName   : getProfileShortName(profile.name),
+                created_at  : profile.created_at || now,
+                updated_at  : profile.updated_at || now
             };
 
             if (props) {

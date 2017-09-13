@@ -67,7 +67,7 @@
         }
         %>
 
-        <tr class="item <%=(item.is_exported) ? 'exported' : '' %>" data-id="<%= item.link%>" data-cid="<%= item.cid%>">'
+        <tr class="item <%=(item.is_exported) ? 'exported' : (!item.status) ? 'pending' : '' %> " data-id="<%= item.link%>" data-cid="<%= item.cid%>">'
 
             <!-- checkbox -->
             <td class="cell-checkbox">
@@ -428,7 +428,7 @@
                         <th class="cell-delete"></th>
                     </tr>
                     </thead>
-                    <tbody class="jobProfileList">
+                    <tbody class="jobProfileList job-profile-list-items">
 
 
                     </tbody>
