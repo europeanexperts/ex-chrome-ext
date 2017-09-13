@@ -28,7 +28,7 @@
         var url = HUNTER_API_HOST + '/email-finder?api_key=' + options.apiKey;
         var params = {
             domain   : 'domain',
-            companyId: 'linkedin_id',
+            company: 'company',
             firstName: 'first_name',
             lastName : 'last_name'
         };

@@ -460,7 +460,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     title       : (_titleArr.length) ? _titleArr[0] : '',
                     country     : $el.find('.pv-top-card-section__location').html() || '',
                     summary     : _summary.trim(),
-                    picture     : ($avatar.hasClass('ghost-person') ) ? '' : $avatar.attr('src')
+                    picture     : ($avatar.hasClass('ghost-person') ) ? '' : $avatar.attr('src'),
+                    company      : $el.find('h3.pv-top-card-section__company').first().text().trim()
                 };
 
                 cb(null, parsed);
@@ -511,19 +512,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             function (parsed, cb) {
                 var lastCompanyPath = $el.find('.experience-section .pv-position-entity>a').first().attr('href');
                 var nameObj = getNameObj();
-                var companyId = getIdFromCompanyPath(lastCompanyPath);
+                var company = parsed.company || '';
+                var domain = parsed.domain || '';
+                //var companyId = getIdFromCompanyPath(lastCompanyPath);
+                //var company = getIdFromCompanyPath(lastCompanyPath);
                 var _options = {
                     firstName: nameObj.first_name,
                     lastName : nameObj.last_name,
-                    domain   : parsed.domain,
-                    companyId: companyId
+                    domain   : domain,
+                    company: company
                 };
 
                 if (!checkParseStatus()) {
                     return cb(new ParseStatusError());
                 }
 
-                if (!companyId && !parsed.domain) {
+                if (!company && !domain) {
                     console.warn('The email can not be parsed');
                     parsed.email = '';
 
@@ -922,6 +926,10 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
         }, 200);
     });
+
+    console.log('READYYYYYYY');
+
+    window.parser_test = ProfileHunter;
 })();
 
 /*SOCIAL_PARSER.onLoadProfile(function (err) {
