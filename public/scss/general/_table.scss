@@ -213,6 +213,26 @@ th {
     }
   }
 
+  .job-profile-list-items {
+    .item {
+      td {
+        background: #f2e4ab;
+      }
+
+      &.pending {
+        td {
+          background: #ffffff;
+        }
+      }
+
+      &.exported {
+        td {
+          background: #38a898;
+        }
+      }
+    }
+  }
+
   &.import {
 
     .cell-job,
