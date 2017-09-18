@@ -174,9 +174,30 @@
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.type === CONFIG.IMPORT_PROFILE_MESSAGE) {
-            importProfileRequest(request.data, function (err, res) {
-                sendResponse({error: err, success: res, req: request});
-            });
+            //TODO: remove dirty hack after fix backend 500 response on successfuly import
+            (function () {
+                var iterationCount = 1;
+                var maxIterationCount = 2;
+
+                function sendIteration() {
+                    importProfileRequest(request.data, function (err, res) {
+                        if (!err || iterationCount >= maxIterationCount) {
+                            if (iterationCount >= maxIterationCount && !err) {
+                                res = {};
+                            };
+
+                            return sendResponse({error: err, success: res, req: request});
+                        };
+
+                        iterationCount++;
+                        sendIteration();
+                    });
+                }
+
+                sendIteration();
+
+            })(request);
+            //TODO:end
 
         } else if (request.type === CONFIG.REFRESH_PROFILE_MESSAGE) {
             refreshProfile(request);
