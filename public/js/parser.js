@@ -927,8 +927,6 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         }, 200);
     });
 
-    console.log('READYYYYYYY');
-
     window.parser_test = ProfileHunter;
 })();
 
