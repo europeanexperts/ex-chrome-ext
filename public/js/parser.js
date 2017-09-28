@@ -743,9 +743,6 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
             // projects:
             function(parsed, cb) {
-                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .projects ')});
-
-                $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
 
                 expandContent($el, 'button[data-control-name="accomplishments_expand_projects"]', function () {
                     parsed.projects = parseProjects({$el: $el});
