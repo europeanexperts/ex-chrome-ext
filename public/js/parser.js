@@ -1,5 +1,67 @@
 window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
+var loaderCSS = '.sk-cube-grid {\n' +
+    '  width: 40px;\n' +
+    '  height: 40px;\n' +
+    '  margin: 40vh auto;\n' +
+    '}\n' +
+    '\n' +
+    '.sk-cube-grid .sk-cube {\n' +
+    '  width: 33%;\n' +
+    '  height: 33%;\n' +
+    '  background-color: #da6f6f;\n' +
+    '  float: left;\n' +
+    '  -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;\n' +
+    '          animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out; \n' +
+    '}\n' +
+    '.sk-cube-grid .sk-cube1 {\n' +
+    '  -webkit-animation-delay: 0.2s;\n' +
+    '          animation-delay: 0.2s; }\n' +
+    '.sk-cube-grid .sk-cube2 {\n' +
+    '  -webkit-animation-delay: 0.3s;\n' +
+    '          animation-delay: 0.3s; }\n' +
+    '.sk-cube-grid .sk-cube3 {\n' +
+    '  -webkit-animation-delay: 0.4s;\n' +
+    '          animation-delay: 0.4s; }\n' +
+    '.sk-cube-grid .sk-cube4 {\n' +
+    '  -webkit-animation-delay: 0.1s;\n' +
+    '          animation-delay: 0.1s; }\n' +
+    '.sk-cube-grid .sk-cube5 {\n' +
+    '  -webkit-animation-delay: 0.2s;\n' +
+    '          animation-delay: 0.2s; }\n' +
+    '.sk-cube-grid .sk-cube6 {\n' +
+    '  -webkit-animation-delay: 0.3s;\n' +
+    '          animation-delay: 0.3s; }\n' +
+    '.sk-cube-grid .sk-cube7 {\n' +
+    '  -webkit-animation-delay: 0s;\n' +
+    '          animation-delay: 0s; }\n' +
+    '.sk-cube-grid .sk-cube8 {\n' +
+    '  -webkit-animation-delay: 0.1s;\n' +
+    '          animation-delay: 0.1s; }\n' +
+    '.sk-cube-grid .sk-cube9 {\n' +
+    '  -webkit-animation-delay: 0.2s;\n' +
+    '          animation-delay: 0.2s; }\n' +
+    '\n' +
+    '@-webkit-keyframes sk-cubeGridScaleDelay {\n' +
+    '  0%, 70%, 100% {\n' +
+    '    -webkit-transform: scale3D(1, 1, 1);\n' +
+    '            transform: scale3D(1, 1, 1);\n' +
+    '  } 35% {\n' +
+    '    -webkit-transform: scale3D(0, 0, 1);\n' +
+    '            transform: scale3D(0, 0, 1); \n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    '@keyframes sk-cubeGridScaleDelay {\n' +
+    '  0%, 70%, 100% {\n' +
+    '    -webkit-transform: scale3D(1, 1, 1);\n' +
+    '            transform: scale3D(1, 1, 1);\n' +
+    '  } 35% {\n' +
+    '    -webkit-transform: scale3D(0, 0, 1);\n' +
+    '            transform: scale3D(0, 0, 1);\n' +
+    '  } \n' +
+    '}';
+
 (function () {
     'use strict';
 
@@ -28,6 +90,41 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         STOPPED  : 'stopped'
     };
     var _status = null;
+    var LOADER_ID = 'parser_ex_loader';
+    var CSS_ID = 'parser_ex_css';
+
+    var $css = $("<style>").attr({'type': 'text/css', id: CSS_ID}).html(loaderCSS);
+    var $loader = $("<div>").attr("id", LOADER_ID).css({
+        position: 'fixed',
+        top: 0, bottom: 0,
+        left: 0, right: 0,
+        display: 'none',
+        "z-index": 5,
+        "background-color": 'rgba(255,255,255, 0.5)'
+    }).html('<div class="sk-cube-grid">\n' +
+        '  <div class="sk-cube sk-cube1"></div>\n' +
+        '  <div class="sk-cube sk-cube2"></div>\n' +
+        '  <div class="sk-cube sk-cube3"></div>\n' +
+        '  <div class="sk-cube sk-cube4"></div>\n' +
+        '  <div class="sk-cube sk-cube5"></div>\n' +
+        '  <div class="sk-cube sk-cube6"></div>\n' +
+        '  <div class="sk-cube sk-cube7"></div>\n' +
+        '  <div class="sk-cube sk-cube8"></div>\n' +
+        '  <div class="sk-cube sk-cube9"></div>\n' +
+        '</div>');
+
+    function injectCustomElements() {
+        var isCssInjected = !!$('#' + CSS_ID).length;
+        var isLoaderInjected = !!$('#' + LOADER_ID).length;
+
+        if (!isCssInjected) {
+            $css.appendTo('body');
+        }
+
+        if (!isLoaderInjected) {
+            $loader.appendTo('body');
+        }
+    }
 
     function ParseStatusError() {
         this.name = 'ParseStatusError';
@@ -367,7 +464,68 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         return parseInt(numStr, 10);
     }
 
+    function scrollDownProfileWhileHeightDontChange(callback) {
+        var $profile = $('.profile-detail');
+        var $scrollContent = $('html, body');
+        var intervalTime = 2000;
+        var profileHeight = 0;
+        var profileTop = 0;
+
+        function scrollToBottom() {
+            var newProfileTop = $profile.offset().top || 0;
+            var newProfileHeight = $profile.height() || 0;
+            var position = newProfileTop + newProfileHeight;
+
+            if (newProfileHeight === profileHeight) {
+                $scrollContent.scrollTop(0);
+                return callback();
+            }
+
+            profileHeight = newProfileHeight;
+            profileTop = newProfileTop;
+
+            console.log('ScrollToBottom:', position);
+
+            $scrollContent.scrollTop(position);
+
+            window.setTimeout(function () {
+                scrollToBottom();
+            }, intervalTime);
+
+
+
+        }
+
+        scrollToBottom();
+
+    };
+
+    function expandContent($element, buttonSelector, callback) {
+        var intervalTime = 1000;
+        var maxExpandCount = 5;
+        var expandCount = 0;
+
+        function expand() {
+            var $button = $element.find(buttonSelector);
+
+            if (!$button.length || expandCount >= maxExpandCount) {
+                return callback();
+            }
+
+            $button.click();
+            expandCount = expandCount + 1;
+
+            window.setTimeout(function () {
+                expand()
+            }, intervalTime);
+        }
+
+        expand();
+    }
+
     SOCIAL_PARSER.PARSE_STATUSES = PARSE_STATUSES;
+
+    SOCIAL_PARSER.TIMERS = SOCIAL_PARSER.TIMERS || [];
 
     SOCIAL_PARSER.onLoadJobs = function (callback) {
         $(document).ready(function () {
@@ -427,8 +585,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
         });
     };
 
+    SOCIAL_PARSER._getLoader = function () {
+        return $loader = $('#' + LOADER_ID);
+    };
+
+    SOCIAL_PARSER.startLoader = function () {
+        return SOCIAL_PARSER._getLoader().css('display', 'block')
+    };
+
+    SOCIAL_PARSER.stopLoader = function () {
+        return SOCIAL_PARSER._getLoader().css('display', 'none');
+    };
+
     SOCIAL_PARSER.parseProfileAsync = function (callback) {
         var $el = $('body');
+
+        SOCIAL_PARSER.startLoader();
 
         async.waterfall([
 
@@ -443,9 +615,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // animate:
             function (cb) {
-                $('body').animate({scrollTop: $('.profile-detail').height()}, 5000, function () {
-                    return cb();
-                });
+                scrollDownProfileWhileHeightDontChange(cb);
             },
 
             // general info:
@@ -501,11 +671,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                     timeout        : 100
                 };
 
-                prepareSection(_options, function() {
-                    parsed.companies = parseProfileExperience({$el: $el.find(_options.sectionSelector)}) || [];
-
-                    cb(null, parsed);
-                });
+                parsed.companies = parseProfileExperience({$el: $el.find(_options.sectionSelector)}) || [];
+                cb(null, parsed);
             },
 
             // email:
@@ -553,39 +720,34 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             // languages:
             function (parsed, cb) {
                 var _languages;
+                
+                expandContent($el, 'button[data-control-name="accomplishments_expand_languages"]', function () {
+                    _languages = $el.find('.pv-accomplishments-section .languages li')
+                        .map(function () {
+                            var $li = $(this);
+                            var lang = $li.find('h4').html();
+                            var level = $li.find('.pv-accomplishment-entity__proficiency').html() || '';
 
-                // expand languages container
-                $el.find('button[data-control-name="accomplishments_expand_languages"]').click();
-                _languages = $el.find('.pv-accomplishments-section .languages li')
-                    .map(function () {
-                        var $li = $(this);
-                        var lang = $li.find('h4').html();
-                        var level = $li.find('.pv-accomplishment-entity__proficiency').html() || '';
+                            return {
+                                language: parseVisuallyHidden(lang),
+                                level   : level.trim()
+                            };
+                        })
+                        .toArray();
 
-                        return {
-                            language: parseVisuallyHidden(lang),
-                            level   : level.trim()
-                        };
-                    })
-                    .toArray();
-
-                parsed.languages = _languages;
-                cb(null, parsed);
+                    parsed.languages = _languages;
+                    cb(null, parsed);
+                });
+                
             },
 
             // projects:
             function(parsed, cb) {
                 var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .projects ')});
-                var _options= {
-                    $el            : $el,
-                    sectionName    : 'projects',
-                    sectionSelector: '.pv-accomplishments-section .projects li',
-                    buttonSelector: '.pv-accomplishments-section .projects button.link',
-                    totalCount     : _totalCount
-                };
 
                 $el.find('button[data-control-name="accomplishments_expand_projects"]').click();
-                prepareSection(_options, function() {
+
+                expandContent($el, 'button[data-control-name="accomplishments_expand_projects"]', function () {
                     parsed.projects = parseProjects({$el: $el});
 
                     cb(null, parsed);
@@ -596,30 +758,22 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             function (parsed, cb) {
                 var _skills;
 
-                $el.find('button[data-control-name="skill_details"][aria-expanded="false"]').click();
-                _skills = $el.find('.pv-skill-entity__skill-name')
-                    .map(function () {
-                        return $(this).html();
-                    })
-                    .toArray();
+                expandContent($el, 'button[data-control-name="skill_details"][aria-expanded="false"]', function () {
+                    _skills = $el.find('.pv-skill-entity__skill-name')
+                        .map(function () {
+                            return $(this).html();
+                        })
+                        .toArray();
 
-                parsed.skills = _skills;
-                cb(null, parsed);
+                    parsed.skills = _skills;
+                    cb(null, parsed);
+                });
+
             },
 
             // certifications:
             function (parsed, cb) {
-                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .certifications')});
-                var _options= {
-                    $el            : $el,
-                    sectionName    : 'certifications',
-                    sectionSelector: '.pv-accomplishments-section .certifications li',
-                    buttonSelector: '.pv-accomplishments-section .certifications button.link',
-                    totalCount     : _totalCount
-                };
-
-                $el.find('button[data-control-name="accomplishments_expand_certifications"]').click();
-                prepareSection(_options, function() {
+                expandContent($el, 'button[data-control-name="accomplishments_expand_certifications"]', function () {
                     parsed.certifications = parseCertifications({$el: $el});
 
                     cb(null, parsed);
@@ -628,16 +782,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             // courses:
             function (parsed, cb) {
-                var _totalCount = parseSectionCount({$el: $el.find('.pv-accomplishments-section .courses')});
-                var _options = {
-                    $el            : $el,
-                    sectionName    : 'courses',
-                    sectionSelector: '.pv-accomplishments-section .courses li',
-                    totalCount     : _totalCount
-                };
-
-                $el.find('button[data-control-name="accomplishments_expand_courses"]').click();
-                prepareSection(_options, function() {
+                expandContent($el, 'button[data-control-name="accomplishments_expand_courses"]', function () {
                     var $courses = $el.find('.pv-accomplishments-section .courses');
 
                     parsed.courses = parseProfileCourses({$el: $courses}) || [];
@@ -647,6 +792,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
             }
 
         ], function (err, parsed) {
+            SOCIAL_PARSER.stopLoader();
             if (err) {
                 return callback(err);
             }
@@ -753,8 +899,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
 
             SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STARTED});
 
-            $body.animate({scrollTop: 0});
-            $body.animate({scrollTop: $body.find('.profile-detail').height()}, 5000, function () {
+            $body.animate({scrollTop: 0}).animate({scrollTop: $body.find('.profile-detail').height()}, 5000, function () {
                 SOCIAL_PARSER.parseProfileAsync(function (err, data) {
                     if (err) {
                         return self.errorHandler(err);
@@ -816,6 +961,7 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
                 message = xhr;
             }
 
+            SOCIAL_PARSER.stopLoader();
             this.notification({message: message});
         },
 
@@ -907,6 +1053,8 @@ window.SOCIAL_PARSER = window.SOCIAL_PARSER || {};
     $(document).ready(function () {
         var _path;
         var hunter;
+
+        injectCustomElements();
 
         if (window.location.href.indexOf(REFRESH_PROFILE_ACTION) !== -1) {
             startRefreshProfile();
