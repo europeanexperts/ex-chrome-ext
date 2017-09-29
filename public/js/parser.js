@@ -468,6 +468,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         var $profile = $('.profile-detail');
         var $scrollContent = $('html, body');
         var intervalTime = 2000;
+        var scrollDuration = 1000;
         var profileHeight = 0;
         var profileTop = 0;
 
@@ -475,6 +476,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
             var newProfileTop = $profile.offset().top || 0;
             var newProfileHeight = $profile.height() || 0;
             var position = newProfileTop + newProfileHeight;
+            var triggered = false;
 
             if (newProfileHeight === profileHeight) {
                 $scrollContent.scrollTop(0);
@@ -486,13 +488,17 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
             console.log('ScrollToBottom:', position);
 
-            $scrollContent.scrollTop(position);
-
-            window.setTimeout(function () {
-                scrollToBottom();
-            }, intervalTime);
-
-
+            $scrollContent.animate({
+                scrollTop: position
+             }, scrollDuration, function () {
+                window.setTimeout(function () {
+                    if (triggered) {
+                        return;
+                    }
+                    triggered = true;
+                    scrollToBottom();
+                }, intervalTime);
+            });
 
         }
 
@@ -896,29 +902,27 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
             SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STARTED});
 
-            $body.animate({scrollTop: 0}).animate({scrollTop: $body.find('.profile-detail').height()}, 5000, function () {
-                SOCIAL_PARSER.parseProfileAsync(function (err, data) {
+            SOCIAL_PARSER.parseProfileAsync(function (err, data) {
+                if (err) {
+                    return self.errorHandler(err);
+                }
+
+                SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
+
+                self.sendProfile({profile: data}, function (err, res) {
+                    var successMessage;
+
                     if (err) {
                         return self.errorHandler(err);
                     }
 
-                    SOCIAL_PARSER.onChangeParseStatus({status: PARSE_STATUSES.STOPPED});
-
-                    self.sendProfile({profile: data}, function (err, res) {
-                        var successMessage;
-
-                        if (err) {
-                            return self.errorHandler(err);
-                        }
-
-                        successMessage = (res && res.success && res.success.message) || 'The profile was successfully parsed and was exported to server.';
-                        self.notification({
-                            message: successMessage,
-                            type   : 'success'
-                        });
-                        self.setButtonText(self.calcButtonText({isExported: true}));
-                        $body.animate({scrollTop: 0});
+                    successMessage = (res && res.success && res.success.message) || 'The profile was successfully parsed and was exported to server.';
+                    self.notification({
+                        message: successMessage,
+                        type: 'success'
                     });
+                    self.setButtonText(self.calcButtonText({isExported: true}));
+                    $body.animate({scrollTop: 0});
                 });
             });
         },
