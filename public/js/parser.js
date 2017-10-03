@@ -628,7 +628,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
             function (cb) {
                 var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
                 var _summary = parseProfileSummary({$el: $el}) || '';
-                var $avatar = $el.find('.pv-top-card-section__photo img');
+                var $avatar = $el.find('.pv-top-card-section__profile-photo-container img').first();
                 var parsed = {
                     link        : window.location.pathname,
                     linkedin_url: window.location.origin + window.location.pathname, // without hash
@@ -636,7 +636,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
                     title       : (_titleArr.length) ? _titleArr[0] : '',
                     country     : $el.find('.pv-top-card-section__location').html() || '',
                     summary     : _summary.trim(),
-                    picture     : ($avatar.hasClass('ghost-person') ) ? '' : $avatar.attr('src'),
+                    picture     : ($avatar.hasClass('ghost-person') ) ? '' : ($avatar.attr('src') || ''),
                     company      : $el.find('h3.pv-top-card-section__company').first().text().trim()
                 };
 
