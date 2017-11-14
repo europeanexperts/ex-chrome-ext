@@ -10,12 +10,172 @@
     <script src="/js/libs/html5shiv/dist/html5shiv.min.js"></script>
     <script src="/js/libs/respond/dest/respond.min.js"></script>
     <!--[endif]-->
-
 </head>
 <body>
 
 <div id="templates">
+    <% if (full) {%>
+    <script type="text/template" id="job-list-template">
+        <% items.forEach(function(item) {
+        var createdAt = new Date(item.created_at);
+        %>
 
+        <tr class="item" data-id="<%= item.id%>">
+            <td>
+                <div class="chbWrap checkbox-wrap">
+                    <input type="checkbox" class="checkbox" id="checkbox-<%= item.id%>">
+                    <label for="checkbox-<%= item.id%>">
+                        <span class="check">
+                            <svg class="icon icon-check">
+                                <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                            </svg>
+                        </span>
+                    </label>
+                </div>
+            </td>
+            <td class="cell-avatar">
+                <div class="avatar"><%= item.short_name%></div>
+            </td>
+            <td class="jobLanguage cell-job-name"><%= item.job_name%></td>
+            <td class="cell-job-date"><%= createdAt.toLocaleDateString()%></td>
+            <td class="jobRegion cell-region"><%= item.region%></td>
+            <td class="jobProfilesCount cell-cell-profiles"><%= (item.profiles && item.profiles.length) || 0%></td>
+            <td class="cell-settings">
+                <svg class="editJobBtn icon icon-settings">
+                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-settings"></use>
+                </svg>
+            </td>
+            <td class="cell-delete">
+                <svg class="deleteBtn icon icon-delete">
+                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                </svg>
+            </td>
+        </tr>
+        <% }); %>
+    </script>
+
+    <script type="text/template" id="job-profiles-list-template">
+        <% items.forEach(function(item) {
+        var _status = 'Pending';
+        var _addDate = new Date(item.created_at);
+
+        if (item.status === 1) {
+        _status = 'Successful';
+        } else if (item.status === -1) {
+        _status = 'Unsuccessful';
+        } else {
+        _status = 'Pending';
+        }
+        %>
+
+        <tr class="item <%=(item.is_exported) ? 'exported' : (!item.status) ? 'pending' : '' %> " data-id="<%= item.link%>" data-cid="<%= item.cid%>">'
+
+            <!-- checkbox -->
+            <td class="cell-checkbox">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" class="checkbox" id="checkbox-<%= item.cid%>">
+                    <label for="checkbox-<%= item.cid%>">
+                        <span class="check">
+                            <svg class="icon icon-check">
+                                <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                             </svg>
+                        </span>
+                    </label>
+                </div>
+            </td>
+
+            <!-- job avatar -->
+            <td class="cell-avatar">
+                <div class="avatar"><%= item.shortName%></div>
+            </td>
+
+            <!-- profile info -->
+            <td class="cell-name" title="<%= item.name%>"><%= item.name%></td>
+            <td class="cell-job" title="<%= item.job%>"><%= item.job%></td>
+            <td class="cell-date"><%= _addDate.toLocaleDateString() %></td>
+            <td class="profileStatus cell-status"><%= _status %></td>
+            <td class="profileAction cell-action">
+                <a class="exportBtn <%= (item.status === 1) ? '' : 'hide'%>" href="#" data-action="export">
+                    <svg class="icon icon-export">
+                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-export"></use>
+                    </svg>
+                    <span>Export</span>
+                </a>
+
+                <a class="importBtn <%= (item.status === -1) ? '' : 'hide'%>" href="#" data-action="import">
+                    <svg class="icon icon-import">
+                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-import"></use>
+                    </svg>
+                    <span>Import</span>
+                </a>
+
+            </td>
+
+            <td class="cell-delete">
+                <svg class="deleteBtn icon icon-delete">
+                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-delete"></use>
+                </svg>
+            </td>
+        </tr>
+        <% }); %>
+    </script>
+
+    <script type="text/template" id="import-profile-template">
+        <table class="table import">
+            <thead>
+            <tr>
+                <th class="cell-avatar"></th>
+                <th class="cell-name">Name</th>
+                <th class="cell-job">Job</th>
+                <th class="cell-region">Region</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <% if (profile && profile.name) { %>
+                <td class="cell-avatar">
+                    <div class="avatar"><%= profile.shortName%></div>
+                </td>
+                <td class="cell-name"><%= profile.name%></td>
+                <td class="cell-job"><%= profile.title%></td>
+                <td class="cell-region"><%= profile.country %></td>
+                <% } else {%>
+                <td colspan="4">Enter URL and press "NEXT STEP"</td>
+                <% } %>
+            </tr>
+            </tbody>
+        </table>
+    </script>
+
+    <script type="text/template" id="import-job-list-template">
+        <% if (items && items.length) { %>
+        <% items.forEach(function(item) { %>
+        <tr class="item" data-id="<%= item.id%>">
+            <td class="cell-checkbox">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" class="checkbox" id="import-job-<%= item.id%>">
+                    <label for="import-job-<%= item.id%>">
+                            <span class="check">
+                                <svg class="icon icon-check">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                </svg>
+                            </span>
+                    </label>
+                </div>
+            </td>
+            <td class="cell-avatar">
+                <div class="avatar"><%= item.short_name%></div>
+            </td>
+            <td class="cell-job-name" title="<%= item.job_name %>"><%= item.job_name %></td>
+            <td class="cell-region"><%= item.region%></td>
+            <td class="cell-profiles"><%= (item.profiles && item.profiles.length) || 0%></td>
+        </tr>
+        <% }); %>
+        <% } else {%>
+        <td colspan="5">No data</td>
+        <% } %>
+    </script>
+    <%}%>
 </div>
 
 <div id="messageWrapper">
@@ -76,6 +236,7 @@
                 </form>
             </div>
 
+            <% if (!full) {%>
             <!-- My Profile Page -->
             <div class="page" data-name="myProfile" data-title="My Profile">
                 <div>
@@ -89,14 +250,271 @@
                     </div>
                 </div>
 
-               <!-- <footer class="main-footer">
+            </div>
+
+            <%} else {%>
+
+            <!-- Jobs List page -->
+            <div class="page" data-name="jobs" data-title="Job List">
+                <div class="top-panel">
                     <div class="btn-group">
                         <div class="left-side">
-                            <button class="btn yellow">Next step</button>
+                            <button class="createJobBtn btn yellow">Create job</button>
                         </div>
                     </div>
-                </footer>-->
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th colspan="2" class="cell-checkbox">
+                            <input type="checkbox" class="checkbox selectAllChb" id="selectAllJobs" name="select_all_jobs">
+                            <label for="selectAllJobs" class="checkbox-label">
+                                <span class="check">
+                                    <svg class="icon icon-check">
+                                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                    </svg>
+                                </span>
+                                <span class="chbText">Select all</span>
+                            </label>
+                        </th>
+                        <th class="cell-job-name">Job Name</th>
+                        <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
+                            <a href="">
+                                <span>Add date</span>
+                                <svg class="icon icon-up">
+                                    <use class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../img/sprite.svg#icon-up"></use>
+                                </svg>
+                            </a>
+                        </th>
+                        <th class="cell-region">Region</th>
+                        <th class="cell-profiles">Profiles</th>
+                        <th class="cell-settings"></th>
+                        <th class="cell-delete"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="jobList">
+                    <tr><td colspan="7">Loading ...</td></tr>
+                    </tbody>
+                </table>
+
+                <footer class="main-footer">
+                    <div class="btn-group">
+                        <div class="right-side">
+                            <button class="deleteSelectedBtn btn red hide">Delete</button>
+                        </div>
+                    </div>
+                </footer>
             </div>
+
+            <!-- Job Item page -->
+            <div class="page" data-name="job" data-title="Create Job">
+                <form action="">
+                    <div class="input-field">
+                        <label for="search-query">Search query</label>
+                        <input type="text" id="search-query" name="job_name">
+                    </div>
+                    <div class="input-field">
+                        <label for="region">Region</label>
+                        <input type="text" id="region" name="region">
+                    </div>
+                    <div class="input-field">
+                        <label for="language">Profile language</label>
+                        <input type="text" id="language" name="language">
+                    </div>
+                    <div class="input-field">
+                        <label for="shortName">Short name</label>
+                        <input type="text" id="shortName" name="short_name" maxlength="3">
+                    </div>
+                    <div class="input-field textarea-wrap">
+                        <label for="url">URL</label>
+                        <textarea id="url" name="url"></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <div class="left-side">
+                            <div class="input-field">
+                                <input type="checkbox" class="checkbox" id="checkbox-import_existing" name="import_existing">
+                                <label for="checkbox-import_existing" class="checkbox-label">
+                            <span class="check">
+                                <svg class="icon icon-check">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                </svg>
+                            </span>
+                                    <span>Do not import existing developers</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="right-side">
+                            <input class="saveBtn btn yellow big" type="submit" value="Create job">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Job Profiles page -->
+            <div class="page" data-name="jobProfiles" data-title="Profiles">
+                <div class="jobProfileHeader top-panel">
+                    <div class="info-panel">
+                        <div class="info-block">
+                            <div class="info-field">
+                                <div class="term">Region:</div>
+                                <div class="jobProfileRegion definition"></div>
+                            </div>
+                            <div class="info-field">
+                                <div class="term">Date:</div>
+                                <div class="jobProfileDate definition"></div>
+                            </div>
+                        </div>
+                        <ul class="counter">
+                            <li class="count-item">
+                                <span class="countTotal number">-</span>
+                                <span class="caption">total</span>
+                            </li>
+                            <li class="count-item">
+                                <span class="countSuccessful number">-</span>
+                                <span class="caption">successful</span>
+                            </li>
+                            <li class="count-item">
+                                <span class="countUnSuccessful number">-</span>
+                                <span class="caption">unsuccessful</span>
+                            </li>
+                            <li class="count-item">
+                                <span class="countPending number">-</span>
+                                <span class="caption">pending</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <div class="left-side">
+                            <button class="startBtn btn yellow">
+                                <svg class="icon icon-start">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-start"></use>
+                                </svg>
+                                <span>Start</span>
+                            </button>
+                            <button class="pauseBtn btn yellow hide">
+                                <svg class="icon icon-pause">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-pause"></use>
+                                </svg>
+                                <span>Pause</span>
+                            </button>
+                            <button class="restartBtn btn red">Restart</button>
+                        </div>
+                        <div class="right-side">
+                            <button class="exportSelectedBtn btn yellow">Export to Experts</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="loader">
+                    <div class="progressWrapper">
+                        <div class="loaderProgress"></div>
+                        <div class="loaderMessage">Loading ...</div>
+                    </div>
+                </div>
+                <table class="table hide">
+                    <thead>
+                    <tr>
+                        <th colspan="2" class="cell-checkbox">
+                            <input type="checkbox" class="checkbox selectAllChb" id="selectAllJobProfiles" name="select_all_job_profiles">
+                            <label for="selectAllJobProfiles" class="checkbox-label">
+                            <span class="check">
+                                <svg class="icon icon-check">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-check"></use>
+                                </svg>
+                            </span>
+                                <span class="chbText">Select all</span>
+                            </label>
+                        </th>
+                        <th class="cell-search">
+                            <div class="search-field">
+                                <input class="searchField" type="search" placeholder="Search by name">
+                                <button class="searchBtn btn">
+                                    <svg class="icon icon-search">
+                                        <use class="icon-svg" xlink:href="../img/sprite.svg#icon-search"></use>
+                                    </svg>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="cell-job">Job</th>
+                        <th class="sortable cell-date" data-sort-by="created_at" data-order="asc">
+                            <a href="">
+                                <span>Add date</span>
+                                <svg class="icon icon-up">
+                                    <use class="icon-svg" xlink:href="../img/sprite.svg#icon-up"></use>
+                                </svg>
+                            </a>
+                        </th>
+                        <th class="cell-status">Status</th>
+                        <th class="cell-action">Action</th>
+                        <th class="cell-delete"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="jobProfileList job-profile-list-items">
+
+
+                    </tbody>
+                </table>
+                <div class="main-footer">
+                    <div class="btn-group">
+                        <div class="left-side">
+                            <button class="exportSelectedBtn btn yellow">Export to Experts</button>
+                            <button class="importSelectedBtn btn yellow">Add search</button>
+                        </div>
+                        <div class="deleteSelectedBtn right-side">
+                            <button class="btn red">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import profile page -->
+            <div class="page" data-name="importProfile" data-title="Import Profile">
+                <form action="">
+                    <div class="input-field textarea-wrap">
+                        <label for="importUrl">URL</label>
+                        <textarea id="importUrl" name="url"></textarea>
+                    </div>
+                </form>
+
+                <div id="importProfileWrapper"></div>
+
+                <footer class="main-footer">
+                    <div class="btn-group">
+                        <div class="left-side">
+                            <button class="nextBtn btn yellow">Next step</button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+
+            <!-- Import profile page -->
+            <div class="page" data-name="importJobListPage" data-title="Import Profile">
+                <div class="top-panel">
+                    <p class="hint">Select job to import profile</p>
+                </div>
+                <div id="importJobsWrapper"></div>
+                <table class="table import">
+                    <thead>
+                    <tr>
+                        <th class="cell-checkbox"></th>
+                        <th class="cell-avatar"></th>
+                        <th class="cell-job-name">Job name</th>
+                        <th class="cell-region">Region</th>
+                        <th class="cell-action">Profiles</th>
+                    </tr>
+                    </thead>
+                    <tbody class="items"></tbody>
+                </table>
+
+                <footer class="main-footer">
+                    <div class="btn-group">
+                        <div class="left-side">
+                            <button class="importBtn btn yellow">Import</button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+
+            <%}%>
 
         </main>
     </div>
@@ -104,6 +522,10 @@
 
 <script src="js/libs/async/dist/async.js"></script>
 <script src="js/libs/jquery/dist/jquery.min.js"></script>
+<script src="js/libs/lodash/lodash.js"></script>
+
+<script src="js/config.js"></script>
+<script src="js/templates.js"></script>
 <script src="js/api.js"></script>
 <script src="js/popup.js"></script>
 </body>
