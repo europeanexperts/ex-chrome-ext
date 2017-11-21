@@ -26,18 +26,10 @@ module.exports = function(grunt) {
     }
 
     grunt.initConfig({
-        watch: {
-            scripts: {
-                //files: ['public/js/*.js'],
-                files: ['public/**/*'],
-                tasks: ['clear', 'copy:dev']
-            }
-        },
         copy: {
             full: {
                 files: [
                     // includes files within path
-                    //{expand: true, cwd: 'public/', src: ['js/libs/**', 'js/popup.js'], dest: 'build/'},
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
                     {src: 'public/popup.html', dest: 'build/popup.html'},
                     {expand: true, cwd: 'public/', src: [
@@ -49,6 +41,7 @@ module.exports = function(grunt) {
                       'js/background.js',
                       'js/options.js',
                       'js/templates.js',
+                      'js/libs/**/*',
                       'css/**',
                       'fonts/**',
                       'img/**'
@@ -80,7 +73,11 @@ module.exports = function(grunt) {
                       'js/popup.js',
                       'js/background.js',
                       'js/options.js',
-                      'js/templates.js'
+                      'js/templates.js',
+                      'js/libs/**/*',
+                      'css/**',
+                      'fonts/**',
+                      'img/**'
                     ], dest: 'build/'},
                     {
                       src: 'public/js/configSimple.js',
