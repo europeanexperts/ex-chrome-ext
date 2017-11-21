@@ -32,6 +32,26 @@ th {
       }
     }
 
+    .checkbox-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-transform: none;
+    }
+
+    .cell-checkbox {
+      width: auto;
+      padding-right: 0;
+
+      .checkbox-label {
+        margin: 0;
+        padding-left: 2.2rem;
+        font-family: $base-font-name;
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-transform: none;
+      }
+    }
+
     .cell-date {
       a {
         color: $base-color;
@@ -104,7 +124,7 @@ th {
     }
 
     &-avatar {
-      width: 5rem;
+      width: 7.6rem;
     }
 
     &-name {
@@ -119,7 +139,7 @@ th {
     }
 
     &-region {
-      width: 19rem;
+      width: 10rem;
       max-width: 19rem;
     }
 
@@ -146,11 +166,12 @@ th {
     }
 
     &-status {
-      width: 9rem;
+      //width: 9rem;
+      padding: 1rem 0;
     }
 
     &-action {
-      width: 9rem;
+      //width: 9rem;
 
       a {
         color: $base-color;
@@ -180,6 +201,38 @@ th {
     }
   }
 
+  .sortable {
+    svg {
+      transition: color 350ms ease-in-out;
+    }
+
+    &[data-order="asc"] {
+      .icon-up {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .job-profile-list-items {
+    .item {
+      td {
+        background: #f2e4ab;
+      }
+
+      &.pending {
+        td {
+          background: #ffffff;
+        }
+      }
+
+      &.exported {
+        td {
+          background: #38a898;
+        }
+      }
+    }
+  }
+
   &.import {
 
     .cell-job,
@@ -203,4 +256,5 @@ th {
       max-width: 28.3rem;
     }
   }
+
 }

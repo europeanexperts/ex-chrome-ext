@@ -11,16 +11,17 @@ $colors-default : (
 );
 
 $colors-state : (
-  'red'        : #e97660,
-  'dark-red'   : #e25034,
-  'yellow'     : #f1c40f,
-  'green'      : #38a898,
-  'dark-green' : #2a8578,
-  'light-green': #b7dcd5,
-  'brown'      : #c9caa8,
-  'light-blue' : #f4f7f9,
-  'gray'       : #aaa,
-  'dark-gray'  : #292929,
+  'red'         : #e97660,
+  'dark-red'    : #e25034,
+  'yellow'      : #f1c40f,
+  'light-yellow': #f2e4ab,
+  'green'       : #38a898,
+  'dark-green'  : #2a8578,
+  'light-green' : #b7dcd5,
+  'brown'       : #c9caa8,
+  'light-blue'  : #f4f7f9,
+  'gray'        : #aaa,
+  'dark-gray'   : #292929,
 );
 
 $form-colors : (
@@ -45,7 +46,7 @@ $colors : (
       @return map-get($curr-color, $type);
     }
   }
-  
+
   @warn "Unknown `#{$type}` in #{$color}.";
   @return null;
 }
