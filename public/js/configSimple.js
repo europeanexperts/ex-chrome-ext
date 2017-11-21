@@ -2,7 +2,7 @@
     'use strict';
 
     var APP_ENV = 'live';
-    var FULL = true;
+    var FULL = false;
     var SHARED_CONF = {
         HUNTER_API_HOST        : 'https://api.hunter.io/v2',
         REFRESH_PROFILE_MESSAGE: 'REFRESH_PROFILE',

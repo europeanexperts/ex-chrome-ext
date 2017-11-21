@@ -14,7 +14,6 @@
 <body>
 
 <div id="templates">
-    <% if (full) {%>
     <script type="text/template" id="job-list-template">
         <% items.forEach(function(item) {
         var createdAt = new Date(item.created_at);
@@ -175,7 +174,6 @@
         <td colspan="5">No data</td>
         <% } %>
     </script>
-    <%}%>
 </div>
 
 <div id="messageWrapper">
@@ -235,24 +233,6 @@
                     <input class="btn yellow big" type="submit" value="Restore">
                 </form>
             </div>
-
-            <% if (!full) {%>
-            <!-- My Profile Page -->
-            <div class="page" data-name="myProfile" data-title="My Profile">
-                <div>
-                    <div class="input-field">
-                        <label for="my_name">Name</label>
-                        <input type="text" id="my_name" name="my_name" value="test user name" placeholder="Username" disabled />
-                    </div>
-                    <div class="input-field">
-                        <label for="my_email">Email</label>
-                        <input type="text" id="my_email" name="my_email" value="test@email.com" placeholder="example@mail.com" disabled />
-                    </div>
-                </div>
-
-            </div>
-
-            <%} else {%>
 
             <!-- Jobs List page -->
             <div class="page" data-name="jobs" data-title="Job List">
@@ -514,7 +494,6 @@
                 </footer>
             </div>
 
-            <%}%>
 
         </main>
     </div>

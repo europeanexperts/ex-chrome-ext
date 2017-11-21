@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-
+  var CONFIG = GET_APP_CONFIG();
   var compiledTemplates = {};
   var $el = $('#templates');
 
@@ -10,7 +10,7 @@
 
       if (!compiledTemplates[templateId]) {
         $template = $el.find('#' + templateId + '-template');
-        compiledTemplates[templateId] = _.template($template.html());
+        compiledTemplates[templateId] = _.template($template.html({full: !!CONFIG.FULL}));
       }
 
       return compiledTemplates[templateId];

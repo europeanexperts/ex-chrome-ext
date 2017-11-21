@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-    var full = false; //TODO: get from build/run variable
+    var full = GET_APP_CONFIG().FULL;
     var LINKEDIN_HOST = 'https://www.linkedin.com';
     var EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var PASSWORD_MIN_LENGTH = 6;

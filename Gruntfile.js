@@ -6,10 +6,23 @@ module.exports = function(grunt) {
         var sha = (grunt.option('sha')) ? 'SHA' + grunt.option('sha') : '';
         var name;
 
-        name = ['build_simple', 'v2.'+version, dateStr, sha + '.zip'].join('_');
+        name = ['build_full', 'v2.'+version, dateStr, sha + '.zip'].join('_');
         console.log('>>> name', name);
 
         return name;
+    }
+
+    function getBuildNameSimple() {
+      var now = new Date();
+      var dateStr = grunt.template.date(now, 'ddmmyy');
+      var version = grunt.option('ver') || '1.0';
+      var sha = (grunt.option('sha')) ? 'SHA' + grunt.option('sha') : '';
+      var name;
+
+      name = ['build_simple', 'v2.'+version, dateStr, sha + '.zip'].join('_');
+      console.log('>>> name', name);
+
+      return name;
     }
 
     grunt.initConfig({
@@ -21,13 +34,29 @@ module.exports = function(grunt) {
             }
         },
         copy: {
-            main: {
+            full: {
                 files: [
                     // includes files within path
                     //{expand: true, cwd: 'public/', src: ['js/libs/**', 'js/popup.js'], dest: 'build/'},
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
-                    {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
-                    {expand: true, cwd: 'public/', src: ['js/**', 'css/**', 'fonts/**', 'img/**'], dest: 'build/'}
+                    {src: 'public/popup.html', dest: 'build/popup.html'},
+                    {expand: true, cwd: 'public/', src: [
+                      'js/parser.js',
+                      'js/euexContentScript.js',
+                      'js/contentScript.js',
+                      'js/api.js',
+                      'js/popup.js',
+                      'js/background.js',
+                      'js/options.js',
+                      'js/templates.js',
+                      'css/**',
+                      'fonts/**',
+                      'img/**'
+                    ], dest: 'build/'},
+                    {
+                        src: 'public/js/config.js',
+                        dest: 'build/js/config.js'
+                    }
 
                     // includes files within path and its sub-directories
                     /*{expand: true, src: ['path/!**'], dest: 'dest/'},
@@ -39,30 +68,43 @@ module.exports = function(grunt) {
                     //{expand: true, flatten: true, src: ['path/**'], dest: 'dest/', filter: 'isFile'},
                 ]
             },
-            dev: {
+            simple: {
                 files: [
                     {expand: true, src: ['manifest.json', 'icon.png'], dest: 'build/'},
-                    {expand: true, cwd: 'public/', src: ['popup.html'], dest: 'build/'},
+                    {src: 'public/popupSimple.html', dest: 'build/popup.html'},
                     {expand: true, cwd: 'public/', src: [
-                        'js/parser.js',
-                        'js/euexContentScript.js',
-                        'js/contentScript.js',
-                        'js/config.js',
-                        'js/api.js',
-                        'js/popup.js',
-                        'js/background.js'
-                    ], dest: 'build/'}
+                      'js/parser.js',
+                      'js/euexContentScript.js',
+                      'js/contentScript.js',
+                      'js/api.js',
+                      'js/popup.js',
+                      'js/background.js',
+                      'js/options.js',
+                      'js/templates.js'
+                    ], dest: 'build/'},
+                    {
+                      src: 'public/js/configSimple.js',
+                      dest: 'build/js/config.js'
+                    }
                 ]
             }
         },
         compress: {
-            main: {
+            full: {
                 options: {
                     archive: 'builds/' + getBuildName()
                 },
                 files: [
                     {src: ['build/**'], dest: ''}
                 ]
+            },
+            simple: {
+              options: {
+                archive: 'builds/' + getBuildNameSimple()
+              },
+              files: [
+                {src: ['build/**'], dest: ''}
+              ]
             }
         }
     });
@@ -75,7 +117,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
 
     // register grunt tasks:
-    grunt.registerTask('build', ['copy:main', 'compress']);
-    grunt.registerTask('build-dev', ['copy:dev']);
+    grunt.registerTask('build', ['copy:full', 'compress:full']);
+    grunt.registerTask('build-simple', ['copy:simple', 'compress:simple']);
     grunt.registerTask('default', ['build']);
 };
