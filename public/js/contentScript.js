@@ -4,8 +4,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             sendResponse({data: SOCIAL_PARSER.parseJobs(), method: "runtime", _pre: request});
         });
     } else if (request.method === 'profile') {
+
         SOCIAL_PARSER.onLoadProfile(function () {
+            SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STARTED});
             SOCIAL_PARSER.parseProfileAsync(function(err, data) {
+                SOCIAL_PARSER.onChangeParseStatus({status: SOCIAL_PARSER.PARSE_STATUSES.STOPPED});
                 sendResponse({err: err, data: data, _pre: request});
             });
         });
