@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+http://git.thinkmobiles.com:9000/web/LinkedIn_parser_EuEx"
   },
+  "scripts": {
+    "build": "grunt"
+  },
   "author": "TM Team",
   "license": "MIT",
   "bugs": {

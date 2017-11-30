@@ -630,7 +630,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
                 var _summary = parseProfileSummary({$el: $el}) || '';
                 var $avatar = $el.find('.pv-top-card-section__profile-photo-container img').first().length ?
                     $el.find('.pv-top-card-section__profile-photo-container img').first() :
-                    $el.find('.pv-top-card-section__profile-photo-container div div').first()
+                    $el.find('.pv-top-card-section__profile-photo-container div div div').first()
                 ;
 
                 var parsed = {
