@@ -95,11 +95,11 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
     var $css = $("<style>").attr({'type': 'text/css', id: CSS_ID}).html(loaderCSS);
     var $loader = $("<div>").attr("id", LOADER_ID).css({
-        position: 'fixed',
-        top: 0, bottom: 0,
-        left: 0, right: 0,
-        display: 'none',
-        "z-index": 5,
+        position          : 'fixed',
+        top               : 0, bottom: 0,
+        left              : 0, right: 0,
+        display           : 'none',
+        "z-index"         : 5,
         "background-color": 'rgba(255,255,255, 0.5)'
     }).html('<div class="sk-cube-grid">\n' +
         '  <div class="sk-cube sk-cube1"></div>\n' +
@@ -133,7 +133,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
     }
 
     function checkParseStatus() {
-        return _status === PARSE_STATUSES.STARTED  || _status === PARSE_STATUSES.RESTARTED;
+        return _status === PARSE_STATUSES.STARTED || _status === PARSE_STATUSES.RESTARTED;
     }
 
     function parseVisuallyHidden(str) {
@@ -186,7 +186,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         var $el = options.$el;
         var count = $el.find('h3 span:last').html() || '0';
 
-        return  parseInt(count, 10);
+        return parseInt(count, 10);
     }
 
     function prepareSection(options, callback) {
@@ -203,7 +203,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
             var interval;
             var i = 0;
 
-            var check = function() {
+            var check = function () {
                 if (totalCount) {
                     return ($el.find(sectionSelector).length === totalCount || (maxIterations < i));
                 }
@@ -372,7 +372,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
     }
 
     function findEmail(options, callback) {
-        chrome.runtime.sendMessage({type: CONFIG.FIND_EMAIL_MESSAGE, data: options}, function(result) {
+        chrome.runtime.sendMessage({type: CONFIG.FIND_EMAIL_MESSAGE, data: options}, function (result) {
             result = result || {};
 
             if (result.error) {
@@ -454,7 +454,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         var numStr = '';
         var numRegExp = /[0-9]/;
 
-        while (i < len)  {
+        while (i < len) {
             if (numRegExp.test(str[i])) {
                 numStr += str[i];
             }
@@ -490,7 +490,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
             $scrollContent.animate({
                 scrollTop: position
-             }, scrollDuration, function () {
+            }, scrollDuration, function () {
                 window.setTimeout(function () {
                     if (triggered) {
                         return;
@@ -611,7 +611,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         async.waterfall([
 
             // check parse status:
-            function(cb) {
+            function (cb) {
                 if (!checkParseStatus()) {
                     return cb(new ParseStatusError());
                 }
@@ -628,7 +628,11 @@ var loaderCSS = '.sk-cube-grid {\n' +
             function (cb) {
                 var _titleArr = $el.find('.pv-top-card-section__headline').html().split(' – ');
                 var _summary = parseProfileSummary({$el: $el}) || '';
-                var $avatar = $el.find('.pv-top-card-section__profile-photo-container img').first();
+                var $avatar = $el.find('.pv-top-card-section__profile-photo-container img').first().length ?
+                    $el.find('.pv-top-card-section__profile-photo-container img').first() :
+                    $el.find('.pv-top-card-section__profile-photo-container div div').first()
+                ;
+
                 var parsed = {
                     link        : window.location.pathname,
                     linkedin_url: window.location.origin + window.location.pathname, // without hash
@@ -636,8 +640,15 @@ var loaderCSS = '.sk-cube-grid {\n' +
                     title       : (_titleArr.length) ? _titleArr[0] : '',
                     country     : $el.find('.pv-top-card-section__location').html() || '',
                     summary     : _summary.trim(),
-                    picture     : ($avatar.hasClass('ghost-person') ) ? '' : ($avatar.attr('src') || ''),
-                    company      : $el.find('h3.pv-top-card-section__company').first().text().trim()
+                    picture     : ($avatar.hasClass('ghost-person') ) ?
+                        '' :
+                        ($avatar.attr('src') ||
+                        $avatar.css('background-image')
+                            .replace('url(', '')
+                            .replace(')', '')
+                            .replace(/\"/gi, "") ||
+                        ''),
+                    company     : $el.find('h3.pv-top-card-section__company').first().text().trim()
                 };
 
                 cb(null, parsed);
@@ -693,7 +704,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
                     firstName: nameObj.first_name,
                     lastName : nameObj.last_name,
                     domain   : domain,
-                    company: company
+                    company  : company
                 };
 
                 if (!checkParseStatus()) {
@@ -707,7 +718,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
                     return cb(null, parsed);
                 }
 
-                findEmail(_options, function(err, res) {
+                findEmail(_options, function (err, res) {
                     var data;
 
                     if (err) {
@@ -748,7 +759,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
             },
 
             // projects:
-            function(parsed, cb) {
+            function (parsed, cb) {
 
                 expandContent($el, 'button[data-control-name="accomplishments_expand_projects"]', function () {
                     parsed.projects = parseProjects({$el: $el});
@@ -818,7 +829,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         return PATTERNS.PROFILE_URL.test(url);
     };
 
-    SOCIAL_PARSER.onChangeParseStatus = function(options) {
+    SOCIAL_PARSER.onChangeParseStatus = function (options) {
         var status = options.status;
 
         console.info('onChangeParseStatus', status);
@@ -854,7 +865,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         var instance = ProfileHunter.instance;
 
         if (instance !== undefined) {
-            this.checkExportedProfile(function(err, isExported) {
+            this.checkExportedProfile(function (err, isExported) {
                 instance.isExportedProfile = isExported;
                 instance.renderButton();
             });
@@ -873,7 +884,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
         init: function () {
             var self = this;
 
-            this.checkExportedProfile(function(err, isExported) {
+            this.checkExportedProfile(function (err, isExported) {
                 self.isExportedProfile = isExported;
                 self.render();
             });
@@ -919,7 +930,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
                     successMessage = (res && res.success && res.success.message) || 'The profile was successfully parsed and was exported to server.';
                     self.notification({
                         message: successMessage,
-                        type: 'success'
+                        type   : 'success'
                     });
                     self.setButtonText(self.calcButtonText({isExported: true}));
                     $body.animate({scrollTop: 0});
@@ -966,7 +977,7 @@ var loaderCSS = '.sk-cube-grid {\n' +
             this.notification({message: message});
         },
 
-        calcButtonText: function(options) {
+        calcButtonText: function (options) {
             if (options.isExported) {
                 return 'Exported';
             }
@@ -974,11 +985,11 @@ var loaderCSS = '.sk-cube-grid {\n' +
             return 'Go Experts';
         },
 
-        setButtonText: function(text) {
+        setButtonText: function (text) {
             this.$btn.find('.btnText').html(text);
         },
 
-        checkExportedProfile: function(callback) {
+        checkExportedProfile: function (callback) {
             var data = {
                 link: window.location.pathname
             };
