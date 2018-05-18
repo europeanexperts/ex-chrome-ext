@@ -79,8 +79,8 @@ var loaderCSS = '.sk-cube-grid {\n' +
     };
     var SELECTORS = {
         TOTAL                 : '.search-results__total',
-        SEARCH_RESULT         : '.results-list',
-        SEARCH_RESULT_PROFILES: '.results-list li'
+        SEARCH_RESULT         : 'ul[class*=results]:last',
+        SEARCH_RESULT_PROFILES: 'ul[class*=results] li',
     };
     var PARSE_STATUSES = {
         CREATED  : 'created',
