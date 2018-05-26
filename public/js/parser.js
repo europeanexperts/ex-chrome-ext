@@ -267,6 +267,62 @@ var loaderCSS = '.sk-cube-grid {\n' +
         return _companies;
     }
 
+    function isV2Verion() {
+      return true
+    }
+
+    function parseSkills(options) {
+      var $el = options.$el;
+
+      if (isV2Verion()) {
+        var $skillSection = $el.find('.pv-skill-categories-section');
+        var $allSkills = $skillSection.find('ol');
+
+        var DOMskills = $allSkills[0];
+        var DOMknowledges = $allSkills[1];
+        var DOMtechnologies = $allSkills[2];
+        var DOMotherSkills = $allSkills[3];
+
+        var _skills = [];
+
+        if (DOMskills) {
+          $(DOMskills).find('>li').map(function () {
+            var text = $(this).find('div:first p').text().trim();
+            _skills.push(text);
+          })
+        }
+
+        if (DOMknowledges) {
+          $(DOMknowledges).find('>li').map(function () {
+            var text = $(this).find('div:first p').text().trim();
+            _skills.push(text);
+          })
+        }
+
+        if (DOMtechnologies) {
+          $(DOMtechnologies).find('>li').map(function () {
+            var text = $(this).find('div:first p').text().trim();
+            _skills.push(text);
+          })
+        }
+
+        if (DOMotherSkills) {
+          $(DOMotherSkills).find('>li').map(function () {
+            var text = $(this).find('div:first p').text().trim();
+            _skills.push(text);
+          })
+        }
+
+        return _skills;
+      } else {
+        return $el.find('.pv-skill-entity__skill-name')
+                  .map(function () {
+                      return $(this).html();
+                  })
+                  .toArray();
+      }
+    }
+
     function parseCertifications(options) {
         var $el = options.$el;
         var _certifications = $el.find('.pv-accomplishments-section .certifications li')
@@ -770,16 +826,9 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
             // skills:
             function (parsed, cb) {
-                var _skills;
 
                 expandContent($el, 'button[data-control-name="skill_details"][aria-expanded="false"]', function () {
-                    _skills = $el.find('.pv-skill-entity__skill-name')
-                        .map(function () {
-                            return $(this).html();
-                        })
-                        .toArray();
-
-                    parsed.skills = _skills;
+                    parsed.skills = parseSkills({$el: $el});
                     cb(null, parsed);
                 });
 
@@ -1027,7 +1076,8 @@ var loaderCSS = '.sk-cube-grid {\n' +
         },
 
         renderButton: function () {
-            var $actions = $('.pv-top-card-section__actions');
+            // var $actions = $('.pv-top-card-section__actions');   v1
+            var $actions = $('.pv-top-card-v2-section__actions:last');
             var $span;
             var btnText = this.calcButtonText({isExported: this.isExportedProfile});
 
@@ -1039,9 +1089,13 @@ var loaderCSS = '.sk-cube-grid {\n' +
 
                 return;
             }
+            var v1BtnStyle = 'background: #F1C40F;margin-left: 12px;'
+            var v1BtnClass = 'primary top-card-action hunterBtnWrp';
+            var v2BtnStyle = 'background: #F1C40F;';
+            var v2BtnClass = 'button-primary-large mt2 ml2 pl4 pr4';
 
             this.$btn = $([
-                '<button class="primary top-card-action hunterBtnWrp" style="background: #F1C40F;margin-left: 12px;">',
+                '<button class="' + v2BtnClass + '" style="'+ v2BtnStyle +'">',
                 '<span class="btnText hunterBtn">' + btnText + '</span>',
                 '</button>'
             ].join(' '));

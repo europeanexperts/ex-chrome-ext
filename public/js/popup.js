@@ -195,6 +195,7 @@
                     hunter_api_key: authOptions.hunter_api_key
                 }));
 
+                APP.$heading.html(authOptions.name);
                 APP.authorize(authOptions);
             });
         }
@@ -1879,10 +1880,13 @@
         },
         run: function() {
             var authToken = localStorage.getItem('AUTH_TOKEN');
+            var user = JSON.parse(localStorage.getItem('AUTH_PROFILE'));
 
             if (!authToken) {
                 return APP.unauthorize();
             }
+
+            APP.$heading.html(user.name);
 
             APP.authorize({token: authToken});
         },
