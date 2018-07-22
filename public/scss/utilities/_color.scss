@@ -1,25 +1,51 @@
 @import './colors/project_default';
 
 // General ---------------
-
+$light-text    : color('default', 'gray');
+$error-color   : color('state', 'red');
+$success-color : $base-color;
 // -----------------------
 
-// Header ---------------
-
+// Scroll ----------------
+$scrollbar-thumb      : rgba($black, .15);
+$scrollbar-thumb-hover: rgba($black, .25);
+$scrollbar-track      : rgba($black, .07);
 // -----------------------
 
-// Nav-bar ----------------
-
-// -----------------------
-
-// Footer ----------------
-
-// -----------------------
+// Form ------------------
+$input-border    : rgba($black, .1);
+$input-bg        : color('form', 'light-gray');
+$input-text      : color('form', 'dark-gray');
+$unchecked-bg    : color('form', 'gray');
+$checked-bg      : $base-color;
 
 // Buttons ---------------
-
+$btn-text        : $white;
+$btn-red         : color('state', 'red');
+$btn-red-hover   : color('state', 'dark-red');
+$btn-green       : color('state', 'green');
+$btn-green-hover : color('state', 'dark-green');
+$btn-yellow      : color('state', 'yellow');
+$btn-inactive    : color('state', 'light-green');
+$btn-gradient    : linear-gradient(to top, rgba($black, 0.2) 0%, rgba($white, 0.2) 100%);
 // -----------------------
 
 // Tables ----------------
-
+$table-bg          : color('state', 'light-blue');
+$avatar-bg         : color('state', 'brown');
+$exported-field-bg : color('state', 'light-yellow');
 // -----------------------
+
+// Icons -----------------
+$icon-arrow-left : $base-color;
+$icon-check      : $white;
+$icon-delete     : color('state', 'red');
+$icon-export     : $base-color;
+$icon-import     : $base-color;
+$icon-log-out    : $base-color;
+$icon-search     : $black;
+$icon-settings   : color('state', 'gray');
+$icon-start      : $base-color;
+$icon-pause      : $base-color;
+$icon-up         : $base-color;
+

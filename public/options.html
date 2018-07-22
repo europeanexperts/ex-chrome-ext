@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <!--[if lt IE 9]-->
+    <script src="/js/libs/html5shiv/dist/html5shiv.min.js"></script>
+    <script src="/js/libs/respond/dest/respond.min.js"></script>
+    <!--[endif]-->
+
+    <style>
+        .main-content {
+            height: auto;
+        }
+
+        input[type="radio"] {
+            height: 15px;
+        }
+
+        .field-error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+
+</head>
+
+<body>
+<div class="options-wrapper">
+    <main class="main-content">
+        <form id="appSettingsForm" action="">
+            <div class="input-field">
+                <p>Select Environment <span class="required-field">*</span> <span class="field-error hide"></span></p>
+                <label>
+                    <input type="radio" name="app_env" value="dev"/>
+                    Development
+                </label>
+
+                <label>
+                    <input type="radio" name="app_env" value="live" />
+                    Live
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <div class="left-side"></div>
+                <div class="right-side">
+                    <input class="saveSettingsBtn btn yellow" type="submit" value="Save">
+                </div>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script src="js/libs/jquery/dist/jquery.min.js"></script>
+<script src="js/options.js"></script>
+</body>
+</html>

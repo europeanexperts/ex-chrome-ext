@@ -1,0 +1,99 @@
+$icon-size-default: 3rem;
+
+.icon {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-content: center;
+  justify-content: center;
+  width: $icon-size-default;
+  height: $icon-size-default;
+  font-size: $icon-size-default;
+  line-height: 100%;
+  text-align: center;
+  overflow: hidden;
+  vertical-align: middle;
+
+  &-svg {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+
+  &-arrow-left {
+    width: 1.8rem;
+    height: 1.8rem;
+    color: $icon-arrow-left;
+  }
+
+  &-check {
+    width: .8rem;
+    height: .8rem;
+    color: $icon-check;
+  }
+
+  &-delete {
+    width: 1.4rem;
+    height: 1.4rem;
+    color: $icon-delete;
+
+    &:hover {
+      color: $btn-red-hover;
+    }
+  }
+
+  &-export {
+    width: 1.4rem;
+    height: 1.4rem;
+    color: $icon-export;
+  }
+
+  &-import {
+    width: 1.4rem;
+    height: 1.4rem;
+    color: $icon-import;
+  }
+
+  &-log-out {
+    width: 1.9rem;
+    height: 1.9rem;
+    color: $icon-log-out;
+  }
+
+  &-search {
+    width: 1rem;
+    height: 1.1rem;
+    color: $icon-search;
+  }
+
+  &-settings {
+    width: 1.8rem;
+    height: 1.8rem;
+    color: $icon-settings;
+
+    &:hover {
+      color: darken($icon-settings, 10%);
+    }
+  }
+
+  &-start {
+    width: 1rem;
+    height: .9rem;
+    margin-right: .7rem;
+    color: $icon-start;
+    vertical-align: top;
+  }
+
+  &-up {
+    width: 1rem;
+    height: 1rem;
+    color: $icon-up;
+  }
+
+  &-pause {
+    width: .9rem;
+    height: .9rem;
+    color: $icon-pause;
+  }
+}

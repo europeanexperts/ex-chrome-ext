@@ -1,5 +1,5 @@
 {
-  "name": "LinkedIn parser EuEx template",
+  "name": "front_end-template",
   "version": "1.0.0",
   "description": "CSS Template for LinkedIn parser EuEx",
   "repository": {
@@ -14,7 +14,10 @@
   "devDependencies": {
     "autoprefixer": "^6.5.1",
     "grunt": "^1.0.1",
+    "grunt-clear": "^0.2.1",
+    "grunt-cli": "^1.2.0",
     "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-uglify": "^2.0.0",

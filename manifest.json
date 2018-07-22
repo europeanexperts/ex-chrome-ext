@@ -1,0 +1,51 @@
+{
+  "manifest_version": 2,
+  "name": "EuEx",
+  "description": "EuEx LinkedIn Parser",
+  "version": "0.0.1",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "EuEx LinkedIn Parser"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*"
+      ],
+      "js": [
+        "js/libs/async/dist/async.js",
+        "js/libs/jquery/dist/jquery.min.js",
+        "js/parser.js",
+        "js/contentScript.js"
+      ]
+    },
+
+    {
+      "matches": [
+        "http://euex-stage.fpdev.xyz/*",
+        "https://join.europeanexperts.com/*"
+      ],
+      "js": [
+        "js/euexContentScript.js"
+      ]
+    }
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "background": {
+    "scripts": [
+      "js/libs/jquery/dist/jquery.min.js",
+      "js/config.js",
+      "js/background.js"
+    ],
+    "persistent": false
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "cookies",
+    "http://euex-stage.fpdev.xyz/*",
+    "https://join.europeanexperts.com/*"
+  ]
+}

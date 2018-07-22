@@ -257,6 +257,15 @@ input {
   }
 }
 
+textarea,
+input,
+button {
+  &:focus,
+  &:active {
+    outline: 0;
+  }
+}
+
 textarea {
   overflow: auto;
   vertical-align: top;
@@ -267,4 +276,11 @@ table {
     collapse: collapse;
     spacing: 0;
   };
+}
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

@@ -1,12 +1,5 @@
 @import '../utilities/color';
 
-// Tables colors - transfer into 'utilities/colors.scss' file for project
-$table-border   : $base-border;
-$table-bg       : lighten(color('default', 'light-gray'), 20%);
-$table-bg-hover : lighten(color('default', 'light-gray'), 10%);
-$table-caption  : color('default', 'gray');
-// ----------------------
-
 // Tables style
 table {
   border: {
@@ -15,150 +8,253 @@ table {
   };
 }
 
-caption {
-  padding-top: .8em;
-  padding-bottom: .8em;
-  color: $table-caption;
-  text-align: right;
-}
-
 td,
 th {
-  padding: .8em;
+  border: 0;
   text-align: left;
   vertical-align: middle;
-}
-
-td {
-  border-top: .1rem solid $table-border;
-}
-
-thead th {
-  border: {
-    top: .1rem solid $table-border;
-    bottom: .2rem solid $table-border;
-  };
-  vertical-align: bottom;
-}
-
-tfoot th {
-  border: {
-    top: .2rem solid $table-border;
-    bottom: .1rem solid $table-border;
-  };
 }
 
 .table {
   display: table;
   width: 100%;
   max-width: 100%;
+  font-size: 1.1rem;
+  //table-layout: fixed;
 
-  // block formatting
-  &-caption {
-    display: table-caption;
-    padding-top: .8em;
-    padding-bottom: .8em;
-    color: $table-caption;
-    text-align: right;
-  }
-
-  &-row {
-    display: table-row;
-  }
-
-  &-cell {
-    display: table-cell;
-    padding: .8em;
-    border-top: .1rem solid $table-border;
-  }
-
-  &-head {
-    display: table-header-group;
-
-    .table-cell {
-      border: {
-        top: .1rem solid $table-border;
-        bottom: .1rem solid $table-border;
-      };
-      font-weight: 700;
-    }
-  }
-
-  &-body {
-    display: table-row-group;
-  }
-
-  &-foot {
-    display: table-footer-group;
-
-    .table-cell {
-      border: {
-        top: .2rem solid $table-border;
-        bottom: .1rem solid $table-border;
-      };
-      font-weight: 700;
-    }
-  }
-
-  // table formatting
-  &.striped {
-    tbody tr:nth-child(2n + 1) td {
-      background: $table-bg;
-    }
-
-    .table-body .table-row:nth-child(2n + 1) .table-cell {
-      background: $table-bg;
-    }
-  }
-
-  &.bordered {
-    border: .1rem solid $table-border;
-
+  thead {
     th {
-      border: {
-        right: .1rem solid $table-border;
-        left: .1rem solid $table-border;
-      };
+      height: auto;
+      padding: 1rem;
+      font: {
+        size: 1.2rem;
+        weight: 700;
+      }
+    }
+
+    .checkbox-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-transform: none;
+    }
+
+    .cell-checkbox {
+      width: auto;
+      padding-right: 0;
+
+      .checkbox-label {
+        margin: 0;
+        padding-left: 2.2rem;
+        font-family: $base-font-name;
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-transform: none;
+      }
+    }
+
+    .cell-date {
+      a {
+        color: $base-color;
+
+        &:hover {
+          color: $base-hover ;
+
+          .icon-up {
+            color: $base-hover;
+          }
+        }
+      }
+
+      svg {
+        vertical-align: baseline;
+      }
+    }
+  }
+
+  tbody {
+    tr:nth-child(2n + 1) {
+      td {
+        background: $table-bg;
+      }
+    }
+
+    tr {
+      height: 5rem;
     }
 
     td {
-      border: .1rem solid $table-border;
+      @extend %textOverflow;
+      padding: 1rem;
+
+      &:first-child {
+        border-radius: .2rem 0 0 .2rem;
+      }
+
+      &:last-child {
+        border-radius: 0 .2rem .2rem 0;
+      }
     }
-  
-    .table-cell {
-      border-right: .1rem solid $table-border;
+
+    .cell-job-name,
+    .cell-name {
+      font-family: $second-font-name;
+      font-weight: 900;
+      text-transform: uppercase;
     }
   }
 
-  &.hovered {
-    tbody tr:hover td {
-      background: $table-bg-hover;
+  .avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: .4rem;
+    background-color: $avatar-bg;
+    color: $white;
+    font-family: $second-font-name;
+    font-weight: 900;
+    line-height: 3rem;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .cell {
+
+    &-checkbox {
+      width: 2.8rem;
+      padding-right: 0;
     }
 
-    .table-body .table-row:hover .table-cell {
-      background: $table-bg-hover;
+    &-avatar {
+      width: 7.6rem;
+    }
+
+    &-name {
+      width: 20.3rem;
+      max-width: 20.3rem;
+      padding-left: 0;
+    }
+
+    &-job-name {
+      width: 29.9rem;
+      max-width: 29.9rem;
+    }
+
+    &-region {
+      width: 10rem;
+      max-width: 19rem;
+    }
+
+    &-profiles {
+      width: 7rem;
+    }
+
+    &-settings,
+    &-delete {
+      width: 4rem;
+
+      svg {
+        cursor: pointer;
+      }
+    }
+
+    &-job {
+      width: 12rem;
+      max-width: 12rem;
+    }
+
+    &-date {
+      width: 9rem;
+    }
+
+    &-status {
+      //width: 9rem;
+      padding: 1rem 0;
+    }
+
+    &-action {
+      //width: 9rem;
+
+      a {
+        color: $base-color;
+        font-family: $second-font-name;
+        font-weight: 700;
+        text-transform: uppercase;
+
+        span {
+          margin-left: .3rem;
+          text-decoration: underline;
+        }
+
+
+        &:hover {
+          color: $base-hover;
+
+          .icon-export,
+          .icon-import {
+            color: $base-hover;
+          }
+        }
+      }
+    }
+
+    &-search {
+      padding-left: 0;
     }
   }
 
-  &.condensed {
-    td,
-    th,
-    .table-cell {
-      padding: .4em;
+  .sortable {
+    svg {
+      transition: color 350ms ease-in-out;
+    }
+
+    &[data-order="asc"] {
+      .icon-up {
+        transform: rotate(180deg);
+      }
     }
   }
 
-  &.centered {
-    td,
-    th,
-    .table-cell {
-      text-align: center;
+  .job-profile-list-items {
+    .item {
+      td {
+        background: #f2e4ab;
+      }
+
+      &.pending {
+        td {
+          background: #ffffff;
+        }
+      }
+
+      &.exported {
+        td {
+          background: #38a898;
+        }
+      }
     }
   }
 
-  &-responsive {
-    width: 100%;
-    min-height: .01%;
-    overflow: auto;
+  &.import {
+
+    .cell-job,
+    .cell-region {
+      width: 20rem;
+      max-width: 20rem;
+    }
+
+    .cell-profiles {
+      width: 15rem;
+      max-width: 15rem;
+    }
+
+    .cell-name {
+      width: 26.1rem;
+      max-width: 26.1rem;
+    }
+
+    .cell-job-name {
+      width: 28.3rem;
+      max-width: 28.3rem;
+    }
   }
+
 }

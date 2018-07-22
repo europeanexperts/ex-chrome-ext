@@ -1,37 +1,22 @@
 @import '../utilities/color';
 @import '../utilities/fonts_var';
 
-// Buttons colors - transfer into 'utilities/colors.scss' file for project
-
-$btn-text   : $white;
-$btn-red    : color('state', 'red');
-$btn-blue   : color('state', 'blue');
-$btn-green  : color('state', 'green');
-$btn-orange : color('state', 'orange');
-// ----------------------
-
 // Buttons style
-.close { // popup close button
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
+a, svg {
+  transition: all 350ms ease-in-out 0s;
 }
 
 .btn {  // general styles for all buttons(<a>, <button>)
   position: relative;
   display: inline-block;
   margin: 0;
-  padding: .8rem 1.6rem;
-  border: 0 none {
-    width: .1rem;
-    style: solid;
-    color: transparent;
-  };
+  padding: .8rem 3rem;
+  border: 0 none;
+  border-radius: 1.4rem;
   outline: none 0;
   background-color: transparent;
-  font-family: $base-font-family;
-  font-size: 1.6rem;
+  font-family: $second-font-name;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -44,94 +29,88 @@ $btn-orange : color('state', 'orange');
   user-select: none;
 
   &.red {
-    border-color: $btn-red;
-    background-color: $btn-red;
-    color: $white;
+    background: {
+      color: $btn-red;
+      image: $btn-gradient;
+    };
+    color: $btn-text;
 
     &:hover {
-      border-color: lighten($btn-red, 10%);
-      background-color: lighten($btn-red, 10%);
-    }
-  }
-
-  &.blue {
-    border-color: $btn-blue;
-    background-color: $btn-blue;
-    color: $white;
-
-    &:hover {
-      border-color: lighten($btn-blue, 10%);
-      background-color: lighten($btn-blue, 10%);
+      background-color: $btn-red-hover;
     }
   }
 
   &.green {
-    border-color: $btn-green;
-    background-color: $btn-green;
-    color: $white;
-
-    &:hover {
-      border-color: lighten($btn-green, 10%);
-      background-color: lighten($btn-green, 10%);
-    }
-  }
-
-  &.orange {
-    border-color: $btn-orange;
-    background-color: $btn-orange;
-    color: $white;
-
-    &:hover {
-      border-color: lighten($btn-orange, 10%);
-      background-color: lighten($btn-orange, 10%);
-    }
-  }
-
-  &.bordered {
-    background-color: transparent;
-
-    &.red {
-      color: $btn-red;
-
-      &:hover {
-        border-color: $btn-red;
-        background-color: $btn-red;
-        color: $white;
-      }
-    }
-
-    &.blue {
-      color: $btn-blue;
-
-      &:hover {
-        border-color: $btn-blue;
-        background-color: $btn-blue;
-        color: $white;
-      }
-    }
-
-    &.green {
+    background: {
       color: $btn-green;
+      image: $btn-gradient;
+    };
+    color: $btn-text;
 
-      &:hover {
-        border-color: $btn-green;
-        background-color: $btn-green;
-        color: $white;
-      }
+    &:hover {
+      background-color: $btn-green-hover;
     }
+  }
 
-    &.orange {
-      color: $btn-orange;
+  &.big {
+    padding: 1.5rem 3.6rem;
+    border-radius: 5.5rem;
+  }
 
-      &:hover {
-        border-color: $btn-orange;
-        background-color: $btn-orange;
+  &.yellow {
+    padding: .6rem 3rem;
+    border: 2px solid $btn-yellow;
+    background: transparent;
+    color: $btn-yellow;
+
+    &:hover {
+      background: $btn-yellow;
+      color: $white;
+
+      .icon-pause,
+      .icon-start {
         color: $white;
       }
     }
   }
 
-  &.rounded {
-    border-radius: .5rem;
+  &.inactive {
+    background-color: $btn-inactive;
+    pointer-events: none;
+  }
+}
+
+.log-in {
+  .btn {
+    &.big {
+      padding: 1.5rem 5.3rem;
+    }
+  }
+}
+
+.btn-group {
+  overflow: hidden;
+
+  svg {
+    margin-right: .3rem;
+    vertical-align: baseline;
+  }
+
+  .left-side {
+    float: left;
+    font-size: 0;
+
+    .btn {
+      margin-right: 1rem;
+    }
+  }
+
+  .right-side {
+    float: right;
+    font-size: 0;
+
+    .btn {
+      margin-left: 1rem;
+    }
   }
 }

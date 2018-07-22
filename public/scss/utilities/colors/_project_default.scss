@@ -4,22 +4,36 @@ $white : #fff !default;
 // -----------------------
 
 $colors-default : (
-  'blue'       : #08c,
-  'light-gray' : #bdbdbd,
-  'gray'       : #616161,
-  'dark-gray'  : #212121
+  'blue'       : #2c6cda,
+  'light-gray' : #e4e4e4,
+  'gray'       : #898989,
+  'dark-gray'  : #2b2b2b
 );
 
 $colors-state : (
-  'red'    : #f44336,
-  'green'  : #4caf50,
-  'blue'   : #08c,
-  'orange' : #ff9800
+  'red'         : #e97660,
+  'dark-red'    : #e25034,
+  'yellow'      : #f1c40f,
+  'light-yellow': #f2e4ab,
+  'green'       : #38a898,
+  'dark-green'  : #2a8578,
+  'light-green' : #b7dcd5,
+  'brown'       : #c9caa8,
+  'light-blue'  : #f4f7f9,
+  'gray'        : #aaa,
+  'dark-gray'   : #292929,
+);
+
+$form-colors : (
+  'light-gray' : #f6f6f6,
+  'gray'       : #d2d2d2,
+  'dark-gray'  : #5d5d5d
 );
 
 $colors : (
   'default' : $colors-default,
-  'state'   : $colors-state
+  'state'   : $colors-state,
+  'form'    : $form-colors
 );
 
 // usage: color("name-of-type", "name-of-color")
@@ -43,4 +57,6 @@ $base-bg     : $white;
 $base-text   : color('default', 'dark-gray');
 $base-link   : color('default', 'blue');
 $base-border : color('default', 'light-gray');
+$base-color  : color('state', 'yellow');
+$base-hover  : color('state', 'dark-gray');
 // -----------------------

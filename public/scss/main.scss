@@ -9,15 +9,17 @@
 // Layouts
 //@import 'layouts/container'; // uncomment if needed to use(not default template)
 //@import 'layouts/grid'; // uncomment if needed to use(not default template)
-@import 'layouts/flex_container';
-@import 'layouts/flex_grid';
+//@import 'layouts/flex_container';
+//@import 'layouts/flex_grid';
 
 // General
 @import 'general/general';
-// @import 'general/forms'; // uncomment if needed to use(not default template)
-// @import 'general/button'; // uncomment if needed to use(not default template)
+@import 'general/forms';
+@import 'general/button';
 // @import 'general/popup'; // uncomment if needed to use(not default template)
-// @import 'general/table'; // uncomment if needed to use(not default template)
+@import 'general/table';
+@import 'general/icons';
+@import 'general/scroll';
 
 // Modules
 @import 'modules/header';
